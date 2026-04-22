@@ -12,6 +12,8 @@ export function SlideBar({ menuItems }: { menuItems: MenuItems[] }) {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
     };
 
     return (

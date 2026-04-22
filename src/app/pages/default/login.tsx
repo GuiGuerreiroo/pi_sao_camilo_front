@@ -5,19 +5,26 @@ import { useNavigate } from 'react-router-dom'
 import { useForm, type SubmitHandler, } from 'react-hook-form';
 import { ILoginFormSchema, type ILoginForm } from '../../interface/loginValidation';
 import { zodResolver } from '@hookform/resolvers/zod'
+import { authUser } from '../../api/user/authUser';
+import { getDecodedToken } from '../../hooks/tokenDecode';
+import { resendCode } from '../../api/user/resendCode';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 export function Login() {
     const [showPassword, setShowPassword] = useState(false)
-
     const navigate = useNavigate()
-
     const [isLoading, setIsLoading] = useState(false)
-  
+    
+    // New states for Resend Flow and Error Handling
+    const [showResendModal, setShowResendModal] = useState(false);
+    const [resendEmail, setResendEmail] = useState('');
+    const [isResending, setIsResending] = useState(false);
+
     const {
         register,
         handleSubmit,
         formState: { errors }
-
     } = useForm<ILoginForm>({
         resolver: zodResolver(ILoginFormSchema)
     })
@@ -26,16 +33,69 @@ export function Login() {
 
     async function handleSubmitData(data: ILoginForm) {
         setIsLoading(true)
+        
         try {
-            navigate('/paginaInicial');
-        }
+            await authUser(data)
 
+            const tokenData = getDecodedToken();
+
+            switch (tokenData && tokenData.role) {
+                case 'ADM':
+                    navigate('/paginaInicialADM');
+                    break;
+                case 'SUPPORT':
+                    navigate('/paginaInicialSupport');
+                    break;
+                case 'USER':
+                    navigate('/paginaInicialAthlete');
+                    break;
+                default:
+                    navigate('/error');
+            }
+        }
         catch (error) {
-            console.log(error)
+            console.error(error)
+            
+            if (axios.isAxiosError(error) && error.response?.status === 403) {
+                const backendMessage = error.response?.data?.message;
+                
+                if (backendMessage === 'Usuário não confirmado') {
+                    setResendEmail(data.email);
+                    setShowResendModal(true);
+                } else {
+                    toast.error(backendMessage || "Erro de autenticação. Verifique suas credenciais.");
+                }
+            } else {
+                toast.error("Erro inesperado. Tente novamente mais tarde.");
+            }
         }
-
         finally {
             setIsLoading(false)
+        }
+    }
+
+    async function handleResendCode() {
+        setIsResending(true);
+        
+        try {
+            await resendCode(resendEmail);
+            setShowResendModal(false);
+            toast.success("Código reenviado com sucesso!");
+            // Navigate to verify screen, passing the email in state
+            navigate('/verify', { state: { email: resendEmail } });
+        } catch (error) {
+            console.error(error);
+            setShowResendModal(false);
+            
+            if (axios.isAxiosError(error) && error.response?.status === 410) {
+                const backendMessage = error.response?.data?.message || "Código expirado ou inválido.";
+                toast.error(backendMessage);
+                navigate('/register');
+            } else {
+                toast.error("Erro ao reenviar o código. Tente novamente.");
+            }
+        } finally {
+            setIsResending(false);
         }
     }
 
@@ -49,11 +109,6 @@ export function Login() {
                     alt="São Camilo"
                     className="mx-auto mb-10 w-full max-w-[16rem]"
                 />
-
-                {/* Title */}
-                {/* <h1 className="mb-6 text-xl leading-tight font-bold text-black">
-                    Faça login:
-                </h1> */}
 
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
                     {/* Email / Código */}
@@ -71,6 +126,7 @@ export function Login() {
                             placeholder="exemplo@saocamilo.edu.br"
                             className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
                         />
+                         {errors.email && <span className="text-sm text-red-500 mt-1">{errors.email.message}</span>}
                     </div>
 
                     {/* Senha */}
@@ -98,6 +154,7 @@ export function Login() {
                                 {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                             </button>
                         </div>
+                        {errors.password && <span className="text-sm text-red-500 mt-1">{errors.password.message}</span>}
                     </div>
 
                     {/* Submit */}
@@ -127,6 +184,37 @@ export function Login() {
                     </div>
                 </form>
             </section>
+
+            {/* Modal Reenviar Código */}
+            {showResendModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+                        <h3 className="mb-4 text-xl font-bold text-gray-900">Validar E-mail</h3>
+                        <p className="mb-6 text-gray-700">
+                            Sua conta já existe, mas seu email não foi validado! Deseja reenviar o código?
+                        </p>
+                        <div className="flex justify-end space-x-3">
+                            <Button
+                                type="button"
+                                onClick={() => setShowResendModal(false)}
+                                disabled={isResending}
+                                className="rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300"
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleResendCode}
+                                disabled={isResending}
+                                loading={isResending}
+                                className="rounded-md bg-[#c81925] px-4 py-2 text-sm font-medium text-white hover:bg-[#a1141c]"
+                            >
+                                Sim, reenviar
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }
