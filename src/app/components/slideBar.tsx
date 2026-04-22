@@ -32,7 +32,7 @@ export function SlideBar({ menuItems }: { menuItems: MenuItems[] }) {
             >
                 {/* Slidebar Header */}
                 <div className="p-6 border border-gray-300 flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-blue-900/60">Menu</h2>
+                    <h2 className="text-2xl font-bold text-red-800">Menu</h2>
                     <button
                         onClick={toggleMenu}
                         className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -76,12 +76,12 @@ export function SlideBar({ menuItems }: { menuItems: MenuItems[] }) {
                 </div>
 
                 {/* Menu Footer */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200">
+                {/* <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200">
                     <div className="text-center">
                         <p className="text-sm text-gray-500">Instituto Mauá de Tecnologia</p>
                         <p className="text-xs text-gray-400 mt-1">© 2025</p>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     )

@@ -13,8 +13,9 @@ import Perfil from './pages/default/config';
 
 
 const menuItemsAthlete: MenuItems[] = [
-    { name: "Meu Perfil", route: "/perfil" },
-    { name: "Apresentação", route: "/paginaInicialAthlete" },
+    { name: "Meu Perfil", route: "/perfilStud" },
+    { name: "Novo Treino", route: "/paginaInicialAthlete" },
+    { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
 
@@ -26,7 +27,7 @@ export default function App() {
                     <Route path="/" element={<Login />} />
                     <Route path="/error" element={<Unauthorized />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
-
+                    <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
                     {/* Placeholder for future screens */}
                     {/* <Route path='/verify' element={<VerifyEmail />} /> */}
                     {/* <Route path='/register' element={<CreateUser />} /> */}
@@ -39,7 +40,7 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
-                        <Route path="/perfil" element={<Perfil />}/> 
+                        <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
                     {/* Example of adding the Admin route later */}
