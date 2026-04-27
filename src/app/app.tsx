@@ -13,7 +13,8 @@ import type { MenuItems } from './interface/menuItems';
 
 const menuItemsAthlete: MenuItems[] = [
     { name: "Meu Perfil", route: "/perfilStud" },
-    { name: "Apresentação", route: "/paginaInicialAthlete" },
+    { name: "Novo Treino", route: "/paginaInicialAthlete" },
+    { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
 

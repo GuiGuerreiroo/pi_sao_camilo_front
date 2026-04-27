@@ -23,10 +23,10 @@ export default function Button({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${className}`}
+      className={`${className} ${loading ? 'flex justify-center items-center' : ''}`}
     >
       {loading ? (
-        <FiLoader className="animate-spin" size={20} />
+        <FiLoader className="animate-spin" size={25} />
       ) : (
         children
       )}
