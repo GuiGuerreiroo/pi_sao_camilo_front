@@ -9,6 +9,7 @@ import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
 import type { MenuItems } from './interface/menuItems';
+import Perfil from './pages/default/config';
 
 
 const menuItemsAthlete: MenuItems[] = [
@@ -26,7 +27,7 @@ export default function App() {
                     <Route path="/" element={<Login />} />
                     <Route path="/error" element={<Unauthorized />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
-
+                    <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
                     {/* Placeholder for future screens */}
                     {/* <Route path='/verify' element={<VerifyEmail />} /> */}
                     {/* <Route path='/register' element={<CreateUser />} /> */}
@@ -39,7 +40,7 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
-                        {/* <Route path="/perfilStud" element={<UserAccount menuItems={menuItemsAthlete}/>}/> */}
+                        <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
                     {/* Example of adding the Admin route later */}
