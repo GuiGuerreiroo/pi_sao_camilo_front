@@ -7,6 +7,7 @@ import type { MenuItems } from "../interface/menuItems";
 import type { UserInterface } from "../interface/UserInterface";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Settings } from "lucide-react";
+import { getDecodedToken } from "../hooks/tokenDecode";
 
 export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
     const [userName, setUserName] = useState('');
@@ -29,32 +30,29 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
 
     useEffect(() => {
         try {
-            const storedUser = localStorage.getItem('user')
+            const tokenData = getDecodedToken();
 
-            if (storedUser) {
+            if (tokenData) {
 
-                const user: UserInterface = JSON.parse(storedUser)
-
-                if (user.name) {
-                    setUserName(user.name)
+                if (tokenData.name) {
+                    setUserName(tokenData.name)
                 }
                 else {
                     console.log("user name not found")
                     setUserName("Desconhecido")
                 }
 
-                switch (user.role) {
+                switch (tokenData.role) {
                     case "ADMIN":
-                        return setRole("Administrador(a)");
+                    case "ADM":
+                        return setRole("Admin");
 
-                    case "MODERATOR":
-                        return setRole("Moderador(a)");
+                    case "SUPPORT":
+                        return setRole("Suporte");
 
-                    case "PROFESSOR":
-                        return setRole("Professor(a)");
-
+                    case "USER":
                     case "STUDENT":
-                        return setRole("Estudante");
+                        return setRole("Atleta");
 
                     default:
                         console.log('user role not found')
@@ -65,7 +63,6 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         catch (e) {
             console.log(`erro para pegar o usuario do token, ${e}`)
         }
-
     }, [])
 
     // Esconder no login
@@ -80,13 +77,13 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                         <div className="bg-white/20 rounded-full w-10 h-10 flex items-center justify-center">
                             <FaUserCircle className="text-2xl" />
                         </div>
-                        <div>
-                            <h1 className="font-semibold text-lg">{role}</h1>
-                            <p className="text-sm opacity-90">{userName}</p>
+                        <div className="flex items-center gap-x-1.5 text-white">
+                            <span className="font-bold text-lg">{role}</span>
+                            <span className="text-lg">{userName}</span>
                         </div>
                     </div>
                     <button
-                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
+                        className="p-2 rounded-lg text-black-600 hover:bg-red-400 transition-all duration-200"
                         onClick={toggleMenu}
                     >
                         <IoMenu className="text-2xl" />
