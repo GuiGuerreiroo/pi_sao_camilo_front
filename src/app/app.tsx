@@ -10,6 +10,9 @@ import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
 import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
+import { CreateAccount } from './pages/default/createAccount';
+import { VerifyAccount } from './pages/default/verifyAccount'
+
 
 
 const menuItemsAthlete: MenuItems[] = [
@@ -25,6 +28,8 @@ export default function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Login />} />
+                    <Route path="/createAccount" element={<CreateAccount />} />
+                    <Route path="/verifyAccount" element={<VerifyAccount />} />
                     <Route path="/error" element={<Unauthorized />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
                     <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />

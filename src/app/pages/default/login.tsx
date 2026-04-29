@@ -15,7 +15,7 @@ export function Login() {
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
-    
+
     // New states for Resend Flow and Error Handling
     const [showResendModal, setShowResendModal] = useState(false);
     const [resendEmail, setResendEmail] = useState('');
@@ -33,7 +33,7 @@ export function Login() {
 
     async function handleSubmitData(data: ILoginForm) {
         setIsLoading(true)
-        
+
         try {
             await authUser(data)
 
@@ -55,10 +55,10 @@ export function Login() {
         }
         catch (error) {
             console.error(error)
-            
+
             if (axios.isAxiosError(error) && error.response?.status === 403) {
                 const backendMessage = error.response?.data?.message;
-                
+
                 if (backendMessage === 'Usuário não confirmado') {
                     setResendEmail(data.email);
                     setShowResendModal(true);
@@ -76,7 +76,7 @@ export function Login() {
 
     async function handleResendCode() {
         setIsResending(true);
-        
+
         try {
             await resendCode(resendEmail);
             setShowResendModal(false);
@@ -86,7 +86,7 @@ export function Login() {
         } catch (error) {
             console.error(error);
             setShowResendModal(false);
-            
+
             if (axios.isAxiosError(error) && error.response?.status === 410) {
                 const backendMessage = error.response?.data?.message || "Código expirado ou inválido.";
                 toast.error(backendMessage);
@@ -101,8 +101,8 @@ export function Login() {
 
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-white/50 px-4 py-6 sm:px-6 sm:py-8">
-            <section className="w-full max-w-md rounded-lg bg-[#d7d7d7] px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
+        <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+            <section className="w-full max-w-md rounded-lg bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
                 {/* Logo */}
                 <img
                     src="/sao_camilo_logo.svg"
@@ -126,7 +126,7 @@ export function Login() {
                             placeholder="exemplo@saocamilo.edu.br"
                             className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
                         />
-                         {errors.email && <span className="text-sm text-red-500 mt-1">{errors.email.message}</span>}
+                        {errors.email && <span className="text-sm text-red-500 mt-1">{errors.email.message}</span>}
                     </div>
 
                     {/* Senha */}
@@ -176,7 +176,7 @@ export function Login() {
                             Esqueci minha senha
                         </a>
                         <a
-                            href="#"
+                            href="/createAccount"
                             className="font-semibold text-[#c81925] underline-offset-2 transition-colors hover:text-[#9f141d] hover:underline"
                         >
                             Criar conta
