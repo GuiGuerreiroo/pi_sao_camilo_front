@@ -12,6 +12,9 @@ import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
 import { VerifyAccount } from './pages/default/verifyAccount'
+import PreSession from './pages/athlete/pre_session';
+import MidSession from './pages/athlete/mid_session';
+
 
 
 
@@ -45,6 +48,8 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
+                        <Route path="/nova-sessao" element={<PreSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/durante-sessao" element={<MidSession menuItems={menuItemsAthlete} />} />
                         <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
