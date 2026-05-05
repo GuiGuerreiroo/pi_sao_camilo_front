@@ -6,7 +6,7 @@ import type { MenuItems } from "../../interface/menuItems";
 import { FaCalendarAlt, FaClock, FaPlay, FaPause, FaMinus, FaPlus } from "react-icons/fa";
 import { GiWaterBottle } from "react-icons/gi";
 
-export default function MidSession({ menuItems }: { menuItems: MenuItems[] }) {
+export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
   const [fluidIntake, setFluidIntake] = useState(0);
   const [timer, setTimer] = useState(0);
@@ -28,13 +28,12 @@ export default function MidSession({ menuItems }: { menuItems: MenuItems[] }) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '00')}`;
   };
 
   const handleDecreaseFluid = () => setFluidIntake(prev => Math.max(0, prev - 50));
   const handleIncreaseFluid = () => setFluidIntake(prev => prev + 250);
 
-  // Data e hora atuais para mockup
   const now = new Date();
   const dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}`;
   const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -44,25 +43,25 @@ export default function MidSession({ menuItems }: { menuItems: MenuItems[] }) {
       <main className="min-h-screen bg-gray-50 pb-24 font-sans text-gray-800">
         <NavBar menuItems={menuItems} />
 
-      {/* Header */}
       <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
         <h1 className="text-2xl font-bold text-red-600 mb-6">Durante a Sessão</h1>
 
         {/* Stepper */}
-        <div className="flex items-center justify-center relative mb-10 px-4 w-full mx-auto">
-          <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-gray-300 -z-10 transform -translate-y-1/2"></div>
-          
-          <div className="flex flex-col items-center bg-gray-50 px-2">
-            <div className="w-8 h-8 rounded-full border-2 border-red-600 text-red-600 bg-white flex items-center justify-center font-bold text-sm">1</div>
-          </div>
-          <div className="flex-1"></div>
-          <div className="flex flex-col items-center bg-gray-50 px-2">
-            <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm">2</div>
-          </div>
-          <div className="flex-1"></div>
-          <div className="flex flex-col items-center bg-gray-50 px-2">
-            <div className="w-8 h-8 rounded-full border-2 border-red-200 text-red-400 bg-white flex items-center justify-center font-bold text-sm">3</div>
-          </div>
+        <div className="flex items-center mb-10 px-2 w-full">
+          {[1, 2, 3].map((step, i) => (
+            <React.Fragment key={step}>
+              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 transition-colors ${
+                step <= currentStep
+                  ? "bg-red-600 border-red-600 text-white"
+                  : "bg-white border-gray-300 text-gray-400"
+              }`}>
+                {step}
+              </div>
+              {i < 2 && (
+                <div className="flex-1 h-0.5 mx-1 transition-colors" style={{ background: step < currentStep ? "#dc2626" : "#d1d5db" }} />
+              )}
+            </React.Fragment>
+          ))}
         </div>
 
         <div className="space-y-8">
@@ -139,14 +138,14 @@ export default function MidSession({ menuItems }: { menuItems: MenuItems[] }) {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Volume Urinário</label>
             <input 
               type="number" 
-              className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all" 
+              className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
               placeholder="0 ml" 
             />
           </div>
 
           <div className="pt-6">
             <button 
-              onClick={() => navigate('/post-session')} // Redirecionando para a próxima etapa (ajustar conforme rota real)
+              onClick={() => navigate('/post-session')}
               className="w-full py-3 rounded-xl border-2 border-red-600 text-red-600 font-bold text-center active:bg-red-50 hover:bg-red-50 transition-colors"
             >
               Registrar Durante a Sessão
