@@ -12,15 +12,16 @@ import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
 import { VerifyAccount } from './pages/default/verifyAccount'
+import NewSession from './pages/athlete/new_session';
 import PreSession from './pages/athlete/pre_session';
 import MidSession from './pages/athlete/mid_session';
-
+import PostSession from './pages/athlete/post_session';
 
 
 
 const menuItemsAthlete: MenuItems[] = [
     { name: "Meu Perfil", route: "/perfilStud" },
-    { name: "Novo Treino", route: "/paginaInicialAthlete" },
+    { name: "Novo Treino", route: "/new-session" },
     { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
@@ -48,9 +49,11 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
-                        <Route path="/nova-sessao" element={<PreSession menuItems={menuItemsAthlete} />} />
-                        <Route path="/durante-sessao" element={<MidSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
                         <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
+                        <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
                     {/* Example of adding the Admin route later */}

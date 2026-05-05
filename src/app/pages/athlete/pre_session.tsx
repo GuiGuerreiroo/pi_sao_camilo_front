@@ -6,11 +6,10 @@ import type { MenuItems } from "../../interface/menuItems";
 import { FaThermometerHalf, FaSun, FaTint, FaWind, FaPlus } from "react-icons/fa";
 import { GiWaterBottle } from "react-icons/gi";
 
-export default function PreSession({ menuItems }: { menuItems: MenuItems[] }) {
+export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
   
-  // Array de cores para a seleção de cor da urina baseada na escala de hidratação
   const urineColors = [
     "#fefaf0", "#fef08a", "#fde047", "#facc15",
     "#eab308", "#ca8a04", "#a16207", "#713f12"
@@ -21,25 +20,25 @@ export default function PreSession({ menuItems }: { menuItems: MenuItems[] }) {
       <main className="min-h-screen bg-gray-50 pb-24 font-sans text-gray-800">
         <NavBar menuItems={menuItems} />
 
-      {/* Header */}
       <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
         <h1 className="text-2xl font-bold text-red-600 mb-6">Pré-Sessão</h1>
 
         {/* Stepper */}
-        <div className="flex items-center justify-center relative mb-8 px-4 w-full mx-auto">
-          <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-gray-300 -z-10 transform -translate-y-1/2"></div>
-          
-          <div className="flex flex-col items-center bg-gray-50 px-2">
-            <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm">1</div>
-          </div>
-          <div className="flex-1"></div>
-          <div className="flex flex-col items-center bg-gray-50 px-2">
-            <div className="w-8 h-8 rounded-full border-2 border-red-200 text-red-400 bg-white flex items-center justify-center font-bold text-sm">2</div>
-          </div>
-          <div className="flex-1"></div>
-          <div className="flex flex-col items-center bg-gray-50 px-2">
-            <div className="w-8 h-8 rounded-full border-2 border-red-200 text-red-400 bg-white flex items-center justify-center font-bold text-sm">3</div>
-          </div>
+        <div className="flex items-center mb-8 px-2 w-full">
+          {[1, 2, 3].map((step, i) => (
+            <React.Fragment key={step}>
+              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 transition-colors ${
+                step <= currentStep
+                  ? "bg-red-600 border-red-600 text-white"
+                  : "bg-white border-gray-300 text-gray-400"
+              }`}>
+                {step}
+              </div>
+              {i < 2 && (
+                <div className="flex-1 h-0.5 mx-1 transition-colors" style={{ background: step < currentStep ? "#dc2626" : "#d1d5db" }} />
+              )}
+            </React.Fragment>
+          ))}
         </div>
         
         <div className="space-y-6">
@@ -48,7 +47,7 @@ export default function PreSession({ menuItems }: { menuItems: MenuItems[] }) {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Massa Corporal Pré-Exercício</label>
             <input 
               type="number" 
-              className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all" 
+              className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
               placeholder="0.0 kg" 
             />
           </div>
@@ -80,7 +79,7 @@ export default function PreSession({ menuItems }: { menuItems: MenuItems[] }) {
                 <option>Tontura</option>
               </select>
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
@@ -142,7 +141,7 @@ export default function PreSession({ menuItems }: { menuItems: MenuItems[] }) {
 
           <div className="pt-6">
             <button 
-              onClick={() => navigate('/durante-sessao')} // Redirecionando para a próxima etapa
+              onClick={() => navigate('/mid-session')}
               className="w-full py-3 rounded-xl border-2 border-red-600 text-red-600 font-bold text-center active:bg-red-50 hover:bg-red-50 transition-colors"
             >
               Registrar Pré-Sessão
