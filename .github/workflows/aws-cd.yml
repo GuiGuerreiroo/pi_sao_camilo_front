@@ -40,7 +40,7 @@ jobs:
           STAGE: "dev"
           AWS_REGION: "us-east-1"
         run: |
-          cd infra
+          cd iac
           npm install
           npx cdk deploy --require-approval never
           
