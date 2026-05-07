@@ -19,7 +19,7 @@ jobs:
       - name: Configurar AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: "us_east-1"
+          aws-region: "us-east-1"
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: github-action-${{ github.run_id }}
 
@@ -38,7 +38,7 @@ jobs:
       - name: Deploy Infra e Upload via CDK
         env:
           STAGE: "dev"
-          AWS_REGION: "us_east-1"
+          AWS_REGION: "us-east-1"
         run: |
           cd infra
           npm install
