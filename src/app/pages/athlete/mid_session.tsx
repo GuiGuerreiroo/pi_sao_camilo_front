@@ -11,6 +11,17 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
   const [fluidIntake, setFluidIntake] = useState(0);
   const [timer, setTimer] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [urineVolume, setUrineVolume] = useState("");
+  const [error, setError] = useState("");
+
+  const handleNext = () => {
+    if (!urineVolume) {
+      setError("Por favor, preencha o volume urinário.");
+      return;
+    }
+    setError("");
+    navigate('/post-session');
+  };
 
   useEffect(() => {
     let interval: any = null;
@@ -32,7 +43,7 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
   };
 
   const handleDecreaseFluid = () => setFluidIntake(prev => Math.max(0, prev - 50));
-  const handleIncreaseFluid = () => setFluidIntake(prev => prev + 250);
+  const handleIncreaseFluid = () => setFluidIntake(prev => Math.min(10000, prev + 250));
 
   const now = new Date();
   const dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}`;
@@ -138,14 +149,17 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
             <label className="block text-sm font-semibold text-gray-700 mb-2">Volume Urinário</label>
             <input 
               type="number" 
-              className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+              value={urineVolume}
+              onChange={(e) => { setUrineVolume(e.target.value); setError(""); }}
+              className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`} 
               placeholder="0 ml" 
             />
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
 
           <div className="pt-6">
             <button 
-              onClick={() => navigate('/post-session')}
+              onClick={handleNext}
               className="w-full py-3 rounded-xl border-2 border-red-600 text-red-600 font-bold text-center active:bg-red-50 hover:bg-red-50 transition-colors"
             >
               Registrar Durante a Sessão

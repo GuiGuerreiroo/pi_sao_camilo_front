@@ -9,6 +9,18 @@ import { GiWaterBottle } from "react-icons/gi";
 export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
+  const [massaCorporal, setMassaCorporal] = useState("");
+  const [hydration, setHydration] = useState<number | null>(null);
+  const [error, setError] = useState("");
+
+  const handleNext = () => {
+    if (!massaCorporal) {
+      setError("Por favor, preencha a massa corporal pré-exercício.");
+      return;
+    }
+    setError("");
+    navigate('/mid-session');
+  };
   
   const urineColors = [
     "#fefaf0", "#fef08a", "#fde047", "#facc15",
@@ -47,9 +59,12 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
             <label className="block text-sm font-semibold text-gray-700 mb-2">Massa Corporal Pré-Exercício</label>
             <input 
               type="number" 
-              className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+              value={massaCorporal}
+              onChange={(e) => { setMassaCorporal(e.target.value); setError(""); }}
+              className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`} 
               placeholder="0.0 kg" 
             />
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
 
           {/* Cor da Urina */}
@@ -91,15 +106,20 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
             <label className="block text-sm font-semibold text-gray-700 mb-2">Histórico Recente de Hidratação</label>
             <div className="flex justify-between items-end px-2">
               {[
-                { label: "500ml", icon: <GiWaterBottle className="text-3xl text-gray-400" /> },
-                { label: "1L", icon: <GiWaterBottle className="text-4xl text-gray-400" /> },
-                { label: "1,5L", icon: <GiWaterBottle className="text-5xl text-gray-400" /> },
-                { label: "+1,5L", icon: <div className="flex items-center"><GiWaterBottle className="text-5xl text-gray-400" /><FaPlus className="text-xs text-gray-400 -ml-2" /></div> }
+                { label: "500ml", value: 500, icon: <GiWaterBottle className="text-3xl text-gray-400" /> },
+                { label: "1L", value: 1000, icon: <GiWaterBottle className="text-4xl text-gray-400" /> },
+                { label: "1,5L", value: 1500, icon: <GiWaterBottle className="text-5xl text-gray-400" /> },
+                { label: "+1,5L", value: 2000, icon: <div className="flex items-center"><GiWaterBottle className="text-5xl text-gray-400" /><FaPlus className="text-xs text-gray-400 -ml-2" /></div> }
               ].map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
-                  <div className="h-14 flex items-end justify-center">{item.icon}</div>
+                <button 
+                  key={idx} 
+                  onClick={() => setHydration(item.value)}
+                  className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all ${hydration === item.value ? 'border-red-600 bg-red-50 scale-105' : 'border-gray-200 bg-white'}`}
+                  style={{ width: '70px', height: '80px' }}
+                >
+                  <div className="flex-1 flex items-end justify-center pb-1">{item.icon}</div>
                   <span className="text-xs font-bold text-gray-600">{item.label}</span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -141,7 +161,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
 
           <div className="pt-6">
             <button 
-              onClick={() => navigate('/mid-session')}
+              onClick={handleNext}
               className="w-full py-3 rounded-xl border-2 border-red-600 text-red-600 font-bold text-center active:bg-red-50 hover:bg-red-50 transition-colors"
             >
               Registrar Pré-Sessão
