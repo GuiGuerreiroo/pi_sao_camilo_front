@@ -12,6 +12,16 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
   const [fadiga, setFadiga] = useState(false);
   const [roupaEncharcada, setRoupaEncharcada] = useState(false);
   const [intensidade, setIntensidade] = useState(1);
+  const [error, setError] = useState("");
+
+  const handleNext = () => {
+    if (!massaCorporal) {
+      setError("Por favor, preencha a massa corporal pós-exercício.");
+      return;
+    }
+    setError("");
+    navigate("/dashboard");
+  };
 
   const totalDots = 8;
 
@@ -84,10 +94,11 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
               <input
                 type="number"
                 value={massaCorporal}
-                onChange={e => setMassaCorporal(e.target.value)}
-                className="w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-200 transition-all text-gray-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                onChange={e => { setMassaCorporal(e.target.value); setError(""); }}
+                className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all text-gray-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`}
                 placeholder="0 kg"
               />
+              {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
             </div>
 
             {/* Checkboxes */}
@@ -108,40 +119,49 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
             />
 
             {/* Intensidade do Treino */}
-            <div className="bg-white rounded-2xl shadow-md border border-gray-200 px-5 py-4">
-              <label className="block text-sm font-semibold text-gray-800 mb-4">
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 px-5 py-6">
+              <label className="block text-lg font-semibold text-gray-800 mb-6">
                 Intensidade do Treino
               </label>
-              <div className="relative flex items-center justify-between px-1">
-                <div className="absolute left-1 right-1 h-0.5 bg-gray-300"></div>
-                <div
-                  className="absolute left-1 h-0.5 bg-red-600 transition-all"
-                  style={{ width: `${(intensidade / (totalDots - 1)) * 100}%` }}
-                ></div>
-                {Array.from({ length: totalDots }, (_, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setIntensidade(i)}
-                    className={`relative z-10 rounded-full cursor-pointer transition-all flex-shrink-0 ${
-                      i === intensidade
-                        ? "w-5 h-5 bg-red-600 ring-2 ring-white ring-offset-1 ring-offset-red-600"
-                        : i < intensidade
-                        ? "w-2.5 h-2.5 bg-red-600"
-                        : "w-2.5 h-2.5 bg-gray-300"
-                    }`}
-                  />
-                ))}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-5 right-5 flex items-center">
+                  <div className="w-full h-1 bg-gray-300 rounded-full">
+                    <div
+                      className="h-1 bg-red-600 transition-all rounded-full"
+                      style={{ width: `${(intensidade / (totalDots - 1)) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="relative flex items-center justify-between">
+                  {Array.from({ length: totalDots }, (_, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setIntensidade(i)}
+                      className="relative z-10 w-10 h-10 flex items-center justify-center cursor-pointer group"
+                    >
+                      <div
+                        className={`rounded-full transition-all flex-shrink-0 group-hover:scale-110 ${
+                          i === intensidade
+                            ? "w-6 h-6 bg-red-600 ring-4 ring-white shadow-md"
+                            : i < intensidade
+                            ? "w-3 h-3 bg-red-600"
+                            : "w-3 h-3 bg-gray-300"
+                        }`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-between mt-3">
-                <span className="text-[10px] text-gray-500 leading-tight">Pouco<br />cansativo</span>
-                <span className="text-[10px] text-gray-500 leading-tight text-right">Muito<br />cansativo</span>
+              <div className="flex justify-between mt-2 px-1">
+                <span className="text-sm text-gray-500 leading-tight">Pouco<br />cansativo</span>
+                <span className="text-sm text-gray-500 leading-tight text-right">Muito<br />cansativo</span>
               </div>
             </div>
 
             {/* Botão */}
             <div className="pt-2">
               <button
-                onClick={() => navigate("/dashboard")}
+                onClick={handleNext}
                 className="w-full py-3 rounded-xl border-2 border-red-600 text-red-600 font-bold text-center active:bg-red-50 hover:bg-red-50 transition-colors"
               >
                 Registrar Pós-Sessão
