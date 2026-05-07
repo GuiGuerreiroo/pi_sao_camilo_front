@@ -2,24 +2,28 @@ name: ReactJS CI
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    branches:
+      - dev
+    types: [opened, synchronize, reopened]
+
 jobs:
-  next_js_ci:
+  react_ci:
     name: Run ReactJS CI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 
 
       - name: Use Node.js 22.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 
         with:
           node-version: 22.x
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci 
 
-      - name: Lint with ESLint and Prettier
+      - name: Lint with ESLint
         run: npm run lint
 
       - name: Build ReactJS app
