@@ -30,7 +30,7 @@ jobs:
 
       - name: Build do Front-end (React/Vite)
         run: |
-          npm ci
+          npm install
           npm run build
         env:
           VITE_MSS_API_URL: ${{ vars.VITE_MSS_API_URL }} 
@@ -41,7 +41,7 @@ jobs:
           AWS_REGION: "us_east-1"
         run: |
           cd infra
-          npm ci
+          npm install
           npx cdk deploy --require-approval never
           
       # FIM! Não precisa de S3 cp nem de Cloudfront Invalidation. O CDK já fez tudo.
