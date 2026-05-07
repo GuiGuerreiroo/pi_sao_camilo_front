@@ -14,7 +14,7 @@ export type SYMPTOMS =
     | "FRAQUEZA"
     | "CONFUSAO_MENTAL";
 
-export interface Training {
+export interface TrainingInterface {
     training_id: string;
     user_id: string;
     modality: MODALITY;

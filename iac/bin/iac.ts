@@ -11,3 +11,8 @@ const env= {
 
 const stackName= process.env.STACKNAME || "ProjetoNutriEsportivaSaoCamilo"
 
+new IacStack(
+    app, 
+    stackName,
+    { env }
+);

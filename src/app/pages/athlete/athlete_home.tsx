@@ -1,5 +1,5 @@
 import type { MenuItems } from "../../interface/menuItems";
-import type { Training, MODALITY } from "../../interface/TrainingInterface";
+import type { TrainingInterface, MODALITY } from "../../interface/TrainingInterface";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import { get_all_trainings } from "../../api/training/get_all_trainings";
@@ -86,7 +86,7 @@ function dehydrationLevel(pct: number): { label: string; color: string } {
 const NOW = Date.now();
 const DAY = 86400000;
 
-const MOCK_TRAININGS: Training[] = [
+const MOCK_TRAININGS: TrainingInterface[] = [
     {
         training_id: "1",
         user_id: "u1",
@@ -177,7 +177,7 @@ function SessionCard({
     training,
     onTap,
 }: {
-    training: Training;
+    training: TrainingInterface;
     onTap: () => void;
 }) {
     const risk = dehydrationLevel(training.weight_variation_percentage);
@@ -270,7 +270,7 @@ function QuickStatCard({
 
 export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
     const navigate = useNavigate();
-    const [trainings, setTrainings] = useState<Training[]>([]);
+    const [trainings, setTrainings] = useState<TrainingInterface[]>([]);
     const [userName, setUserName] = useState("Atleta");
 
     useEffect(() => {

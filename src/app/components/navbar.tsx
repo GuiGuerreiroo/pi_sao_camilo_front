@@ -1,10 +1,11 @@
 import { IoMenu } from "react-icons/io5";
-import { FaUserCircle, FaThLarge, FaPlus, FaFileAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaUserCircle, FaThLarge, FaPlus, FaFileAlt } from "react-icons/fa";
 import { useContext, useEffect, useState } from "react";
 import { SlideBarContext } from "../contexts/slideBarContext"
 import { SlideBar } from "./slideBar";
 import type { MenuItems } from "../interface/menuItems";
-import type { UserInterface } from "../interface/UserInterface";
+// UserInterface will be used when profile navigation is integrated
+// import type { UserInterface } from "../interface/UserInterface";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Settings } from "lucide-react";
 import { getDecodedToken } from "../hooks/tokenDecode";
@@ -21,7 +22,9 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         slideBarContext?.setIsOpen(!(slideBarContext.isOpen));
     }
 
-    const handleLogout = () => {
+    // @ts-expect-error — handleLogout will be wired to a UI button in a future PR
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
