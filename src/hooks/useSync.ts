@@ -57,7 +57,7 @@ export function useSync(): UseSyncReturn {
       for (const workout of pending) {
         try {
           // Strip the local Dexie `id` — backend doesn't expect it
-          const { id: _localId, ...payload } = workout;
+          const {...payload } = workout;
           const response = await apiClient.post('/create-training', payload);
 
           const workoutDb: TrainingInterface = response.data.training;

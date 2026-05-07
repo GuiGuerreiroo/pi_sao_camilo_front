@@ -72,6 +72,7 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
       setTimeout(() => {
         setErrorMessage('');
       }, 4000);
+      console.log(error);
     }
   };
 
