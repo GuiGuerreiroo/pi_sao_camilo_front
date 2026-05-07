@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Mail, Lock, Edit, X } from 'lucide-react';
 import { getDecodedToken } from '../../hooks/tokenDecode';
 import type { MenuItems } from '../../interface/menuItems';
@@ -45,7 +45,8 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
   const handlePasswordChange = async () => {
     // 1. Get the values the user typed
     const currentPassword = passwordForm.current;
-    const newPassword = passwordForm.new;
+    // newPassword will be used when the backend API is integrated
+    // const newPassword = passwordForm.new;
 
     try {
       // 2. Here goes your backend API validation

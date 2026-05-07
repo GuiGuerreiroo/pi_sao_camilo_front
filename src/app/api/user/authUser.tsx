@@ -6,7 +6,7 @@ export async function authUser(data: ILoginForm) {
     const baseURL= import.meta.env.VITE_MSS_API_URL
 
     const response = await axios.post(
-        `${baseURL}auth-user`,
+        `${baseURL}/auth-user`,
         {
             "email": data.email,
             "password": data.password

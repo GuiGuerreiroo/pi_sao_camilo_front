@@ -12,6 +12,7 @@ import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
 import { VerifyAccount } from './pages/default/verifyAccount'
+import { SyncProvider } from './contexts/SyncContext';
 
 
 
@@ -24,50 +25,52 @@ const menuItemsAthlete: MenuItems[] = [
 
 export default function App() {
     return (
-        <div>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/createAccount" element={<CreateAccount />} />
-                    <Route path="/verifyAccount" element={<VerifyAccount />} />
-                    <Route path="/error" element={<Unauthorized />} />
-                    <Route path="/unauthorized" element={<Unauthorized />} />
-                    <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
-                    {/* Placeholder for future screens */}
-                    {/* <Route path='/verify' element={<VerifyEmail />} /> */}
-                    {/* <Route path='/register' element={<CreateUser />} /> */}
-                    {/* <Route path='/alterarSenha' element={<ChangePassword />} /> */}
+        <SyncProvider>
+            <div>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/createAccount" element={<CreateAccount />} />
+                        <Route path="/verifyAccount" element={<VerifyAccount />} />
+                        <Route path="/error" element={<Unauthorized />} />
+                        <Route path="/unauthorized" element={<Unauthorized />} />
+                        <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
+                        {/* Placeholder for future screens */}
+                        {/* <Route path='/verify' element={<VerifyEmail />} /> */}
+                        {/* <Route path='/register' element={<CreateUser />} /> */}
+                        {/* <Route path='/alterarSenha' element={<ChangePassword />} /> */}
 
-                    <Route element={<PrivateRoute requiredRole="SUPPORT" />}>
-                        <Route path="/paginaInicialSupport" element={<SupportHome />} />
-                        {/* <Route path="/perfilSupport" element={<UserAccount menuItems={menuItemsSupport}/>}/> */}
-                    </Route>
+                        <Route element={<PrivateRoute requiredRole="SUPPORT" />}>
+                            <Route path="/paginaInicialSupport" element={<SupportHome />} />
+                            {/* <Route path="/perfilSupport" element={<UserAccount menuItems={menuItemsSupport}/>}/> */}
+                        </Route>
 
-                    <Route element={<PrivateRoute requiredRole="USER" />}>
-                        <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
-                        <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
-                    </Route>
+                        <Route element={<PrivateRoute requiredRole="USER" />}>
+                            <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
+                            <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
+                        </Route>
 
-                    {/* Example of adding the Admin route later */}
-                    <Route element={<PrivateRoute requiredRole="ADM" />}>
-                        <Route path="/paginaInicialADM" element={<AdminHome />} />
-                        {/* <Route path="/perfilAdmin" element={<UserAccount menuItems={menuItemsAdmin}/>}/> */}
-                    </Route>
+                        {/* Example of adding the Admin route later */}
+                        <Route element={<PrivateRoute requiredRole="ADM" />}>
+                            <Route path="/paginaInicialADM" element={<AdminHome />} />
+                            {/* <Route path="/perfilAdmin" element={<UserAccount menuItems={menuItemsAdmin}/> }/> */}
+                        </Route>
 
-                </Routes>
-            </BrowserRouter>
-            <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
-        </div>
+                    </Routes>
+                </BrowserRouter>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
+            </div>
+        </SyncProvider>
     )
 }

@@ -7,7 +7,7 @@ export async function getUser(): Promise<UserInterface> {
 
     
     const response = await axios.get(
-        `${baseURL}get-user`,
+        `${baseURL}/get-user`,
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
