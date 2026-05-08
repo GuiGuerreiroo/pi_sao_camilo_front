@@ -10,6 +10,14 @@ import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
 import { AthleteSessionReport } from './pages/athlete/athlete_session_report';
 import type { MenuItems } from './interface/menuItems';
+import Perfil from './pages/default/config';
+import { CreateAccount } from './pages/default/createAccount';
+import { VerifyAccount } from './pages/default/verifyAccount'
+import NewSession from './pages/athlete/new_session';
+import PreSession from './pages/athlete/pre_session';
+import MidSession from './pages/athlete/mid_session';
+import PostSession from './pages/athlete/post_session';
+
 
 
 const menuItemsAthlete: MenuItems[] = [
@@ -25,9 +33,11 @@ export default function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Login />} />
+                    <Route path="/createAccount" element={<CreateAccount />} />
+                    <Route path="/verifyAccount" element={<VerifyAccount />} />
                     <Route path="/error" element={<Unauthorized />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
-
+                    <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
                     {/* Placeholder for future screens */}
                     {/* <Route path='/verify' element={<VerifyEmail />} /> */}
                     {/* <Route path='/register' element={<CreateUser />} /> */}
@@ -40,8 +50,11 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
-                        <Route path="/sessao/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />} />
-                        {/* <Route path="/perfilStud" element={<UserAccount menuItems={menuItemsAthlete}/>}/> */}
+                        <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
+                        <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
+                        <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
                     {/* Example of adding the Admin route later */}
