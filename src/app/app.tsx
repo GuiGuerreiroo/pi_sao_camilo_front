@@ -8,6 +8,7 @@ import SupportHome from './pages/support/support_home';
 import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
+import { AthleteSessionReport } from './pages/athlete/athlete_session_report';
 import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
