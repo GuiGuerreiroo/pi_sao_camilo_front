@@ -8,12 +8,13 @@ import SupportHome from './pages/support/support_home';
 import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
+import { AthleteSessionReport } from './pages/athlete/athlete_session_report';
 import type { MenuItems } from './interface/menuItems';
 
 
 const menuItemsAthlete: MenuItems[] = [
     { name: "Meu Perfil", route: "/perfilStud" },
-    { name: "Novo Treino", route: "/paginaInicialAthlete" },
+    { name: "Novo Treino", route: "/new-session" },
     { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
@@ -39,6 +40,7 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
+                        <Route path="/sessao/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />} />
                         {/* <Route path="/perfilStud" element={<UserAccount menuItems={menuItemsAthlete}/>}/> */}
                     </Route>
 
