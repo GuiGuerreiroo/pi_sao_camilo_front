@@ -9,6 +9,7 @@ import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
 import { AthleteSessionReport } from './pages/athlete/athlete_session_report';
+import { AthleteReport } from './pages/athlete/athlete_report';
 import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
@@ -21,8 +22,9 @@ import PostSession from './pages/athlete/post_session';
 
 
 const menuItemsAthlete: MenuItems[] = [
-    { name: "Meu Perfil", route: "/perfilStud" },
+    { name: "Meu Perfil", route: "/paginaInicialAthlete" },
     { name: "Novo Treino", route: "/new-session" },
+    { name: "Relatório", route: "/athleteReport"},
     { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
@@ -55,6 +57,8 @@ export default function App() {
                         <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
                         <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
                         <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
+                        <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />}/> 
+                        <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
                     {/* Example of adding the Admin route later */}

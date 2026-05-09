@@ -362,7 +362,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                             </h3>
                             <button
                                 className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 active:bg-gray-200"
-                                onClick={() => navigate("/historico")}
+                                onClick={() => navigate("/athleteReport")}
                             >
                                 <FaChevronRight className="text-xs" />
                             </button>
@@ -381,7 +381,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                         training={t}
                                         onTap={() =>
                                             navigate(
-                                                `/sessao/${t.training_id}`
+                                                `/athleteSessionReport/${t.training_id}`
                                             )
                                         }
                                     />

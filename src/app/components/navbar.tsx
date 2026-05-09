@@ -95,22 +95,22 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
             {/* Mobile Navbar (bottom bar) */}
             <div className="fixed bottom-0 left-0 w-full bg-gray-200 flex justify-around items-center py-5 shadow-lg z-50 md:hidden">
 
-                <button onClick={() => navigate("/paginaInicialADM")}>
+                <button onClick={() => navigate("/paginaInicialAthlete")}>
                     <FaThLarge className="text-red-700 text-2xl" />
                 </button>
 
                 <button
                     className="text-red-700 border-4 border-red-700 text-red w-8 h-8 rounded-full flex items-center justify-center  shadow-lg"
-                    onClick={() => navigate("/nova-sessao")}
+                    onClick={() => navigate("/new-session")}
                 >
                     <FaPlus />
                 </button>
 
-                <button onClick={() => navigate("/paginaInicialSupport")}>
+                <button onClick={() => navigate("/athleteReport")}>
                     <FaFileAlt className="text-red-700 text-2xl" />
                 </button>
 
-                <button className="p-2 text-[#BD2024] hover:bg-gray-300 rounded-lg transition-colors">
+                <button onClick={() => navigate("/configuracao")} className="p-2 text-[#BD2024] hover:bg-gray-300 rounded-lg transition-colors">
                     <Settings size={28} strokeWidth={2.5} />
                 </button>
 

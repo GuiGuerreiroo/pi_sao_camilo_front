@@ -116,13 +116,13 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
 
     return (
         <SlideBarContextProvider>
-            <main className="min-h-screen bg-[#1c1c1c] md:bg-gray-50 pb-28 flex flex-col items-center">
+            <main className="min-h-screen bg-gray-50 pb-28 flex flex-col items-center">
                 <div className="w-full">
                     <NavBar menuItems={menuItems} />
                 </div>
                 
                 {/* Title Section */}
-                <div className="w-full max-w-4xl px-4 py-6 text-white md:text-gray-800 flex items-center justify-between">
+                <div className="w-full max-w-4xl px-4 py-6 text-gray-800 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
