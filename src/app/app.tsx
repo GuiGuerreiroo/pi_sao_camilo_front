@@ -8,6 +8,7 @@ import SupportHome from './pages/support/support_home';
 import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
+import { AthleteSessionReport } from './pages/athlete/athlete_session_report';
 import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
@@ -49,11 +50,8 @@ export default function App() {
 
                     <Route element={<PrivateRoute requiredRole="USER" />}>
                         <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
-                        <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
-                        <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
-                        <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
-                        <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
-                        <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
+                        <Route path="/sessao/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />} />
+                        {/* <Route path="/perfilStud" element={<UserAccount menuItems={menuItemsAthlete}/>}/> */}
                     </Route>
 
                     {/* Example of adding the Admin route later */}

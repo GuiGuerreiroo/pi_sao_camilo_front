@@ -2,6 +2,7 @@ import type { MenuItems } from "../../interface/menuItems";
 import type { Training, MODALITY } from "../../interface/TrainingInterface";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
+import { get_all_trainings } from "../../api/training/get_all_trainings";
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -32,7 +33,7 @@ const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
     BASQUETE: <FaBasketballBall />,
     VOLEI: <FaVolleyballBall />,
     TENIS: <MdSportsTennis />,
-    MUSCULACAO: <FaDumbbell />,
+    ACADEMIA: <FaDumbbell />,
     OUTRO: <GiMuscleUp />,
 };
 
@@ -44,13 +45,13 @@ const MODALITY_LABELS: Record<MODALITY, string> = {
     BASQUETE: "Basquete",
     VOLEI: "Vôlei",
     TENIS: "Tênis",
-    MUSCULACAO: "Musculação",
+    ACADEMIA: "Academia",
     OUTRO: "Outro",
 };
 
-function formatDuration(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
+function formatDuration(totalMinutes: number): string {
+    const h = Math.floor(totalMinutes / 60);
+    const m = Math.floor(totalMinutes % 60);
     if (h > 0) return `${h}h ${m}min`;
     return `${m}min`;
 }
@@ -59,6 +60,7 @@ function formatDate(ts: number): string {
     return new Date(ts).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "2-digit",
+        year: "numeric"
     });
 }
 
@@ -272,8 +274,16 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
     const [userName, setUserName] = useState("Atleta");
 
     useEffect(() => {
-        // TODO: trocar por chamada à API real
-        setTrainings(MOCK_TRAININGS);
+        // Fetch trainings from API
+        get_all_trainings()
+            .then((data) => {
+                console.log("Trainings response:", data);
+                setTrainings(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching trainings:", error);
+                setTrainings(MOCK_TRAININGS);
+            });
 
         try {
             const stored = localStorage.getItem("user");
@@ -364,7 +374,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                             </p>
                         ) : (
                             trainings
-                                .slice(0, 4)
+                                .slice(0, 3)
                                 .map((t) => (
                                     <SessionCard
                                         key={t.training_id}
