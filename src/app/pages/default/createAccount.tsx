@@ -7,11 +7,13 @@ import { toast } from 'react-toastify'
 import axios from 'axios'
 import Button from '../../components/button'
 import { ICreateAccountFormSchema, type ICreateAccountForm } from '../../interface/createAccountValidation'
+import { createUser } from '../../api/user/createUser'
 
 export function CreateAccount() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const navigate = useNavigate()
 
   const {
@@ -28,17 +30,28 @@ export function CreateAccount() {
     setIsLoading(true)
 
     try {
-      // Substitua pela sua chamada real de API, ex: await createUser(data)
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await createUser({
+        email: data.email,
+        name: data.nome,
+        password: data.senha,
+        role: data.categoria === 'atleta' ? 'USER' : "SUPPORT",
+      })
 
-      console.log('Dados do formulário:', data)
-
+      setUserEmail(data.email)
       setShowSuccessModal(true)
     } catch (error) {
       console.error(error)
 
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        toast.error(error.response.data.message)
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          toast.error('Este e-mail já está em uso.')
+        } else if (typeof error.response?.data === 'string') {
+          toast.error(error.response.data)
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message)
+        } else {
+          toast.error('Erro ao criar conta. Tente novamente mais tarde.')
+        }
       } else {
         toast.error('Erro ao criar conta. Tente novamente mais tarde.')
       }
@@ -49,7 +62,7 @@ export function CreateAccount() {
 
   function handleContinue() {
     setShowSuccessModal(false)
-    navigate('/login')
+    navigate('/verifyAccount', { state: { email: userEmail } })
   }
 
   return (

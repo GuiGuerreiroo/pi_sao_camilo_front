@@ -82,7 +82,7 @@ export function Login() {
             setShowResendModal(false);
             toast.success("Código reenviado com sucesso!");
             // Navigate to verify screen, passing the email in state
-            navigate('/verify', { state: { email: resendEmail } });
+            navigate('/verifyAccount', { state: { email: resendEmail } });
         } catch (error) {
             console.error(error);
             setShowResendModal(false);
