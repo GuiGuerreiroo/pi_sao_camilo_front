@@ -12,7 +12,7 @@ export async function createUser(data: CreateUserData) {
     const baseURL = import.meta.env.VITE_MSS_API_URL;
 
     const response = await axios.post(
-        `${baseURL}create-user`,
+        `${baseURL}/create-user`,
         {
             email: data.email,
             name: data.name,
