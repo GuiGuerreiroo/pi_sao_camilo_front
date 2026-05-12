@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { get_all_trainings } from "../../api/training/get_all_trainings";
-import type { Training, URINE_COLOR } from "../../interface/TrainingInterface";
+import { AthleteContext } from "../../contexts/AthleteContext";
+import type { TrainingInterface, URINE_COLOR } from "../../interface/TrainingInterface";
 import type { MenuItems } from "../../interface/menuItems";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -58,26 +58,35 @@ function getIntensityLabel(intensity: number): string {
 export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [training, setTraining] = useState<Training | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { trainings, get_all_trainings } = useContext(AthleteContext);
+    const [training, setTraining] = useState<TrainingInterface | null>(null);
+    const [loading, setLoading] = useState(trainings === undefined);
 
     useEffect(() => {
-        get_all_trainings()
-            .then((trainings) => {
-                const found = trainings.find((t) => t.training_id === id);
-                if (found) {
-                    setTraining(found);
-                } else {
-                    console.error("Treino não encontrado com ID:", id);
+        const fetchAndFind = async () => {
+            let currentTrainings = trainings;
+            if (currentTrainings === undefined) {
+                setLoading(true);
+                try {
+                    currentTrainings = await get_all_trainings();
+                } catch (err) {
+                    console.error("Erro ao buscar treinos:", err);
+                    currentTrainings = [];
+                } finally {
+                    setLoading(false);
                 }
-            })
-            .catch((err) => {
-                console.error("Erro ao buscar treinos:", err);
-            })
-            .finally(() => {
+            } else {
                 setLoading(false);
-            });
-    }, [id]);
+            }
+
+            if (currentTrainings) {
+                const found = currentTrainings.find((t) => t.training_id === id);
+                setTraining(found || null);
+            }
+        };
+
+        fetchAndFind();
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (loading) {
         return (

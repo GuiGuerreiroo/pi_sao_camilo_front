@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { get_all_trainings } from "../../api/training/get_all_trainings";
-import type { Training } from "../../interface/TrainingInterface";
+import { AthleteContext } from "../../contexts/AthleteContext";
+import type { TrainingInterface } from "../../interface/TrainingInterface";
 import type { MenuItems } from "../../interface/menuItems";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -37,23 +37,31 @@ function getIntensityLabel(intensity: number): string {
 
 export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
     const navigate = useNavigate();
-    const [trainings, setTrainings] = useState<Training[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { trainings, get_all_trainings } = useContext(AthleteContext);
+    const [loading, setLoading] = useState(trainings === undefined);
 
     useEffect(() => {
+        if (trainings !== undefined) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
         get_all_trainings()
-            .then((data) => {
-                // Ordenar do mais recente para o mais antigo e limitar a 30
-                const sorted = [...data].sort((a, b) => b.start_date - a.start_date);
-                setTrainings(sorted.slice(0, 30));
-            })
             .catch((err) => {
                 console.error("Erro ao buscar treinos:", err);
             })
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const displayTrainings = useMemo(() => {
+        if (!trainings) return [];
+        return [...trainings]
+            .sort((a, b) => b.start_date - a.start_date)
+            .slice(0, 30);
+    }, [trainings]);
 
     if (loading) {
         return (
@@ -87,7 +95,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
 
                 {/* Main Content */}
                 <div className="w-full max-w-4xl px-4 flex flex-col gap-4">
-                    {trainings.length === 0 ? (
+                    {displayTrainings.length === 0 ? (
                         <div className="bg-white rounded-[2rem] p-8 shadow-lg border border-gray-200 text-center">
                             <p className="text-gray-500 mb-4">Nenhum treino encontrado.</p>
                             <button
@@ -98,7 +106,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                             </button>
                         </div>
                     ) : (
-                        trainings.map((training) => (
+                        displayTrainings.map((training) => (
                             <div 
                                 key={training.training_id}
                                 onClick={() => navigate(`/athleteSessionReport/${training.training_id}`)}
