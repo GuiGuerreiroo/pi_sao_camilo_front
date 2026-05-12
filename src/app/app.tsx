@@ -19,6 +19,7 @@ import NewSession from './pages/athlete/new_session';
 import PreSession from './pages/athlete/pre_session';
 import MidSession from './pages/athlete/mid_session';
 import PostSession from './pages/athlete/post_session';
+import ResultSession from './pages/athlete/result_session';
 
 
 
@@ -65,6 +66,7 @@ export default function App() {
                         <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
                         <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />}/> 
                         <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />}/> 
+                        <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />}/> 
                     </Route>
 
                         {/* Example of adding the Admin route later */}

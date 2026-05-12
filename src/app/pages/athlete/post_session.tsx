@@ -20,7 +20,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
       return;
     }
     setError("");
-    navigate("/dashboard");
+    navigate("/result-session");
   };
 
   const totalDots = 8;
