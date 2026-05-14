@@ -75,18 +75,18 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         <>
             {/* Desktop Navbar */}
             <nav className="hidden md:block">
-                <div className="flex justify-between items-center text-white bg-red-800 w-full py-4 px-6">
+                <div className="flex justify-between items-center  bg-gray-200 border-b border-gray-200 w-full py-4 px-6">
                     <div className="flex items-center gap-x-3">
-                        <div className="bg-white/20 rounded-full w-10 h-10 flex items-center justify-center">
+                        <div className="bg-red/20 rounded-full w-10 h-10 flex items-center justify-center">
                             <FaUserCircle className="text-2xl" />
                         </div>
-                        <div className="flex items-center gap-x-1.5 text-white">
+                        <div className="flex items-center gap-x-1.5 text-black">
                             <span className="font-bold text-lg">{role}</span>
                             <span className="text-lg">{userName}</span>
                         </div>
                     </div>
                     <button
-                        className="p-2 rounded-lg text-black-600 hover:bg-red-400 transition-all duration-200"
+                        className="p-2 rounded-lg text-black-600 hover:bg-gray-300 transition-all duration-200"
                         onClick={toggleMenu}
                     >
                         <IoMenu className="text-2xl" />
