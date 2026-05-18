@@ -5,6 +5,8 @@ import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
 import { FaThermometerHalf, FaSun, FaTint, FaWind, FaPlus } from "react-icons/fa";
 import { GiWaterBottle } from "react-icons/gi";
+import { useGeolocation } from "../../hooks/getGeoloc";
+import { useWeather } from "../../hooks/apiWether";
 
 export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
@@ -12,6 +14,20 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
   const [massaCorporal, setMassaCorporal] = useState("");
   const [hydration, setHydration] = useState<number | null>(null);
   const [error, setError] = useState("");
+
+  const { coordinates, loading: geoLoading, error: geoError } = useGeolocation();
+  const { weather, loading: weatherLoading, error: weatherError } = useWeather(
+    coordinates?.latitude,
+    coordinates?.longitude
+  );
+
+  const getSolarExposure = (weatherCode?: number, isDay?: number) => {
+    if (isDay === 0) return "Nula";
+    if (weatherCode === undefined) return "--";
+    if (weatherCode <= 1) return "Alta";
+    if (weatherCode === 2) return "Moderada";
+    return "Baixa";
+  };
 
   const handleNext = () => {
     if (!massaCorporal) {
@@ -39,7 +55,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
         <div className="flex items-center mb-8 px-2 w-full">
           {[1, 2, 3].map((step, i) => (
             <React.Fragment key={step}>
-              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 transition-colors ${
+              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm shrink-0 transition-colors ${
                 step <= currentStep
                   ? "bg-red-600 border-red-600 text-white"
                   : "bg-white border-gray-300 text-gray-400"
@@ -131,32 +147,45 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
               <div className="flex items-center gap-3">
                 <FaThermometerHalf className="text-2xl text-gray-400" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">26°C</span>
+                  <span className="font-bold text-gray-800 text-sm">
+                    {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.temperature || 0)}°C`}
+                  </span>
                   <span className="text-[10px] text-gray-500">Temperatura</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <FaSun className="text-2xl text-gray-400" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">Moderado</span>
+                  <span className="font-bold text-gray-800 text-sm">
+                    {weatherLoading || geoLoading ? "--" : getSolarExposure(weather?.weathercode, weather?.is_day)}
+                  </span>
                   <span className="text-[10px] text-gray-500">Exposição Solar</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <FaTint className="text-2xl text-gray-400" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">73%</span>
+                  <span className="font-bold text-gray-800 text-sm">
+                    {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.relative_humidity || 0)}%`}
+                  </span>
                   <span className="text-[10px] text-gray-500">Umidade</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <FaWind className="text-2xl text-gray-400" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">8km/h</span>
+                  <span className="font-bold text-gray-800 text-sm">
+                    {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.windspeed || 0)}km/h`}
+                  </span>
                   <span className="text-[10px] text-gray-500">Vento</span>
                 </div>
               </div>
             </div>
+            {(geoError || weatherError) && (
+              <p className="text-red-500 text-xs mt-2">
+                {geoError ? `Erro de localização: ${geoError}` : `Erro de clima: ${weatherError}`}
+              </p>
+            )}
           </div>
 
           <div className="pt-6">
