@@ -14,6 +14,10 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
   const [massaCorporal, setMassaCorporal] = useState("");
   const [hydration, setHydration] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [manualTemp, setManualTemp] = useState<string>("");
+  const [manualSolar, setManualSolar] = useState<string>("Baixa");
+  const [manualHumidity, setManualHumidity] = useState<string>("");
+  const [manualWind, setManualWind] = useState<string>("");
 
   const { coordinates, loading: geoLoading, error: geoError } = useGeolocation();
   const { weather, loading: weatherLoading, error: weatherError } = useWeather(
@@ -145,47 +149,85 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
             <label className="block text-sm font-semibold text-gray-700 mb-2">Condições Ambientais</label>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
-                <FaThermometerHalf className="text-2xl text-gray-400" />
+                <FaThermometerHalf className="text-2xl text-gray-400 shrink-0" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">
-                    {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.temperature || 0)}°C`}
-                  </span>
+                  {geoError || weatherError ? (
+                    <input
+                      type="number"
+                      value={manualTemp}
+                      onChange={(e) => setManualTemp(e.target.value)}
+                      className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      placeholder="°C"
+                    />
+                  ) : (
+                    <span className="font-bold text-gray-800 text-sm">
+                      {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.temperature || 0)}°C`}
+                    </span>
+                  )}
                   <span className="text-[10px] text-gray-500">Temperatura</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <FaSun className="text-2xl text-gray-400" />
-                <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">
-                    {weatherLoading || geoLoading ? "--" : getSolarExposure(weather?.weathercode, weather?.is_day)}
-                  </span>
+              <div className="flex items-center gap-3 justify-self-end text-right">
+                <div className="flex flex-col items-end">
+                  {geoError || weatherError ? (
+                    <select
+                      value={manualSolar}
+                      onChange={(e) => setManualSolar(e.target.value)}
+                      className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all text-right"
+                    >
+                      <option>Nula</option>
+                      <option>Baixa</option>
+                      <option>Moderada</option>
+                      <option>Alta</option>
+                    </select>
+                  ) : (
+                    <span className="font-bold text-gray-800 text-sm">
+                      {weatherLoading || geoLoading ? "--" : getSolarExposure(weather?.weathercode, weather?.is_day)}
+                    </span>
+                  )}
                   <span className="text-[10px] text-gray-500">Exposição Solar</span>
                 </div>
+                <FaSun className="text-2xl text-gray-400 shrink-0" />
               </div>
               <div className="flex items-center gap-3">
-                <FaTint className="text-2xl text-gray-400" />
+                <FaTint className="text-2xl text-gray-400 shrink-0" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">
-                    {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.relative_humidity || 0)}%`}
-                  </span>
+                  {geoError || weatherError ? (
+                    <input
+                      type="number"
+                      value={manualHumidity}
+                      onChange={(e) => setManualHumidity(e.target.value)}
+                      className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      placeholder="%"
+                    />
+                  ) : (
+                    <span className="font-bold text-gray-800 text-sm">
+                      {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.relative_humidity || 0)}%`}
+                    </span>
+                  )}
                   <span className="text-[10px] text-gray-500">Umidade</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <FaWind className="text-2xl text-gray-400" />
-                <div className="flex flex-col">
-                  <span className="font-bold text-gray-800 text-sm">
-                    {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.windspeed || 0)}km/h`}
-                  </span>
+              <div className="flex items-center gap-3 justify-self-end text-right">
+                <div className="flex flex-col items-end">
+                  {geoError || weatherError ? (
+                    <input
+                      type="number"
+                      value={manualWind}
+                      onChange={(e) => setManualWind(e.target.value)}
+                      className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      placeholder="km/h"
+                    />
+                  ) : (
+                    <span className="font-bold text-gray-800 text-sm">
+                      {weatherLoading || geoLoading ? "--" : `${Math.round(weather?.windspeed || 0)}km/h`}
+                    </span>
+                  )}
                   <span className="text-[10px] text-gray-500">Vento</span>
                 </div>
+                <FaWind className="text-2xl text-gray-400 shrink-0" />
               </div>
             </div>
-            {(geoError || weatherError) && (
-              <p className="text-red-500 text-xs mt-2">
-                {geoError ? `Erro de localização: ${geoError}` : `Erro de clima: ${weatherError}`}
-              </p>
-            )}
           </div>
 
           <div className="pt-6">

@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -34,10 +33,10 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
       if (!line.trim()) return null;
       
       if (line.startsWith('## ')) {
-        return <h3 key={index} className="text-sm font-bold text-gray-900 mt-4 mb-1">{line.replace('## ', '')}</h3>;
+        return <h3 key={index} className="text-sm font-bold text-gray-900 mt-4 mb-1 w-full wrap-break-word">{line.replace('## ', '')}</h3>;
       }
       if (line.startsWith('# ')) {
-        return <h2 key={index} className="text-base font-extrabold text-gray-900 mt-2 mb-3">{line.replace('# ', '')}</h2>;
+        return <h2 key={index} className="text-base font-extrabold text-gray-900 mt-2 mb-3 w-full wrap-break-word">{line.replace('# ', '')}</h2>;
       }
       
       const parts = line.split(/(\*\*.*?\*\*)/g);
@@ -48,7 +47,7 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
         return part;
       });
 
-      return <p key={index} className="text-sm text-gray-700 leading-relaxed mb-2">{formattedLine}</p>;
+      return <p key={index} className="text-sm text-gray-700 leading-relaxed mb-2 text-justify w-full wrap-break-word">{formattedLine}</p>;
     });
   };
 
@@ -98,14 +97,12 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
 
           {/* Recomendação da IA */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-4">
-            <div className="flex items-start gap-3">
-              <FaExclamationCircle className="text-yellow-400 text-2xl flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Recomendação da IA</p>
-                <div className="mt-2">
-                  {renderFeedback(results.aiFeedback)}
-                </div>
-              </div>
+            <div className="flex items-center gap-2 mb-3">
+              <FaExclamationCircle className="text-yellow-400 text-xl shrink-0" />
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Recomendação da IA</p>
+            </div>
+            <div>
+              {renderFeedback(results.aiFeedback)}
             </div>
           </div>
 
