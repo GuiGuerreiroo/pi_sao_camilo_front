@@ -18,6 +18,7 @@ import {
     FaChevronRight,
     FaArrowLeft
 } from "react-icons/fa6";
+import { FaExclamationCircle, FaTshirt } from "react-icons/fa";
 
 function formatDuration(totalMinutes: number): string {
     const h = Math.floor(totalMinutes / 60);
@@ -61,6 +62,26 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
     const { trainings, get_all_trainings } = useContext(AthleteContext);
     const [training, setTraining] = useState<TrainingInterface | null>(null);
     const [loading, setLoading] = useState(trainings === undefined);
+
+    const renderFeedback = (text: string) => {
+        return text.split('\n').map((line, index) => {
+            if (!line.trim()) return null;
+            if (line.startsWith('## ')) {
+                return <h3 key={index} className="text-sm font-bold text-gray-900 mt-4 mb-1 w-full wrap-break-word">{line.replace('## ', '')}</h3>;
+            }
+            if (line.startsWith('# ')) {
+                return <h2 key={index} className="text-base font-extrabold text-gray-900 mt-2 mb-3 w-full wrap-break-word">{line.replace('# ', '')}</h2>;
+            }
+            const parts = line.split(/(\*\*.*?\*\*)/g);
+            const formattedLine = parts.map((part, i) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>;
+                }
+                return part;
+            });
+            return <p key={index} className="text-sm text-gray-700 leading-relaxed mb-2 text-justify w-full wrap-break-word">{formattedLine}</p>;
+        });
+    };
 
     useEffect(() => {
         const fetchAndFind = async () => {
@@ -131,7 +152,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                 </div>
                 
                 {/* Title Section */}
-                <div className="w-full max-w-4xl px-4 py-6 text-gray-800 flex items-center justify-between">
+                <div className="w-full max-w-7xl px-4 py-6 text-gray-800 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
@@ -140,9 +161,10 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                     </div>
                 </div>
 
-                {/* Main Card */}
-                <div className="w-full max-w-4xl px-4">
-                    <div className="bg-white rounded-[2rem] p-6 md:p-8 shadow-lg border border-gray-200">
+                {/* Main Content Area */}
+                <div className="w-full max-w-7xl px-4 flex flex-col xl:flex-row gap-6">
+                    {/* Main Card */}
+                    <div className="bg-white rounded-[2rem] p-6 md:p-8 shadow-lg border border-gray-200 flex-1">
                         {/* Card Header */}
                         <div className="flex justify-end items-center border-b border-gray-100 pb-4 mb-6">
                             {/* <div className="flex items-center gap-3 text-red-700">
@@ -157,93 +179,11 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                         </div>
 
                         {/* Grid Content */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-x-12 md:gap-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12 md:gap-y-6">
                             
-                            {/* Row 1 */}
-                            <div className="flex flex-col gap-2">
-                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
-                                    <span>Massa corporal</span>
-                                    <FaUser className="text-gray-400" />
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Pré exercício:</span>
-                                    <span>{training.pre_training_weight}kg</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Pós exercício:</span>
-                                    <span>{training.post_training_weight}kg</span>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
-                                    <span>Cor da urina</span>
-                                    <FaDroplet className="text-gray-400" />
-                                </div>
-                                <div 
-                                    className="w-16 h-8 rounded mt-1 border border-gray-200 shadow-sm"
-                                    style={{ backgroundColor: getUrineColorHex(training.urine_color) }}
-                                />
-                            </div>
-
+                            {/* --- ROW 1: Resultados e Massa corporal --- */}
+                            
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
-                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
-                                    <span>Volume urinário</span>
-                                    <FaFilter className="text-gray-400" />
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                    {(training.during_training_urine_elimination || 0).toFixed(1)}ml
-                                </div>
-                            </div>
-
-                            {/* Divider for mobile */}
-                            <div className="hidden md:block col-span-3 h-px bg-gray-100 my-2"></div>
-
-                            {/* Row 2 */}
-                            <div className="flex flex-col gap-2">
-                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
-                                    <span>Intensidade</span>
-                                    <FaSliders className="text-gray-400" />
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                    {getIntensityLabel(training.training_intensity)}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
-                                    <span>Tempo da sessão</span>
-                                    <FaClock className="text-gray-400" />
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                    {formatDuration(training.duration)}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
-                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
-                                    <span>Sintomas</span>
-                                    <FaClipboardList className="text-gray-400" />
-                                </div>
-                                <div className="text-sm text-gray-500 leading-tight">
-                                    {training.pre_training_symptoms.length > 0 || training.post_training_symptoms.length > 0 ? (
-                                        <>
-                                            {Array.from(new Set([...training.pre_training_symptoms, ...training.post_training_symptoms]))
-                                                .filter(s => s !== "NENHUM")
-                                                .map((s) => s.replace(/_/g, " "))
-                                                .join(", ") || "Nenhum"}
-                                        </>
-                                    ) : (
-                                        "Nenhum"
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Divider for mobile */}
-                            <div className="hidden md:block col-span-3 h-px bg-gray-100 my-2"></div>
-
-                            {/* Row 3 */}
-                            <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Resultados</span>
                                     <FaChartBar className="text-gray-400" />
@@ -266,7 +206,26 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Massa corporal</span>
+                                    <FaUser className="text-gray-400" />
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Pré exercício:</span>
+                                    <span>{training.pre_training_weight}kg</span>
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Pós exercício:</span>
+                                    <span>{training.post_training_weight}kg</span>
+                                </div>
+                            </div>
+
+                            <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
+
+                            {/* --- ROW 2: Ingestão de fluidos e Sintomas --- */}
+                            
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Ingestão de fluidos</span>
                                     <FaBottleWater className="text-gray-400" />
@@ -281,7 +240,83 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Sintomas</span>
+                                    <FaClipboardList className="text-gray-400" />
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Pré:</span>
+                                    <span className="text-right">
+                                        {training.pre_training_symptoms.filter(s => s !== "NENHUM").length > 0 
+                                            ? training.pre_training_symptoms.filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
+                                            : "Nenhum"}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Pós:</span>
+                                    <span className="text-right">
+                                        {training.post_training_symptoms.filter(s => s !== "NENHUM").length > 0 
+                                            ? training.post_training_symptoms.filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
+                                            : "Nenhum"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
+
+                            {/* --- ROW 3: Tempo da sessão e Intensidade --- */}
+                            
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Tempo da sessão</span>
+                                    <FaClock className="text-gray-400" />
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    {formatDuration(training.duration)}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Intensidade</span>
+                                    <FaSliders className="text-gray-400" />
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    {getIntensityLabel(training.training_intensity)}
+                                </div>
+                            </div>
+
+                            <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
+
+                            {/* --- ROW 4: Cor da urina e Volume urinário --- */}
+                            
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Cor da urina</span>
+                                    <FaDroplet className="text-gray-400" />
+                                </div>
+                                <div 
+                                    className="w-16 h-8 rounded mt-1 border border-gray-200 shadow-sm"
+                                    style={{ backgroundColor: getUrineColorHex(training.urine_color) }}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Volume urinário</span>
+                                    <FaFilter className="text-gray-400" />
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    {(training.during_training_urine_elimination || 0).toFixed(1)}ml
+                                </div>
+                            </div>
+
+                            <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
+
+                            {/* --- ROW 5: Condições ambientais e Roupas --- */}
+                            
+                            <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Condições ambientais</span>
                                     <FaCloudSun className="text-gray-400" />
@@ -296,18 +331,40 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                 </div>
                             </div>
 
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
+                                    <span>Roupas</span>
+                                    <FaTshirt className="text-gray-400" />
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Encharcadas:</span>
+                                    <span>{training.soaked_clothes === true ? "Sim" : training.soaked_clothes === false ? "Não" : "Não informado"}</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
-                    {/* Action Button */}
-                    <div className="flex justify-end mt-6 pb-6">
-                        <button className="flex items-center gap-2 bg-white text-red-700 font-semibold py-3 px-6 rounded-full shadow-md hover:bg-gray-50 transition-colors border border-gray-100">
-                            <span>Exportar Relatório</span>
-                            <div className="bg-gray-400 text-white rounded-full p-1 text-xs">
-                                <FaChevronRight />
-                            </div>
-                        </button>
+                    {/* Bloco Direito: Recomendação da IA */}
+                    <div className="bg-white rounded-[2rem] shadow-lg border border-gray-200 p-6 flex flex-col xl:w-[475px] shrink-0">
+                        <div className="flex items-center gap-2 mb-4">
+                            <FaExclamationCircle className="text-yellow-400 text-xl shrink-0" />
+                            <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide">Recomendação da IA</h2>
+                        </div>
+                        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            {renderFeedback(training.ai_suggestion || "Nenhuma recomendação disponível para este treino.")}
+                        </div>
                     </div>
+                </div>
+
+                {/* Action Button */}
+                <div className="w-full max-w-7xl px-4 flex justify-end mt-6 pb-6">
+                    <button className="flex items-center gap-2 bg-white text-red-700 font-semibold py-3 px-6 rounded-full shadow-md hover:bg-gray-50 transition-colors border border-gray-100">
+                        <span>Exportar Relatório</span>
+                        <div className="bg-gray-400 text-white rounded-full p-1 text-xs">
+                            <FaChevronRight />
+                        </div>
+                    </button>
                 </div>
             </main>
         </SlideBarContextProvider>

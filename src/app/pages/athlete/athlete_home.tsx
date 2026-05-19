@@ -22,6 +22,18 @@ import {
 } from "react-icons/fa";
 import { MdSportsTennis } from "react-icons/md";
 import { GiMuscleUp } from "react-icons/gi";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
+} from "recharts";
 
 /* ───────────────────────── helpers ───────────────────────── */
 
@@ -248,6 +260,56 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
         return "Boa noite";
     })();
 
+    const [chartMetric, setChartMetric] = useState<string>("massa");
+
+    const chartConfig = useMemo(() => {
+        switch (chartMetric) {
+            case "urina": 
+                return { key: "urina", name: "Volume Urinário", unit: "ml", ticks: [0, 100, 200, 300, 400, 500] };
+            case "duracao": 
+                return { key: "duracao", name: "Duração", unit: "min", ticks: [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180] };
+            case "intensidade": 
+                return { key: "intensidade", name: "Intensidade", unit: "", ticks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
+            case "sudorese": 
+                return { key: "sudorese", name: "Taxa de Sudorese", unit: "L/h", ticks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
+            case "massa":
+            default: 
+                return { key: "variação de massa", name: "Massa Corporal", unit: "kg", ticks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
+        }
+    }, [chartMetric]);
+
+    const chartData = useMemo(() => {
+        return [...safeTrainings].slice(0, 7).reverse().map(t => {
+            let val = 0;
+            switch (chartMetric) {
+                case "urina": val = t.during_training_urine_elimination || 0; break;
+                case "duracao": val = t.duration || 0; break;
+                case "intensidade": val = t.training_intensity || 0; break;
+                case "sudorese": val = t.sudorese || 0; break;
+                case "massa":
+                default: val = t.weight_difference || 0; break;
+            }
+            return {
+                date: formatDate(t.start_date).slice(0, 5), // DD/MM
+                value: Number(val.toFixed(2))
+            };
+        });
+    }, [safeTrainings, chartMetric]);
+
+    const pieData = useMemo(() => {
+        if (safeTrainings.length === 0) return [];
+        const counts: Record<string, number> = {};
+        safeTrainings.forEach(t => {
+            counts[t.modality] = (counts[t.modality] || 0) + 1;
+        });
+        return Object.entries(counts).map(([mod, count]) => ({
+            name: MODALITY_LABELS[mod as MODALITY],
+            value: (count / safeTrainings.length) * 100
+        }));
+    }, [safeTrainings]);
+
+    const PIE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1'];
+
     if (loading) {
         return (
             <SlideBarContextProvider>
@@ -386,6 +448,90 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                             </div>
                         </div>
                     </section>
+
+                    {/* ── Gráficos ── */}
+                    <section className="px-4 mt-5">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {/* Gráfico de Linhas: Evolução Multi-Métrica */}
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
+                                <div className="flex items-center justify-between mb-4 gap-2">
+                                    <h3 className="text-sm font-bold text-gray-700 truncate">Evolução</h3>
+                                    <select
+                                        value={chartMetric}
+                                        onChange={(e) => setChartMetric(e.target.value)}
+                                        className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-lg focus:ring-red-500 focus:border-red-500 block p-1.5 outline-none max-w-[170px]"
+                                    >
+                                        <option value="massa">Variação de Massa (kg)</option>
+                                        <option value="urina">Urina (ml)</option>
+                                        <option value="duracao">Duração (min)</option>
+                                        <option value="intensidade">Intensidade (1-10)</option>
+                                        <option value="sudorese">Sudorese (L/h)</option>
+                                    </select>
+                                </div>
+                                <div className="flex-1 w-full min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                            <XAxis dataKey="date" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+                                            <YAxis 
+                                                width={65}
+                                                tick={{fill: '#6b7280', fontSize: 12}} 
+                                                axisLine={false} 
+                                                tickLine={false} 
+                                                domain={[chartConfig.ticks[0], chartConfig.ticks[chartConfig.ticks.length - 1]]} 
+                                                ticks={chartConfig.ticks}
+                                                tickFormatter={(val: any) => `${val}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`}
+                                            />
+                                            <Tooltip 
+                                                cursor={{stroke: '#f9fafb', strokeWidth: 2}}
+                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                                formatter={(value: any) => [`${value}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`, chartConfig.name]}
+                                            />
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="value" 
+                                                stroke="#dc2626" 
+                                                strokeWidth={3} 
+                                                dot={{ r: 4, fill: '#dc2626', strokeWidth: 2, stroke: '#fff' }} 
+                                                activeDot={{ r: 6, fill: '#dc2626', stroke: '#fff', strokeWidth: 2 }} 
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {/* Gráfico de Pizza: Tipos de Treino */}
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
+                                <h3 className="text-sm font-bold text-gray-700 mb-4">Tipos de Treino</h3>
+                                <div className="flex-1 w-full min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData}
+                                                dataKey="value"
+                                                nameKey="name"
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius={80}
+                                                innerRadius={40}
+                                                labelLine={false}
+                                                label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                            >
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip 
+                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                                formatter={(value: any) => [`${Number(value).toFixed(1)}%`, 'Proporção']}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
 
                     {/* ── card: sugestão IA (último treino) ── */}
                     {/* {trainings.length > 0 && trainings[0].ai_suggestion && (
