@@ -1,4 +1,4 @@
-export type MODALITY = "FUTEBOL" | "CORRIDA" | "NATACAO" | "CICLISMO" | "BASQUETE" | "VOLEI" | "TENIS" | "MUSCULACAO" | "OUTRO";
+export type MODALITY = "FUTEBOL" | "CORRIDA" | "NATACAO" | "CICLISMO" | "BASQUETE" | "VOLEI" | "TENIS" | "ACADEMIA" | "OUTRO";
 
 export type URINE_COLOR = "TRANSPARENTE" | "AMARELO_CLARO" | "AMARELO" | "AMARELO_ESCURO" | "LARANJA" | "MARROM";
 
@@ -22,7 +22,7 @@ export interface TrainingInterface {
     // --- TEMPO ---
     start_date: number; // timestamp ms
     end_date: number;   // timestamp ms
-    duration: number;   // segundos
+    duration: number;   // minutos
 
     // --- CLIMA ---
     environment_temperature: number; // °C

@@ -12,6 +12,7 @@ export async function authUser(data: ILoginForm) {
             "password": data.password
         }
     )
+    console.log(response)
     // armazenando token
     localStorage.setItem('token', response.data.id_token)
     localStorage.setItem('refresh_token', response.data.refresh_token)

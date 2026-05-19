@@ -1,4 +1,4 @@
-import { Route, BrowserRouter, Routes } from 'react-router-dom'
+import { Route, BrowserRouter, Routes, Outlet } from 'react-router-dom'
 import { Login } from './pages/default/login'
 import { Unauthorized } from './pages/default/unauthorized'
 import { ToastContainer } from "react-toastify";
@@ -8,17 +8,32 @@ import SupportHome from './pages/support/support_home';
 import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
 import PrivateRoute from './utils/PrivateRoute';
+import { AthleteSessionReport } from './pages/athlete/athlete_session_report';
+import { AthleteReport } from './pages/athlete/athlete_report';
 import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
 import { VerifyAccount } from './pages/default/verifyAccount'
 import { SyncProvider } from './contexts/SyncContext';
+import NewSession from './pages/athlete/new_session';
+import PreSession from './pages/athlete/pre_session';
+import MidSession from './pages/athlete/mid_session';
+import PostSession from './pages/athlete/post_session';
+import ResultSession from './pages/athlete/result_session';
+import { AthleteContextProvider } from './contexts/AthleteContext';
 
-
+const AthleteLayout = () => {
+    return (
+        <AthleteContextProvider>
+            <Outlet />
+        </AthleteContextProvider>
+    );
+};
 
 const menuItemsAthlete: MenuItems[] = [
-    { name: "Meu Perfil", route: "/perfilStud" },
-    { name: "Novo Treino", route: "/paginaInicialAthlete" },
+    { name: "Tela Principal", route: "/paginaInicialAthlete" },
+    { name: "Novo Treino", route: "/new-session" },
+    { name: "Relatório", route: "/athleteReport"},
     { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
@@ -45,10 +60,19 @@ export default function App() {
                             {/* <Route path="/perfilSupport" element={<UserAccount menuItems={menuItemsSupport}/>}/> */}
                         </Route>
 
-                        <Route element={<PrivateRoute requiredRole="USER" />}>
-                            <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
+                    <Route element={<PrivateRoute requiredRole="USER" />}>
+                        <Route element={<AthleteLayout />}>
+                            <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
+                            <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
+                            <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
                             <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
+                            <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
+                            <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />}/> 
+                            <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />}/> 
+                            <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />}/> 
+                            <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
                         </Route>
+                    </Route>
 
                         {/* Example of adding the Admin route later */}
                         <Route element={<PrivateRoute requiredRole="ADM" />}>

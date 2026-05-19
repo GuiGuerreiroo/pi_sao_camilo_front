@@ -2,7 +2,8 @@ import type { MenuItems } from "../../interface/menuItems";
 import type { TrainingInterface, MODALITY } from "../../interface/TrainingInterface";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
-import { useState, useEffect, useMemo } from "react";
+import { AthleteContext } from "../../contexts/AthleteContext";
+import { useState, useEffect, useMemo, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     FaRunning,
@@ -21,6 +22,18 @@ import {
 } from "react-icons/fa";
 import { MdSportsTennis } from "react-icons/md";
 import { GiMuscleUp } from "react-icons/gi";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
+} from "recharts";
 
 /* ───────────────────────── helpers ───────────────────────── */
 
@@ -32,7 +45,7 @@ const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
     BASQUETE: <FaBasketballBall />,
     VOLEI: <FaVolleyballBall />,
     TENIS: <MdSportsTennis />,
-    MUSCULACAO: <FaDumbbell />,
+    ACADEMIA: <FaDumbbell />,
     OUTRO: <GiMuscleUp />,
 };
 
@@ -44,13 +57,13 @@ const MODALITY_LABELS: Record<MODALITY, string> = {
     BASQUETE: "Basquete",
     VOLEI: "Vôlei",
     TENIS: "Tênis",
-    MUSCULACAO: "Musculação",
+    ACADEMIA: "Academia",
     OUTRO: "Outro",
 };
 
-function formatDuration(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
+function formatDuration(totalMinutes: number): string {
+    const h = Math.floor(totalMinutes / 60);
+    const m = Math.floor(totalMinutes % 60);
     if (h > 0) return `${h}h ${m}min`;
     return `${m}min`;
 }
@@ -59,6 +72,7 @@ function formatDate(ts: number): string {
     return new Date(ts).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "2-digit",
+        year: "numeric"
     });
 }
 
@@ -78,96 +92,6 @@ function dehydrationLevel(pct: number): { label: string; color: string } {
     if (abs < 3) return { label: "Moderado", color: "#f97316" };
     return { label: "Alto", color: "#ef4444" };
 }
-
-/* ───────────────── mock data (replace with API) ─────────────── */
-
-const NOW = Date.now();
-const DAY = 86400000;
-
-const MOCK_TRAININGS: TrainingInterface[] = [
-    {
-        training_id: "1",
-        user_id: "u1",
-        modality: "CORRIDA",
-        start_date: NOW - 1 * DAY,
-        end_date: NOW - 1 * DAY + 3600000,
-        duration: 3600,
-        environment_temperature: 28,
-        environment_humidity: 65,
-        urine_color: "AMARELO_CLARO",
-        pre_training_symptoms: ["NENHUM"],
-        pre_training_weight: 72.5,
-        pre_training_hydration: 500,
-        clothing_equipment: true,
-        during_training_hydration: 600,
-        during_training_urine_elimination: 100,
-        post_training_symptoms: ["FADIGA"],
-        post_training_weight: 71.8,
-        soaked_clothes: true,
-        training_intensity: 7,
-        weight_difference: 0.7,
-        ajusted_weight_difference: 1.2,
-        hydric_balance: 500,
-        sudorese: 1.2,
-        weight_variation_percentage: 0.97,
-        ai_suggestion: "Aumente a hidratação durante o treino em dias quentes.",
-    },
-    {
-        training_id: "2",
-        user_id: "u1",
-        modality: "NATACAO",
-        start_date: NOW - 2 * DAY,
-        end_date: NOW - 2 * DAY + 5400000,
-        duration: 5400,
-        environment_temperature: 26,
-        environment_humidity: 80,
-        urine_color: "AMARELO",
-        pre_training_symptoms: ["NENHUM"],
-        pre_training_weight: 72.3,
-        pre_training_hydration: 400,
-        clothing_equipment: null,
-        during_training_hydration: 300,
-        during_training_urine_elimination: 50,
-        post_training_symptoms: ["NENHUM"],
-        post_training_weight: 71.5,
-        soaked_clothes: null,
-        training_intensity: 5,
-        weight_difference: 0.8,
-        ajusted_weight_difference: 1.05,
-        hydric_balance: 250,
-        sudorese: 0.7,
-        weight_variation_percentage: 1.1,
-        ai_suggestion: null,
-    },
-    {
-        training_id: "3",
-        user_id: "u1",
-        modality: "FUTEBOL",
-        start_date: NOW - 4 * DAY,
-        end_date: NOW - 4 * DAY + 7200000,
-        duration: 7200,
-        environment_temperature: 32,
-        environment_humidity: 55,
-        urine_color: "AMARELO_ESCURO",
-        pre_training_symptoms: ["SEDE_EXCESSIVA"],
-        pre_training_weight: 73,
-        pre_training_hydration: 300,
-        clothing_equipment: true,
-        during_training_hydration: 800,
-        during_training_urine_elimination: 150,
-        post_training_symptoms: ["CAIBRA", "FADIGA"],
-        post_training_weight: 71.2,
-        soaked_clothes: true,
-        training_intensity: 9,
-        weight_difference: 1.8,
-        ajusted_weight_difference: 2.45,
-        hydric_balance: 650,
-        sudorese: 1.225,
-        weight_variation_percentage: 2.47,
-        ai_suggestion:
-            "Atenção: desidratação moderada detectada. Hidrate-se melhor antes e durante o treino.",
-    },
-];
 
 /* ─────────────────────── sub-components ─────────────────────── */
 
@@ -268,27 +192,38 @@ function QuickStatCard({
 
 export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
     const navigate = useNavigate();
-    const [trainings, setTrainings] = useState<TrainingInterface[]>([]);
-    const [userName, setUserName] = useState("Atleta");
+    const { trainings, get_all_trainings, user, getUser } = useContext(AthleteContext);
+    const [loading, setLoading] = useState(trainings === undefined || user === undefined);
 
     useEffect(() => {
-        // TODO: trocar por chamada à API real
-        setTrainings(MOCK_TRAININGS);
-
-        try {
-            const stored = localStorage.getItem("user");
-            if (stored) {
-                const user = JSON.parse(stored);
-                if (user.name) setUserName(user.name);
+        const fetchInitialData = async () => {
+            if (trainings !== undefined && user !== undefined) {
+                setLoading(false);
+                return;
             }
-        } catch {
-            /* ignore */
-        }
-    }, []);
+
+            setLoading(true);
+            try {
+                const promises = [];
+                if (trainings === undefined) promises.push(get_all_trainings());
+                if (user === undefined) promises.push(getUser());
+                await Promise.all(promises);
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const safeTrainings = trainings || [];
+    const userName = user?.name || "Atleta";
 
     /* ── stats computados ── */
     const stats = useMemo(() => {
-        if (trainings.length === 0)
+        if (safeTrainings.length === 0)
             return {
                 avgSudorese: 0,
                 lastTemp: 0,
@@ -299,24 +234,24 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
             };
 
         const avgSudorese =
-            trainings.reduce((s, t) => s + t.sudorese, 0) / trainings.length;
-        const last = trainings[0];
-        const alerts = trainings.filter(
+            safeTrainings.reduce((s, t) => s + (t.sudorese || 0), 0) / safeTrainings.length;
+        const last = safeTrainings[0];
+        const alerts = safeTrainings.filter(
             (t) => Math.abs(t.weight_variation_percentage) >= 2
         ).length;
         const avgIntensity =
-            trainings.reduce((s, t) => s + t.training_intensity, 0) /
-            trainings.length;
+            safeTrainings.reduce((s, t) => s + t.training_intensity, 0) /
+            safeTrainings.length;
 
         return {
             avgSudorese,
             lastTemp: last.environment_temperature,
             lastHumidity: last.environment_humidity,
-            totalSessions: trainings.length,
+            totalSessions: safeTrainings.length,
             alerts,
             avgIntensity,
         };
-    }, [trainings]);
+    }, [safeTrainings]);
 
     const greeting = (() => {
         const h = new Date().getHours();
@@ -325,145 +260,293 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
         return "Boa noite";
     })();
 
+    const [chartMetric, setChartMetric] = useState<string>("massa");
+
+    const chartConfig = useMemo(() => {
+        switch (chartMetric) {
+            case "urina": 
+                return { key: "urina", name: "Volume Urinário", unit: "ml", ticks: [0, 100, 200, 300, 400, 500] };
+            case "duracao": 
+                return { key: "duracao", name: "Duração", unit: "min", ticks: [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180] };
+            case "intensidade": 
+                return { key: "intensidade", name: "Intensidade", unit: "", ticks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
+            case "sudorese": 
+                return { key: "sudorese", name: "Taxa de Sudorese", unit: "L/h", ticks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
+            case "massa":
+            default: 
+                return { key: "variação de massa", name: "Massa Corporal", unit: "kg", ticks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
+        }
+    }, [chartMetric]);
+
+    const chartData = useMemo(() => {
+        return [...safeTrainings].slice(0, 7).reverse().map(t => {
+            let val = 0;
+            switch (chartMetric) {
+                case "urina": val = t.during_training_urine_elimination || 0; break;
+                case "duracao": val = t.duration || 0; break;
+                case "intensidade": val = t.training_intensity || 0; break;
+                case "sudorese": val = t.sudorese || 0; break;
+                case "massa":
+                default: val = t.weight_difference || 0; break;
+            }
+            return {
+                date: formatDate(t.start_date).slice(0, 5), // DD/MM
+                value: Number(val.toFixed(2))
+            };
+        });
+    }, [safeTrainings, chartMetric]);
+
+    const pieData = useMemo(() => {
+        if (safeTrainings.length === 0) return [];
+        const counts: Record<string, number> = {};
+        safeTrainings.forEach(t => {
+            counts[t.modality] = (counts[t.modality] || 0) + 1;
+        });
+        return Object.entries(counts).map(([mod, count]) => ({
+            name: MODALITY_LABELS[mod as MODALITY],
+            value: (count / safeTrainings.length) * 100
+        }));
+    }, [safeTrainings]);
+
+    const PIE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1'];
+
+    if (loading) {
+        return (
+            <SlideBarContextProvider>
+                <main className="min-h-screen bg-gray-50 pb-28">
+                    <NavBar menuItems={menuItems} />
+                    <div className="flex flex-col justify-center items-center h-64 gap-3 mt-16">
+                        <div className="w-10 h-10 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin"></div>
+                        <p className="text-gray-500 text-sm font-medium">Carregando dados...</p>
+                    </div>
+                </main>
+            </SlideBarContextProvider>
+        );
+    }
+
     return (
         <SlideBarContextProvider>
             <main className="min-h-screen bg-gray-50 pb-28">
                 {/* ── header ── */}
                 <NavBar menuItems={menuItems} />
 
-                <div className="px-4 pt-6 pb-2 md:hidden">
-                    <p className="text-sm text-gray-400">{greeting},</p>
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        {userName}
-                    </h1>
-                </div>
-
-                {/* ── seção: Atividade ── */}
-                <section className="px-4 mt-2">
-                    <h2 className="text-lg font-bold text-gray-800 mb-3">
-                        Atividade
-                    </h2>
-
-                    {/* card: Histórico de Sessões */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-semibold text-sm text-gray-700">
-                                Histórico de Sessões
-                            </h3>
-                            <button
-                                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 active:bg-gray-200"
-                                onClick={() => navigate("/historico")}
-                            >
-                                <FaChevronRight className="text-xs" />
-                            </button>
-                        </div>
-
-                        {trainings.length === 0 ? (
-                            <p className="text-sm text-gray-400 py-6 text-center">
-                                Nenhuma sessão registrada ainda.
-                            </p>
-                        ) : (
-                            trainings
-                                .slice(0, 4)
-                                .map((t) => (
-                                    <SessionCard
-                                        key={t.training_id}
-                                        training={t}
-                                        onTap={() =>
-                                            navigate(
-                                                `/sessao/${t.training_id}`
-                                            )
-                                        }
-                                    />
-                                ))
-                        )}
+                    <div className="px-4 pt-6 pb-2 md:hidden">
+                        <p className="text-sm text-gray-400">{greeting},</p>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            {userName}
+                        </h1>
                     </div>
-                </section>
 
-                {/* ── grid 2×2: quick stats ── */}
-                <section className="px-4 mt-5">
-                    <div className="grid grid-cols-2 gap-3">
-                        <QuickStatCard
-                            icon={<FaExclamationTriangle />}
-                            label="Últimos Alertas"
-                            value={
-                                stats.alerts > 0
-                                    ? `${stats.alerts} alerta${stats.alerts > 1 ? "s" : ""}`
-                                    : "Nenhum"
-                            }
-                            color={stats.alerts > 0 ? "#ef4444" : "#22c55e"}
-                        />
-                        <QuickStatCard
-                            icon={<FaTint />}
-                            label="Taxa Média de Sudorese"
-                            value={`${stats.avgSudorese.toFixed(2)} L/h`}
-                            color="#3b82f6"
-                        />
-                        <QuickStatCard
-                            icon={<FaThermometerHalf />}
-                            label="Condições Atuais"
-                            value={`${stats.lastTemp}°C · ${stats.lastHumidity}%`}
-                            color="#f59e0b"
-                        />
-                        <QuickStatCard
-                            icon={<FaStar />}
-                            label="Suas Avaliações"
-                            value={`${stats.totalSessions} sessões`}
-                            color="#8b5cf6"
-                        />
-                    </div>
-                </section>
+                    {/* ── seção: Atividade ── */}
+                    <section className="px-4 mt-2">
+                        <h2 className="text-lg font-bold text-gray-800 mb-3">
+                            Atividade
+                        </h2>
 
-                {/* ── card: Intensidade média ── */}
-                <section className="px-4 mt-5">
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
-                        <span
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-                            style={{
-                                backgroundColor: `${intensityColor(Math.round(stats.avgIntensity))}18`,
-                                color: intensityColor(
-                                    Math.round(stats.avgIntensity)
-                                ),
-                            }}
-                        >
-                            <FaBolt />
-                        </span>
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-700">
-                                Intensidade Média
-                            </p>
-                            <div className="mt-1 w-full h-2 rounded-full bg-gray-200 overflow-hidden">
-                                <div
-                                    className="h-full rounded-full transition-all"
-                                    style={{
-                                        width: `${stats.avgIntensity * 10}%`,
-                                        backgroundColor: intensityColor(
-                                            Math.round(stats.avgIntensity)
-                                        ),
-                                    }}
-                                />
+                        {/* card: Histórico de Sessões */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <h3 className="font-semibold text-sm text-gray-700">
+                                    Histórico de Sessões
+                                </h3>
+                                <button
+                                    className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 active:bg-gray-200"
+                                    onClick={() => navigate("/athleteReport")}
+                                >
+                                    <FaChevronRight className="text-xs" />
+                                </button>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">
-                                {stats.avgIntensity.toFixed(1)} / 10
-                            </p>
-                        </div>
-                    </div>
-                </section>
 
-                {/* ── card: sugestão IA (último treino) ── */}
-                {/* {trainings.length > 0 && trainings[0].ai_suggestion && (
-                    <section className="px-4 mt-5">
-                        <div className="bg-gradient-to-br from-gray-200 to-gray-200 rounded-2xl p-4 shadow-md text-red-600">
-                            <p className="text-xs font-bold uppercase tracking-wider opacity-80 mb-1">
-                                Sugestão da IA
-                            </p>
-                            <p className="text-sm leading-relaxed">
-                                {trainings[0].ai_suggestion}
-                            </p>
+                            {safeTrainings.length === 0 ? (
+                                <p className="text-sm text-gray-400 py-6 text-center">
+                                    Nenhum treino encontrado.
+                                </p>
+                            ) : (
+                                safeTrainings
+                                    .slice(0, 3)
+                                    .map((t) => (
+                                        <SessionCard
+                                            key={t.training_id}
+                                            training={t}
+                                            onTap={() =>
+                                                navigate(
+                                                    `/athleteSessionReport/${t.training_id}`
+                                                )
+                                            }
+                                        />
+                                    ))
+                            )}
                         </div>
                     </section>
-                )} */}
-            </main>
-        </SlideBarContextProvider>
+
+                    {/* ── grid 2×2: quick stats ── */}
+                    <section className="px-4 mt-5">
+                        <div className="grid grid-cols-2 gap-3">
+                            <QuickStatCard
+                                icon={<FaExclamationTriangle />}
+                                label="Últimos Alertas"
+                                value={
+                                    stats.alerts > 0
+                                        ? `${stats.alerts} alerta${stats.alerts > 1 ? "s" : ""}`
+                                        : "Nenhum"
+                                }
+                                color={stats.alerts > 0 ? "#ef4444" : "#22c55e"}
+                            />
+                            <QuickStatCard
+                                icon={<FaTint />}
+                                label="Taxa Média de Sudorese"
+                                value={`${stats.avgSudorese.toFixed(2)} L/h`}
+                                color="#3b82f6"
+                            />
+                            <QuickStatCard
+                                icon={<FaThermometerHalf />}
+                                label="Condições Atuais"
+                                value={`${stats.lastTemp}°C · ${stats.lastHumidity}%`}
+                                color="#f59e0b"
+                            />
+                            <QuickStatCard
+                                icon={<FaStar />}
+                                label="Suas Avaliações"
+                                value={`${stats.totalSessions} sessões`}
+                                color="#8b5cf6"
+                            />
+                        </div>
+                    </section>
+
+                    {/* ── card: Intensidade média ── */}
+                    <section className="px-4 mt-5">
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+                            <span
+                                className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
+                                style={{
+                                    backgroundColor: `${intensityColor(Math.round(stats.avgIntensity))}18`,
+                                    color: intensityColor(
+                                        Math.round(stats.avgIntensity)
+                                    ),
+                                }}
+                            >
+                                <FaBolt />
+                            </span>
+                            <div className="flex-1">
+                                <p className="text-sm font-semibold text-gray-700">
+                                    Intensidade Média
+                                </p>
+                                <div className="mt-1 w-full h-2 rounded-full bg-gray-200 overflow-hidden">
+                                    <div
+                                        className="h-full rounded-full transition-all"
+                                        style={{
+                                            width: `${stats.avgIntensity * 10}%`,
+                                            backgroundColor: intensityColor(
+                                                Math.round(stats.avgIntensity)
+                                            ),
+                                        }}
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    {stats.avgIntensity.toFixed(1)} / 10
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* ── Gráficos ── */}
+                    <section className="px-4 mt-5">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {/* Gráfico de Linhas: Evolução Multi-Métrica */}
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
+                                <div className="flex items-center justify-between mb-4 gap-2">
+                                    <h3 className="text-sm font-bold text-gray-700 truncate">Evolução</h3>
+                                    <select
+                                        value={chartMetric}
+                                        onChange={(e) => setChartMetric(e.target.value)}
+                                        className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-lg focus:ring-red-500 focus:border-red-500 block p-1.5 outline-none max-w-[170px]"
+                                    >
+                                        <option value="massa">Variação de Massa (kg)</option>
+                                        <option value="urina">Urina (ml)</option>
+                                        <option value="duracao">Duração (min)</option>
+                                        <option value="intensidade">Intensidade (1-10)</option>
+                                        <option value="sudorese">Sudorese (L/h)</option>
+                                    </select>
+                                </div>
+                                <div className="flex-1 w-full min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                            <XAxis dataKey="date" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+                                            <YAxis 
+                                                width={65}
+                                                tick={{fill: '#6b7280', fontSize: 12}} 
+                                                axisLine={false} 
+                                                tickLine={false} 
+                                                domain={[chartConfig.ticks[0], chartConfig.ticks[chartConfig.ticks.length - 1]]} 
+                                                ticks={chartConfig.ticks}
+                                                tickFormatter={(val: any) => `${val}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`}
+                                            />
+                                            <Tooltip 
+                                                cursor={{stroke: '#f9fafb', strokeWidth: 2}}
+                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                                formatter={(value: any) => [`${value}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`, chartConfig.name]}
+                                            />
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="value" 
+                                                stroke="#dc2626" 
+                                                strokeWidth={3} 
+                                                dot={{ r: 4, fill: '#dc2626', strokeWidth: 2, stroke: '#fff' }} 
+                                                activeDot={{ r: 6, fill: '#dc2626', stroke: '#fff', strokeWidth: 2 }} 
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {/* Gráfico de Pizza: Tipos de Treino */}
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
+                                <h3 className="text-sm font-bold text-gray-700 mb-4">Tipos de Treino</h3>
+                                <div className="flex-1 w-full min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData}
+                                                dataKey="value"
+                                                nameKey="name"
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius={80}
+                                                innerRadius={40}
+                                                labelLine={false}
+                                                label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                            >
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip 
+                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                                formatter={(value: any) => [`${Number(value).toFixed(1)}%`, 'Proporção']}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    {/* ── card: sugestão IA (último treino) ── */}
+                    {/* {trainings.length > 0 && trainings[0].ai_suggestion && (
+                        <section className="px-4 mt-5">
+                            <div className="bg-gradient-to-br from-gray-200 to-gray-200 rounded-2xl p-4 shadow-md text-red-600">
+                                <p className="text-xs font-bold uppercase tracking-wider opacity-80 mb-1">
+                                    Sugestão da IA
+                                </p>
+                                <p className="text-sm leading-relaxed">
+                                    {trainings[0].ai_suggestion}
+                                </p>
+                            </div>
+                        </section>
+                    )} */}
+                </main>
+            </SlideBarContextProvider>
     );
 }

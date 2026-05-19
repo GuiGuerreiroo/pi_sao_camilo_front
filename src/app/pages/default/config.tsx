@@ -188,8 +188,8 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
               </div>
   
               {/* Dica Box */}
-              <div className="bg-red-50 border border-red-100 rounded-lg p-4 mt-8">
-                <p className="text-sm text-[#BD2024] leading-relaxed">
+              <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4 mt-8">
+                <p className="text-sm text-yellow-700 leading-relaxed">
                   <strong>Dica:</strong> Após preencher os campos acima, o botão de confirmação ficará disponível.
                 </p>
               </div>

@@ -75,18 +75,18 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         <>
             {/* Desktop Navbar */}
             <nav className="hidden md:block">
-                <div className="flex justify-between items-center text-white bg-red-800 w-full py-4 px-6">
+                <div className="flex justify-between items-center  bg-gray-200 border-b border-gray-200 w-full py-4 px-6">
                     <div className="flex items-center gap-x-3">
-                        <div className="bg-white/20 rounded-full w-10 h-10 flex items-center justify-center">
+                        <div className="bg-red/20 rounded-full w-10 h-10 flex items-center justify-center">
                             <FaUserCircle className="text-2xl" />
                         </div>
-                        <div className="flex items-center gap-x-1.5 text-white">
+                        <div className="flex items-center gap-x-1.5 text-black">
                             <span className="font-bold text-lg">{role}</span>
                             <span className="text-lg">{userName}</span>
                         </div>
                     </div>
                     <button
-                        className="p-2 rounded-lg text-black-600 hover:bg-red-400 transition-all duration-200"
+                        className="p-2 rounded-lg text-black-600 hover:bg-gray-300 transition-all duration-200"
                         onClick={toggleMenu}
                     >
                         <IoMenu className="text-2xl" />
@@ -98,22 +98,22 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
             {/* Mobile Navbar (bottom bar) */}
             <div className="fixed bottom-0 left-0 w-full bg-gray-200 flex justify-around items-center py-5 shadow-lg z-50 md:hidden">
 
-                <button onClick={() => navigate("/paginaInicialADM")}>
+                <button onClick={() => navigate("/paginaInicialAthlete")}>
                     <FaThLarge className="text-red-700 text-2xl" />
                 </button>
 
                 <button
                     className="text-red-700 border-4 border-red-700 text-red w-8 h-8 rounded-full flex items-center justify-center  shadow-lg"
-                    onClick={() => navigate("/nova-sessao")}
+                    onClick={() => navigate("/new-session")}
                 >
                     <FaPlus />
                 </button>
 
-                <button onClick={() => navigate("/paginaInicialSupport")}>
+                <button onClick={() => navigate("/athleteReport")}>
                     <FaFileAlt className="text-red-700 text-2xl" />
                 </button>
 
-                <button className="p-2 text-[#BD2024] hover:bg-gray-300 rounded-lg transition-colors">
+                <button onClick={() => navigate("/configuracao")} className="p-2 text-[#BD2024] hover:bg-gray-300 rounded-lg transition-colors">
                     <Settings size={28} strokeWidth={2.5} />
                 </button>
 

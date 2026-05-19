@@ -1,0 +1,17 @@
+import type { TrainingInterface } from "../../interface/TrainingInterface";
+import axios from "axios";
+
+export async function get_all_trainings(): Promise<TrainingInterface[]> {
+    const baseURL = import.meta.env.VITE_MSS_API_URL;
+    
+    const response = await axios.get(
+        `${baseURL}/get-all-trainings`,
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        }
+    );
+    
+    return response.data.trainings;
+}

@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import Button from '../../components/button'
+import { validateCode } from '../../api/user/validateCode'
+import { resendCode } from '../../api/user/resendCode'
 
 const CODE_LENGTH = 6
 const TIMER_SECONDS = 5 * 60 // 5 minutos
@@ -87,18 +89,28 @@ export function VerifyAccount() {
         setIsLoading(true)
 
         try {
-            // Substitua pela sua chamada real de API, ex: await verifyCode({ email, code })
-            await new Promise((resolve) => setTimeout(resolve, 1500))
+            await validateCode({ email, code })
 
             toast.success('E-mail verificado com sucesso!')
             navigate('/')
         } catch (error) {
             console.error(error)
 
-            if (axios.isAxiosError(error) && error.response?.data?.message) {
-                toast.error(error.response.data.message)
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 400 && typeof error.response.data === 'string') {
+                    // Exibe o toast amarelo (warn) com a mensagem da API (ex: "O código expirou. Solicite um novo.")
+                    toast.warn(error.response.data)
+                } else if (error.response?.status === 404 || error.response?.status === 410) {
+                    const msg = typeof error.response.data === 'string' ? error.response.data : 'Conta não encontrada ou excluída.'
+                    toast.error(`${msg} Por favor, crie uma nova conta.`)
+                    navigate('/createAccount')
+                } else if (error.response?.data?.message) {
+                    toast.error(error.response.data.message)
+                } else {
+                    toast.error('Código inválido ou expirado. Tente novamente.')
+                }
             } else {
-                toast.error('Código inválido ou expirado. Tente novamente.')
+                toast.error('Ocorreu um erro inesperado. Tente novamente.')
             }
 
             setDigits(Array(CODE_LENGTH).fill(''))
@@ -116,8 +128,7 @@ export function VerifyAccount() {
         setIsResending(true)
 
         try {
-            // Substitua pela sua chamada real de API, ex: await resendCode(email)
-            await new Promise((resolve) => setTimeout(resolve, 1200))
+            await resendCode(email)
 
             // Reinicia o temporizador
             setTimeLeft(TIMER_SECONDS)
