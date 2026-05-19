@@ -517,7 +517,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                 labelLine={false}
                                                 label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                                             >
-                                                {pieData.map((entry, index) => (
+                                                {pieData.map((_entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                                                 ))}
                                             </Pie>

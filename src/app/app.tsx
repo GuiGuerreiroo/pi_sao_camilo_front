@@ -21,6 +21,9 @@ import MidSession from './pages/athlete/mid_session';
 import PostSession from './pages/athlete/post_session';
 import ResultSession from './pages/athlete/result_session';
 import { AthleteContextProvider } from './contexts/AthleteContext';
+import { SupportContextProvider } from './contexts/SupportContext';
+
+import SupportAthleteDetails from './pages/support/support_athlete_details';
 
 const AthleteLayout = () => {
     return (
@@ -30,10 +33,23 @@ const AthleteLayout = () => {
     );
 };
 
+const SupportLayout = () => {
+    return (
+        <SupportContextProvider>
+            <Outlet />
+        </SupportContextProvider>
+    );
+};
+
 const menuItemsAthlete: MenuItems[] = [
     { name: "Tela Principal", route: "/paginaInicialAthlete" },
     { name: "Novo Treino", route: "/new-session" },
-    { name: "Relatório", route: "/athleteReport"},
+    { name: "Relatório", route: "/athleteReport" },
+    { name: "Configurações", route: "/configuracao" },
+    { name: "Sair", route: "/" }
+];
+const menuItemsSupport: MenuItems[] = [
+    { name: "Tela Principal", route: "/paginaInicialSupport" },
     { name: "Configurações", route: "/configuracao" },
     { name: "Sair", route: "/" }
 ];
@@ -49,30 +65,37 @@ export default function App() {
                         <Route path="/verifyAccount" element={<VerifyAccount />} />
                         <Route path="/error" element={<Unauthorized />} />
                         <Route path="/unauthorized" element={<Unauthorized />} />
-                        <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
+
                         {/* Placeholder for future screens */}
                         {/* <Route path='/verify' element={<VerifyEmail />} /> */}
                         {/* <Route path='/register' element={<CreateUser />} /> */}
                         {/* <Route path='/alterarSenha' element={<ChangePassword />} /> */}
 
                         <Route element={<PrivateRoute requiredRole="SUPPORT" />}>
-                            <Route path="/paginaInicialSupport" element={<SupportHome />} />
-                            {/* <Route path="/perfilSupport" element={<UserAccount menuItems={menuItemsSupport}/>}/> */}
+                            <Route element={<SupportLayout />}>
+                                <Route path="/paginaInicialSupport" element={<SupportHome menuItems={menuItemsSupport} />} />
+                                <Route path="/configuracao" element={<Perfil menuItems={menuItemsSupport} />} />
+
+                                <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsSupport} />} />
+                                <Route path="/support/athleteDetails" element={<SupportAthleteDetails menuItems={menuItemsSupport} />} />
+
+                            </Route>
                         </Route>
 
-                    <Route element={<PrivateRoute requiredRole="USER" />}>
-                        <Route element={<AthleteLayout />}>
-                            <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
-                            <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
-                            <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
-                            <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />}/> 
-                            <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />}/> 
-                            <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />}/> 
-                            <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />}/> 
-                            <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />}/> 
-                            <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
+                        <Route element={<PrivateRoute requiredRole="USER" />}>
+                            <Route element={<AthleteLayout />}>
+                                <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
+                                <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
+                                <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
+                                <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />} />
+                                <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />} />
+                                <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />} />
+                                <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />} />
+                                <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />} />
+                                <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
+                                <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
+                            </Route>
                         </Route>
-                    </Route>
 
                         {/* Example of adding the Admin route later */}
                         <Route element={<PrivateRoute requiredRole="ADM" />}>
