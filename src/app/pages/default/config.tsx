@@ -104,7 +104,7 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                 <p className="text-gray-500 text-sm mt-1">Gerencie suas informações pessoais</p>
               </div>
             </div>
-            <button onClick={handleOpenModal} className="flex items-center gap-2 border border-[#BD2024] text-[#BD2024] bg-transparent hover:bg-[#BD2024] hover:text-white px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center">
+            <button onClick={handleOpenModal} className="flex items-center gap-2 border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center">
               <Edit size={18} />
               Editar Perfil
             </button>
@@ -197,10 +197,10 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
               {/* Salvar Senha Button */}
               <button 
                 onClick={handlePasswordChange}
-                className={`mt-6 flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors w-full ${
+                className={`mt-6 flex items-center justify-center gap-2 border-2 px-5 py-2.5 rounded-lg font-medium transition-colors w-full ${
                   isPasswordReady 
-                    ? 'border border-[#BD2024] text-[#BD2024] bg-transparent hover:bg-[#BD2024] hover:text-white cursor-pointer shadow-sm' 
-                    : 'bg-white border border-gray-200 text-gray-400 cursor-not-allowed'
+                    ? 'border-red-600 text-red-600 bg-white hover:bg-red-50 cursor-pointer' 
+                    : 'border-gray-200 text-gray-400 bg-white cursor-not-allowed'
                 }`}
                 disabled={!isPasswordReady}
               >
@@ -251,13 +251,13 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
               <div className="mt-8 flex gap-3 justify-end">
                 <button 
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-5 py-2.5 font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   Cancelar
                 </button>
                 <button 
                   onClick={handleSave}
-                  className="px-4 py-2 text-sm font-medium border border-[#BD2024] text-[#BD2024] bg-transparent hover:bg-[#BD2024] hover:text-white rounded-lg transition-colors shadow-sm"
+                  className="px-5 py-2.5 font-medium border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 rounded-lg transition-colors"
                 >
                   Salvar Alterações
                 </button>

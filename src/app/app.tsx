@@ -50,7 +50,7 @@ const menuItemsAthlete: MenuItems[] = [
 ];
 const menuItemsSupport: MenuItems[] = [
     { name: "Tela Principal", route: "/paginaInicialSupport" },
-    { name: "Configurações", route: "/configuracao" },
+    { name: "Configurações", route: "/support/configuracao" },
     { name: "Sair", route: "/" }
 ];
 
@@ -74,9 +74,9 @@ export default function App() {
                         <Route element={<PrivateRoute requiredRole="SUPPORT" />}>
                             <Route element={<SupportLayout />}>
                                 <Route path="/paginaInicialSupport" element={<SupportHome menuItems={menuItemsSupport} />} />
-                                <Route path="/configuracao" element={<Perfil menuItems={menuItemsSupport} />} />
+                                <Route path="/support/configuracao" element={<Perfil menuItems={menuItemsSupport} />} />
 
-                                <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsSupport} />} />
+                                <Route path="/support/athleteReport" element={<AthleteReport menuItems={menuItemsSupport} />} />
                                 <Route path="/support/athleteDetails" element={<SupportAthleteDetails menuItems={menuItemsSupport} />} />
 
                             </Route>
