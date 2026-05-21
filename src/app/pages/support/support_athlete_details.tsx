@@ -6,7 +6,7 @@ import NavBar from '../../components/navbar';
 import type { MenuItems } from '../../interface/menuItems';
 import type { TrainingInterface, MODALITY } from '../../interface/TrainingInterface';
 import type { AthleteInGroup } from '../../interface/GroupInterface';
-import { FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaExclamationTriangle } from 'react-icons/fa';
+import { FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory } from 'react-icons/fa';
 import { MdSportsTennis } from 'react-icons/md';
 import { GiMuscleUp } from 'react-icons/gi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
@@ -51,10 +51,10 @@ function formatDate(ts: number): string {
 }
 
 function intensityColor(intensity: number): string {
-    if (intensity <= 3) return "#22c55e"; // green
-    if (intensity <= 6) return "#eab308"; // yellow
-    if (intensity <= 8) return "#f97316"; // orange
-    return "#ef4444"; // red
+    if (intensity <= 3) return "#22c55e";
+    if (intensity <= 6) return "#eab308";
+    if (intensity <= 8) return "#f97316";
+    return "#ef4444";
 }
 
 function dehydrationLevel(pct: number): { label: string; color: string } {
@@ -128,7 +128,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                 default: val = t.weight_difference || 0; break;
             }
             return {
-                date: formatDate(t.start_date).slice(0, 5), // DD/MM
+                date: formatDate(t.start_date).slice(0, 5),
                 value: Number(val.toFixed(2))
             };
         });
@@ -156,7 +156,6 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
             }
             groups[t.modality].count += 1;
         });
-        // Sort by highest count
         return Object.values(groups).sort((a, b) => b.count - a.count);
     }, [safeTrainings]);
 
@@ -186,6 +185,13 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                         <h2 className="text-3xl font-bold text-gray-900">Relatório do Atleta</h2>
                         <p className="text-gray-500 text-sm mt-1">{member.name} &middot; {member.email}</p>
                     </div>
+                    <button
+                        className="ml-auto flex items-center gap-2 text-sm text-red-600 border border-red-200 rounded-full px-4 py-1.5 hover:bg-red-50 active:scale-95 transition-all"
+                        onClick={() => navigate("/sessionHistory", { state: { member, groupIndex: location.state?.groupIndex } })}
+                    >
+                        <FaHistory className="text-xs" />
+                        Histórico
+                    </button>
                 </div>
 
                 {/* Gráficos Lado a Lado */}
@@ -297,7 +303,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                     key={item.modality}
                                     modality={item.modality} 
                                     count={item.count} 
-                                    onClick={() => navigate(`/support/athleteDetails/modality/${item.modality.toLowerCase()}`)}
+                                    onClick={() => navigate("/sessionHistory", { state: { member, groupIndex: location.state?.groupIndex, preSelectedModality: item.modality } })}
                                 />
                             ))}
                         </div>

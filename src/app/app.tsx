@@ -22,8 +22,8 @@ import PostSession from './pages/athlete/post_session';
 import ResultSession from './pages/athlete/result_session';
 import { AthleteContextProvider } from './contexts/AthleteContext';
 import { SupportContextProvider } from './contexts/SupportContext';
-
 import SupportAthleteDetails from './pages/support/support_athlete_details';
+import SessionHistory from './pages/support/support_session_history';
 
 const AthleteLayout = () => {
     return (
@@ -78,7 +78,7 @@ export default function App() {
 
                                 <Route path="/support/athleteReport" element={<AthleteReport menuItems={menuItemsSupport} />} />
                                 <Route path="/support/athleteDetails" element={<SupportAthleteDetails menuItems={menuItemsSupport} />} />
-
+                              <Route path="/sessionHistory" element={<SessionHistory menuItems={menuItemsSupport} />} />
                             </Route>
                         </Route>
 

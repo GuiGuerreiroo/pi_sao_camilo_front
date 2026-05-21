@@ -100,7 +100,7 @@ export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                     {/* Arrow Button */}
                                                     <button 
                                                         className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
-                                                        onClick={() => navigate("/support/athleteDetails", { state: { member } })}
+                                                       onClick={() => navigate("/support/athleteDetails", { state: { member, groupIndex: index + 1 } })}
                                                     >
                                                         <FiChevronRight className="w-4 h-4 ml-0.5" />
                                                     </button>
