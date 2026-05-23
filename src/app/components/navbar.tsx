@@ -50,6 +50,13 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         }
     }, [])
 
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        navigate("/");
+    };
+
     // Esconder no login
     if (location.pathname === "/") return null;
 
@@ -82,6 +89,22 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                                 {item.name}
                             </Link>
                         ))}
+
+                        {/* Configurações */}
+                        <button
+                            onClick={() => navigate(role === 'Suporte' ? '/support/configuracao' : '/configuracao')}
+                            className="text-red-100 hover:text-white transition-colors font-semibold"
+                        >
+                            Perfil
+                        </button>
+
+                        {/* Sair */}
+                        <button
+                            onClick={handleLogout}
+                            className="text-red-100 hover:text-white transition-colors font-semibold"
+                        >
+                            Sair
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -93,19 +116,16 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                     <FaThLarge className="text-red-700 text-2xl" />
                 </button>
 
-                <button
-                    className="text-red-700 border-4 border-red-700 text-red w-8 h-8 rounded-full flex items-center justify-center  shadow-lg"
-                    onClick={() => navigate("/new-session")}
-                >
-                    <FaPlus />
+                <button onClick={() => navigate("/new-session")}>
+                    <FaPlus className="text-red-700 text-2xl" />
                 </button>
 
                 <button onClick={() => navigate("/athleteReport")}>
                     <FaFileAlt className="text-red-700 text-2xl" />
                 </button>
 
-                <button onClick={() => navigate("/configuracao")} className="p-2 text-[#BD2024] hover:bg-gray-300 rounded-lg transition-colors">
-                    <FaUserCircle size={28} />
+                <button onClick={() => navigate("/configuracao")}>
+                    <FaUserCircle className="text-red-700 text-2xl" />
                 </button>
 
             </div>
