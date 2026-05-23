@@ -9,7 +9,7 @@ import type { AthleteInGroup } from '../../interface/GroupInterface';
 import { FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory } from 'react-icons/fa';
 import { MdSportsTennis } from 'react-icons/md';
 import { GiMuscleUp } from 'react-icons/gi';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ReferenceArea } from "recharts";
 
 const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
     FUTEBOL: <FaFutbol />,
@@ -99,6 +99,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
     const safeTrainings = member?.trainings || [];
 
     const [chartMetric, setChartMetric] = useState<string>("massa");
+    const [timeFilter, setTimeFilter] = useState<string>("1m");
 
     const chartConfig = useMemo(() => {
         switch (chartMetric) {
@@ -110,29 +111,93 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                 return { key: "intensidade", name: "Intensidade", unit: "", ticks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
             case "sudorese": 
                 return { key: "sudorese", name: "Taxa de Sudorese", unit: "L/h", ticks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
+            case "diferenca_massa":
+                return { key: "diferenca_massa", name: "Variação de Massa", unit: "kg", ticks: [-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] };
+            case "ajustada_massa":
+                return { key: "ajustada_massa", name: "Volume Total de Suor", unit: "L", ticks: [-0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
             case "massa":
             default: 
-                return { key: "variação de massa", name: "Massa Corporal", unit: "kg", ticks: [0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
+                return { key: "variação de massa", name: "Variação de Massa", unit: "%", ticks: [-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] };
         }
     }, [chartMetric]);
 
+    const filteredTrainings = useMemo(() => {
+        const now = new Date();
+        const past = new Date();
+        switch (timeFilter) {
+            case '1w': past.setDate(now.getDate() - 7); break;
+            case '2w': past.setDate(now.getDate() - 14); break;
+            case '1m': past.setMonth(now.getMonth() - 1); break;
+            case '6m': past.setMonth(now.getMonth() - 6); break;
+            case '1y': past.setFullYear(now.getFullYear() - 1); break;
+            default: past.setMonth(now.getMonth() - 1); break;
+        }
+
+        const filtered = safeTrainings.filter(t => new Date(t.start_date) >= past);
+        return [...filtered].reverse(); // reverse makes it oldest to newest for the chart
+    }, [safeTrainings, timeFilter]);
+
     const chartData = useMemo(() => {
-        return [...safeTrainings].slice(0, 7).reverse().map(t => {
+        return filteredTrainings.map(t => {
             let val = 0;
             switch (chartMetric) {
                 case "urina": val = t.during_training_urine_elimination || 0; break;
                 case "duracao": val = t.duration || 0; break;
                 case "intensidade": val = t.training_intensity || 0; break;
                 case "sudorese": val = t.sudorese || 0; break;
+                case "diferenca_massa": val = t.weight_difference || 0; break;
+                case "ajustada_massa": val = t.ajusted_weight_difference || 0; break;
                 case "massa":
-                default: val = t.weight_difference || 0; break;
+                default: val = t.weight_variation_percentage || 0; break;
             }
             return {
-                date: formatDate(t.start_date).slice(0, 5),
-                value: Number(val.toFixed(2))
+                date: formatDate(t.start_date).slice(0, 5), // DD/MM
+                fullDate: formatDate(t.start_date), // DD/MM/YYYY
+                value: Number(val.toFixed(2)),
+                raw: t
             };
         });
-    }, [safeTrainings, chartMetric]);
+    }, [filteredTrainings, chartMetric]);
+
+    const avgWeight = useMemo(() => {
+        if (filteredTrainings.length === 0) return 70;
+        const sum = filteredTrainings.reduce((acc, t) => acc + (t.pre_training_weight || 70), 0);
+        return sum / filteredTrainings.length;
+    }, [filteredTrainings]);
+
+    const yAxisDomain = useMemo(() => {
+        if (chartData.length === 0) return [0, 10];
+        let dMin = Infinity;
+        let dMax = -Infinity;
+        chartData.forEach(d => {
+            if (d.value < dMin) dMin = d.value;
+            if (d.value > dMax) dMax = d.value;
+        });
+
+        if (dMin === Infinity) dMin = 0;
+        if (dMax === -Infinity) dMax = 0;
+
+        let min = dMin;
+        let max = dMax;
+        
+        if (chartMetric === 'sudorese') {
+            min = Math.min(0, dMin);
+            max = Math.max(3.5, dMax);
+        } else if (chartMetric === 'massa' || chartMetric === 'diferenca_massa') {
+            min = Math.min(-1, dMin);
+            max = Math.max(3, dMax);
+        } else if (chartMetric === 'ajustada_massa' || chartMetric === 'urina' || chartMetric === 'duracao' || chartMetric === 'intensidade') {
+            min = 0;
+        }
+
+        if (max <= dMax) max = dMax + (Math.abs(dMax) * 0.1 || 1);
+        if (min >= dMin && dMin < 0) min = dMin - (Math.abs(dMin) * 0.1 || 1);
+
+        return [
+            chartMetric === 'intensidade' ? 0 : Number(min.toFixed(1)), 
+            chartMetric === 'intensidade' ? 10 : Number(max.toFixed(1))
+        ];
+    }, [chartData, chartMetric]);
 
     const pieData = useMemo(() => {
         if (safeTrainings.length === 0) return [];
@@ -196,65 +261,168 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
 
                 {/* Gráficos Lado a Lado */}
                 <section className="mb-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        
-                        {/* Gráfico 1: Linhas Evolução */}
-                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-[350px]">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-800">Evolução do Treino</h3>
-                                <select
-                                    value={chartMetric}
-                                    onChange={(e) => setChartMetric(e.target.value)}
-                                    className="text-sm bg-gray-50 border border-gray-200 text-gray-700 rounded-lg p-2 outline-none focus:border-red-500"
-                                >
-                                    <option value="massa">Massa Corporal</option>
-                                    <option value="urina">Volume Urinário</option>
-                                    <option value="duracao">Duração</option>
-                                    <option value="intensidade">Intensidade</option>
-                                    <option value="sudorese">Sudorese</option>
-                                </select>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {/* Gráfico de Linhas: Evolução Multi-Métrica */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
+                            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-bold text-gray-700 truncate">Evolução</h3>
+                                    <select
+                                        value={chartMetric}
+                                        onChange={(e) => setChartMetric(e.target.value)}
+                                        className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-lg focus:ring-gray-300 focus:border-gray-300 block p-1.5 outline-none max-w-[170px]"
+                                    >
+                                        <option value="massa">Variação de Massa (%)</option>
+                                        <option value="diferenca_massa">Perda de Massa (kg)</option>
+                                        <option value="ajustada_massa">Volume de Suor (L)</option>
+                                        <option value="duracao">Duração (min)</option>
+                                        <option value="intensidade">Intensidade (1-10)</option>
+                                        <option value="sudorese">Sudorese (L/h)</option>
+                                    </select>
+                                </div>
+                                
+                                <div className="flex bg-gray-100 rounded-lg p-1 overflow-x-auto">
+                                    {['1w', '2w', '1m', '6m', '1y'].map((tf) => (
+                                        <button
+                                            key={tf}
+                                            onClick={() => setTimeFilter(tf)}
+                                            className={`px-2 py-1 text-[10px] font-medium rounded-md transition-colors whitespace-nowrap ${timeFilter === tf ? 'bg-white shadow-sm text-[#c81925]' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >
+                                            {tf === '1w' ? '1 Sem' : tf === '2w' ? '2 Sem' : tf === '1m' ? '1 Mês' : tf === '6m' ? '6 Meses' : '1 Ano'}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="flex-1 w-full min-h-0">
-                                {safeTrainings.length > 0 ? (
+                            <div className="flex-1 w-full min-h-0 relative">
+                                {safeTrainings.length === 0 ? (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <p className="text-gray-400 text-sm font-medium">Sem dados disponíveis</p>
+                                    </div>
+                                ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                                             <XAxis dataKey="date" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
                                             <YAxis 
-                                                width={60}
+                                                width={65}
                                                 tick={{fill: '#6b7280', fontSize: 12}} 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                domain={[chartConfig.ticks[0], chartConfig.ticks[chartConfig.ticks.length - 1]]} 
-                                                ticks={chartConfig.ticks}
-                                                tickFormatter={(val: any) => `${val}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`}
+                                                domain={yAxisDomain}
+                                                tickFormatter={(val: any) => `${Number(val).toLocaleString()}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`}
                                             />
                                             <Tooltip 
                                                 cursor={{stroke: '#f9fafb', strokeWidth: 2}}
-                                                contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
-                                                formatter={(value: any) => [`${value}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`, chartConfig.name]}
+                                                content={({ active, payload, label }: any) => {
+                                                    if (active && payload && payload.length) {
+                                                        const val = payload[0].value;
+                                                        const fullDate = payload[0].payload.fullDate;
+                                                        const name = chartConfig.name;
+                                                        const unit = chartConfig.unit ? ` ${chartConfig.unit}` : '';
+                                                        
+                                                        const ptWeight = payload[0].payload.raw?.pre_training_weight || 70;
+                                                        let color = '#6b7280';
+                                                        if (chartMetric === 'sudorese') {
+                                                            if (val > 2.0) color = '#ef4444';
+                                                            else if (val >= 1.51) color = '#eab308';
+                                                            else if (val >= 0.4) color = '#22c55e';
+                                                            else color = '#eab308';
+                                                        } else if (chartMetric === 'massa') {
+                                                            if (val > 2.0) color = '#ef4444';
+                                                            else if (val >= 1.51) color = '#eab308';
+                                                            else if (val >= 0.0) color = '#22c55e';
+                                                            else color = '#ef4444';
+                                                        } else if (chartMetric === 'diferenca_massa') {
+                                                            if (val < 0) color = '#ef4444';
+                                                            else if (val <= ptWeight * 0.015) color = '#22c55e';
+                                                            else if (val <= ptWeight * 0.02) color = '#eab308';
+                                                            else color = '#ef4444';
+                                                        } else if (chartMetric === 'ajustada_massa') {
+                                                            if (val < 0) color = '#ef4444';
+                                                            else color = '#6b7280';
+                                                        }
+                                            
+                                                        return (
+                                                            <div className="bg-white p-3 rounded-xl shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] border border-gray-100">
+                                                                <p className="text-gray-900 font-medium text-lg mb-1">{fullDate}</p>
+                                                                <p style={{ color }} className="font-semibold text-lg">
+                                                                    {name} : {val}{unit}
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }}
                                             />
+
+                                            {chartMetric === 'sudorese' && (
+                                                <>
+                                                    <ReferenceArea y1={0} y2={0.4} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0.4} y2={1.5} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={1.5} y2={2.0} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={2.0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                </>
+                                            )}
+
+                                            {chartMetric === 'massa' && (
+                                                <>
+                                                    <ReferenceArea y1={yAxisDomain[0]} y2={0} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0} y2={1.5} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={1.5} y2={2.0} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={2.0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                </>
+                                            )}
+
+                                            {chartMetric === 'diferenca_massa' && (
+                                                <>
+                                                    <ReferenceArea y1={yAxisDomain[0]} y2={0} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0} y2={avgWeight * 0.015} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={avgWeight * 0.015} y2={avgWeight * 0.02} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={avgWeight * 0.02} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                </>
+                                            )}
+
                                             <Line 
                                                 type="monotone" 
                                                 dataKey="value" 
-                                                stroke="#dc2626" 
+                                                stroke="#6b7280" 
                                                 strokeWidth={3} 
-                                                dot={{ r: 5, fill: '#dc2626', strokeWidth: 2, stroke: '#fff' }} 
-                                                activeDot={{ r: 7, fill: '#dc2626', stroke: '#fff', strokeWidth: 2 }} 
+                                                dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#6b7280' }} 
+                                                activeDot={{ r: 6, fill: '#6b7280', stroke: '#fff', strokeWidth: 2 }} 
                                             />
                                         </LineChart>
                                     </ResponsiveContainer>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">Sem dados disponíveis</div>
                                 )}
                             </div>
+
+                            {/* Legenda de Cores */}
+                            {['sudorese', 'massa', 'diferenca_massa'].includes(chartMetric) && (
+                                <div className="flex items-center justify-center gap-4 mt-3 mb-1">
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-3 h-3 rounded-full bg-green-500 opacity-80"></div>
+                                        <span className="text-xs text-gray-500 font-medium">Ideal</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-3 h-3 rounded-full bg-yellow-500 opacity-80"></div>
+                                        <span className="text-xs text-gray-500 font-medium">Atenção</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-3 h-3 rounded-full bg-red-500 opacity-80"></div>
+                                        <span className="text-xs text-gray-500 font-medium">Perigo</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Gráfico 2: Pizza Modalidades */}
-                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-[350px]">
-                            <h3 className="text-lg font-bold text-gray-800 mb-2">Tipos de Treino</h3>
-                            <div className="flex-1 w-full min-h-0">
-                                {safeTrainings.length > 0 ? (
+                        {/* Gráfico de Pizza: Tipos de Treino */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
+                            <h3 className="text-sm font-bold text-gray-700 mb-4">Tipos de Treino</h3>
+                            <div className="flex-1 w-full min-h-0 relative">
+                                {safeTrainings.length === 0 ? (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <p className="text-gray-400 text-sm font-medium">Sem dados disponíveis</p>
+                                    </div>
+                                ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
@@ -263,8 +431,8 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                 nameKey="name"
                                                 cx="50%"
                                                 cy="50%"
-                                                outerRadius={100}
-                                                innerRadius={60}
+                                                outerRadius={80}
+                                                innerRadius={40}
                                                 labelLine={false}
                                                 label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                                             >
@@ -273,17 +441,14 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                 ))}
                                             </Pie>
                                             <Tooltip 
-                                                contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
                                                 formatter={(value: any) => [`${Number(value).toFixed(1)}%`, 'Proporção']}
                                             />
                                         </PieChart>
                                     </ResponsiveContainer>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">Sem dados disponíveis</div>
                                 )}
                             </div>
                         </div>
-
                     </div>
                 </section>
 
