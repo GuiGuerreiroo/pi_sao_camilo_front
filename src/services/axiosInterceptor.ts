@@ -78,6 +78,4 @@ export function setupGlobalAxiosInterceptor() {
     },
     (error) => Promise.reject(error)
   );
-
-  // Removed fallback response interceptor as proactive refresh handles token expiration.
 }

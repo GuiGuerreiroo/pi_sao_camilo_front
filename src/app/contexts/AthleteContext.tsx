@@ -5,7 +5,7 @@ import { createContext, useState, type ReactNode } from 'react'
 import axios from 'axios'
 import { AthleteRepositoryHttp } from '../repositories/AthleteRepositoryHttp'
 
-const http = axios.create()
+const http = axios
 const athleteRepository = new AthleteRepositoryHttp(http)
 
 export const AthleteContext = createContext<AthleteContextInterface>(defaultAthleteContext)
