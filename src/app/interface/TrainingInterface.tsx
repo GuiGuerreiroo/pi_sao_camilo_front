@@ -30,26 +30,25 @@ export interface TrainingInterface {
 
     // --- PRÉ-TREINO ---
     urine_color: URINE_COLOR;
-    pre_training_symptoms: SYMPTOMS[];
+    pre_training_symptoms: SYMPTOMS[] | null;
     pre_training_weight: number;       // Kg
     pre_training_hydration: number;    // ml
     clothing_equipment: boolean | null;
 
     // --- DURANTE O TREINO ---
-    during_training_hydration: number;        // ml
-    during_training_urine_elimination: number; // ml
+    during_training_hydration: number | null;        // ml
+    during_training_urine_elimination: number | null; // ml
 
     // --- PÓS-TREINO ---
-    post_training_symptoms: SYMPTOMS[];
+    post_training_symptoms: SYMPTOMS[] | null;
     post_training_weight: number;   // Kg
     soaked_clothes: boolean | null;
     training_intensity: number;     // 0–10
 
     // --- RESULTADOS COMPUTADOS ---
     weight_difference: number;             // Kg
-    ajusted_weight_difference: number;     // L/Kg
-    hydric_balance: number;                // ml
-    sudorese: number;                      // ml/h
+    ajusted_weight_difference: number;     // L
+    sudorese: number;                      // L/h
     weight_variation_percentage: number;   // %
 
     // --- IA ---

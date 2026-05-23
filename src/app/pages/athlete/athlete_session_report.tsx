@@ -157,7 +157,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                         <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
                         </button>
-                        <h1 className="text-3xl font-light">Relatório</h1>
+                        <h1 className="text-2xl font-light">Relatório</h1>
                     </div>
                 </div>
 
@@ -197,8 +197,8 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                     <span>{training.weight_variation_percentage}%</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Balanço Hídrico:</span>
-                                    <span>{(training.hydric_balance || 0).toFixed(2)}ml</span>
+                                    <span>Volume de Suor:</span>
+                                    <span>{(training.ajusted_weight_difference || 0).toFixed(2)}L</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
                                     <span>Taxa de Sudorese Estimada:</span>
@@ -248,16 +248,16 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                 <div className="flex justify-between text-sm text-gray-600 mb-1">
                                     <span>Pré:</span>
                                     <span className="text-right">
-                                        {training.pre_training_symptoms.filter(s => s !== "NENHUM").length > 0 
-                                            ? training.pre_training_symptoms.filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
+                                        {(training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0 
+                                            ? (training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
                                             : "Nenhum"}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
                                     <span>Pós:</span>
                                     <span className="text-right">
-                                        {training.post_training_symptoms.filter(s => s !== "NENHUM").length > 0 
-                                            ? training.post_training_symptoms.filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
+                                        {(training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0 
+                                            ? (training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
                                             : "Nenhum"}
                                     </span>
                                 </div>
@@ -339,6 +339,10 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                 <div className="flex justify-between text-sm text-gray-600">
                                     <span>Encharcadas:</span>
                                     <span>{training.soaked_clothes === true ? "Sim" : training.soaked_clothes === false ? "Não" : "Não informado"}</span>
+                                </div>
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Equipamento pesado:</span>
+                                    <span>{training.clothing_equipment === true ? "Sim" : training.clothing_equipment === false ? "Não" : "Não informado"}</span>
                                 </div>
                             </div>
 

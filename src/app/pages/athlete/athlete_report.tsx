@@ -89,7 +89,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                         <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
                         </button>
-                        <h1 className="text-3xl font-light">Histórico de Treinos</h1>
+                        <h1 className="text-2xl font-light">Histórico de Treinos</h1>
                     </div>
                 </div>
 
@@ -97,13 +97,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                 <div className="w-full max-w-4xl px-4 flex flex-col gap-4">
                     {displayTrainings.length === 0 ? (
                         <div className="bg-white rounded-[2rem] p-8 shadow-lg border border-gray-200 text-center">
-                            <p className="text-gray-500 mb-4">Nenhum treino encontrado.</p>
-                            <button
-                                onClick={() => navigate("/paginaInicialAthlete")}
-                                className="text-red-700 underline hover:text-red-800 transition-colors"
-                            >
-                                Voltar para o Início
-                            </button>
+                            <p className="text-gray-500">Nenhum treino encontrado.</p>
                         </div>
                     ) : (
                         displayTrainings.map((training) => (
