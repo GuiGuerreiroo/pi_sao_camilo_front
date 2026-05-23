@@ -245,7 +245,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                         </LineChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">Sem dados suficientes</div>
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">Sem dados disponíveis</div>
                                 )}
                             </div>
                         </div>
@@ -279,7 +279,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                         </PieChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">Sem dados suficientes</div>
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">Sem dados disponíveis</div>
                                 )}
                             </div>
                         </div>
