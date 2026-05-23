@@ -24,6 +24,7 @@ import { SupportContextProvider } from './contexts/SupportContext';
 import SupportAthleteDetails from './pages/support/support_athlete_details';
 import SessionHistory from './pages/support/support_session_history';
 import SupportSessionReport from './pages/support/support_session_report';
+import SessionResults from './pages/support/support_session_results';
 
 const AthleteLayout = () => {
     return (
