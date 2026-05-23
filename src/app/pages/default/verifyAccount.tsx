@@ -15,6 +15,7 @@ export function VerifyAccount() {
     const [isResending, setIsResending] = useState(false)
     const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS)
     const [timerExpired, setTimerExpired] = useState(false)
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
     const inputsRef = useRef<(HTMLInputElement | null)[]>([])
     const navigate = useNavigate()
     const location = useLocation()
@@ -91,8 +92,7 @@ export function VerifyAccount() {
         try {
             await validateCode({ email, code })
 
-            toast.success('E-mail verificado com sucesso!')
-            navigate('/')
+            setShowSuccessModal(true)
         } catch (error) {
             console.error(error)
 
@@ -151,22 +151,26 @@ export function VerifyAccount() {
         }
     }
 
+    function handleContinue() {
+        setShowSuccessModal(false)
+        navigate('/')
+    }
+
     return (
         <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-            <section className="w-full max-w-md rounded-lg bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
+            <section className="relative w-full max-w-md rounded-3xl bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
 
-                {/* Botão Voltar */}
+                {/* Botão Fechar (X) */}
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/')}
                     disabled={isLoading}
-                    aria-label="Voltar"
-                    className="mb-6 flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-[#7a7a7a] transition-colors hover:bg-black/5 hover:text-[#23262b] disabled:opacity-50"
+                    aria-label="Fechar"
+                    className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
                 >
-                    <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-                        <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
-                    Voltar
                 </button>
 
                 {/* Logo */}
@@ -231,7 +235,7 @@ export function VerifyAccount() {
                     )}
                 </div>
 
-                {/* Botão verificar */}
+                {/* Ações */}
                 <Button
                     type="button"
                     onClick={handleVerify}
@@ -256,6 +260,47 @@ export function VerifyAccount() {
                 </div>
 
             </section>
+
+            {/* Modal de Sucesso */}
+            {showSuccessModal && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+                    onClick={(e) => { if (e.target === e.currentTarget) handleContinue() }}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="modal-title"
+                >
+                    <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+                        <div className="mb-4 flex justify-center">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#c81925]">
+                                <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+                                    <path
+                                        d="M11 20.5L17 26.5L29 14"
+                                        stroke="white"
+                                        strokeWidth="2.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 id="modal-title" className="mb-2 text-center text-xl font-bold text-gray-900">
+                            Cadastro realizado!
+                        </h3>
+                        <p className="mb-6 text-center text-gray-700">
+                            Sua conta foi criada com sucesso.<br />
+                            Bem-vindo ao São Camilo.
+                        </p>
+                        <Button
+                            type="button"
+                            onClick={handleContinue}
+                            className="h-12 w-full rounded-md bg-[#c81925] text-sm font-medium text-white hover:bg-[#a1141c]"
+                        >
+                            Continuar
+                        </Button>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }
