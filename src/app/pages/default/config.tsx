@@ -4,8 +4,10 @@ import { getDecodedToken } from '../../hooks/tokenDecode';
 import type { MenuItems } from '../../interface/menuItems';
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
+import { useNavigate } from 'react-router-dom';
 
 export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     name: '',
     email: ''
@@ -40,6 +42,13 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
     });
     setIsEditModalOpen(false);
     // TODO: Send updated name/email to the backend API here
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    navigate("/");
   };
 
   const handlePasswordChange = async () => {
@@ -95,8 +104,8 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
           
           {/* Header Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-[#BD2024]/10 rounded-xl flex items-center justify-center">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="w-16 h-16 bg-[#BD2024]/10 rounded-xl flex items-center justify-center shrink-0">
                 <User className="text-[#BD2024]" size={28} />
               </div>
               <div>
@@ -104,10 +113,18 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                 <p className="text-gray-500 text-sm mt-1">Gerencie suas informações pessoais</p>
               </div>
             </div>
-            <button onClick={handleOpenModal} className="flex items-center gap-2 border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center">
-              <Edit size={18} />
-              Editar Perfil
-            </button>
+            <div className="flex items-center gap-3 w-full sm:w-auto flex-col sm:flex-row">
+              <button onClick={handleLogout} className="flex items-center gap-2 border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Sair
+              </button>
+              <button onClick={handleOpenModal} className="flex items-center gap-2 border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto justify-center">
+                <Edit size={18} />
+                Editar Perfil
+              </button>
+            </div>
           </div>
   
           {/* Content Grid */}
