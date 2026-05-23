@@ -1,35 +1,17 @@
-import { IoMenu } from "react-icons/io5";
 import { FaUserCircle, FaThLarge, FaPlus, FaFileAlt } from "react-icons/fa";
-import { useContext, useEffect, useState } from "react";
-import { SlideBarContext } from "../contexts/slideBarContext"
-import { SlideBar } from "./slideBar";
+import { useEffect, useState } from "react";
 import type { MenuItems } from "../interface/menuItems";
 // UserInterface will be used when profile navigation is integrated
 // import type { UserInterface } from "../interface/UserInterface";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Settings } from "lucide-react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { getDecodedToken } from "../hooks/tokenDecode";
 
 export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
     const [userName, setUserName] = useState('');
     const [role, setRole] = useState('');
 
-    const slideBarContext = useContext(SlideBarContext)
     const navigate = useNavigate();
     const location = useLocation();
-
-    const toggleMenu = () => {
-        slideBarContext?.setIsOpen(!(slideBarContext.isOpen));
-    }
-
-    // @ts-expect-error — handleLogout will be wired to a UI button in a future PR
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        navigate("/");
-    };
 
     useEffect(() => {
         try {
@@ -75,24 +57,33 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         <>
             {/* Desktop Navbar */}
             <nav className="hidden md:block">
-                <div className="flex justify-between items-center  bg-gray-200 border-b border-gray-200 w-full py-4 px-6">
-                    <div className="flex items-center gap-x-3">
-                        <div className="bg-red/20 rounded-full w-10 h-10 flex items-center justify-center">
-                            <FaUserCircle className="text-2xl" />
-                        </div>
-                        <div className="flex items-center gap-x-1.5 text-black">
-                            <span className="font-bold text-lg">{role}</span>
-                            <span className="text-lg">{userName}</span>
-                        </div>
-                    </div>
-                    <button
-                        className="p-2 rounded-lg text-black-600 hover:bg-gray-300 transition-all duration-200"
-                        onClick={toggleMenu}
+                <div className="flex justify-between items-center bg-red-800 border-b border-[#c81925] w-full py-4 px-6 text-white shadow-md">
+                    {/* Left: User Info */}
+                    <button 
+                        onClick={() => navigate(role === 'Suporte' ? '/support/configuracao' : '/configuracao')}
+                        className="flex items-center gap-x-3 hover:bg-white/10 p-2 -ml-2 rounded-lg transition-colors text-left cursor-pointer"
                     >
-                        <IoMenu className="text-2xl" />
+                        <div className="bg-white/20 rounded-full w-10 h-10 flex items-center justify-center">
+                            <FaUserCircle className="text-2xl text-white" />
+                        </div>
+                        <div className="flex items-center gap-x-1.5">
+                            <span className="text-lg text-white font-medium">{userName}</span>
+                        </div>
                     </button>
+                    
+                    {/* Right: Navigation Links */}
+                    <div className="flex items-center gap-x-8">
+                        {menuItems.map((item, index) => (
+                            <Link
+                                key={index}
+                                to={item.route}
+                                className="text-red-100 hover:text-white transition-colors font-semibold"
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
-                <SlideBar menuItems={menuItems}></SlideBar>
             </nav>
 
             {/* Mobile Navbar (bottom bar) */}
@@ -114,7 +105,7 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                 </button>
 
                 <button onClick={() => navigate("/configuracao")} className="p-2 text-[#BD2024] hover:bg-gray-300 rounded-lg transition-colors">
-                    <Settings size={28} strokeWidth={2.5} />
+                    <FaUserCircle size={28} />
                 </button>
 
             </div>
