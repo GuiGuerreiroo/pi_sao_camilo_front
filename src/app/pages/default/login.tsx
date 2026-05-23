@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '../../components/button'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
@@ -10,16 +10,59 @@ import { getDecodedToken } from '../../hooks/tokenDecode';
 import { resendCode } from '../../api/user/resendCode';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { refreshToken }from '../../api/user/refreshToken';
 
 export function Login() {
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
+    const [isAutoLoggingIn, setIsAutoLoggingIn] = useState(true)
 
     // New states for Resend Flow and Error Handling
     const [showResendModal, setShowResendModal] = useState(false);
     const [resendEmail, setResendEmail] = useState('');
     const [isResending, setIsResending] = useState(false);
+
+    useEffect(() => {
+        const localRefreshToken = localStorage.getItem('refresh_token');
+        if (localRefreshToken) {
+            handleAutoLogin(localRefreshToken);
+        } else {
+            setIsAutoLoggingIn(false);
+        }
+    }, []);
+
+    async function handleAutoLogin(localRefreshToken: string) {
+        setIsLoading(true);
+        try {
+            await refreshToken(localRefreshToken);
+
+            const tokenData = getDecodedToken();
+
+            switch (tokenData && tokenData.role) {
+                case 'ADM':
+                    navigate('/paginaInicialADM');
+                    break;
+                case 'SUPPORT':
+                    navigate('/paginaInicialSupport');
+                    break;
+                case 'USER':
+                    navigate('/paginaInicialAthlete');
+                    break;
+                default:
+                    navigate('/error');
+            }
+
+        } catch (error) {
+            console.error("Auto login failed", error);
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            setIsAutoLoggingIn(false);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const {
         register,
@@ -100,9 +143,20 @@ export function Login() {
     }
 
 
+    if (isAutoLoggingIn) {
+        return (
+            <main className="flex min-h-screen items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-gray-200 border-t-[#c81925] rounded-full animate-spin"></div>
+                    <p className="text-gray-500 font-medium animate-pulse">Autenticando...</p>
+                </div>
+            </main>
+        )
+    }
+
     return (
         <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-            <section className="w-full max-w-md rounded-lg bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
+            <section className="w-full max-w-md rounded-3xl bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
                 {/* Logo */}
                 <img
                     src="/sao_camilo_logo.svg"
