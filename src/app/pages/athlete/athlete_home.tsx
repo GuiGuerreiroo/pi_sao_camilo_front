@@ -450,9 +450,9 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                         </div>
                     </section>
 
-                    {/* ── grid 2×2: quick stats ── */}
+                    {/* ── grid 2×2 (mobile) / 4x1 (desktop): quick stats ── */}
                     <section className="px-4 mt-5">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <QuickStatCard
                                 icon={<FaExclamationTriangle />}
                                 label="Últimos Alertas"
