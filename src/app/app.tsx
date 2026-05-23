@@ -23,6 +23,7 @@ import { AthleteContextProvider } from './contexts/AthleteContext';
 import { SupportContextProvider } from './contexts/SupportContext';
 import SupportAthleteDetails from './pages/support/support_athlete_details';
 import SessionHistory from './pages/support/support_session_history';
+import SupportSessionReport from './pages/support/support_session_report';
 
 const AthleteLayout = () => {
     return (
@@ -73,7 +74,8 @@ export default function App() {
 
                                 <Route path="/support/athleteReport" element={<AthleteReport menuItems={menuItemsSupport} />} />
                                 <Route path="/support/athleteDetails" element={<SupportAthleteDetails menuItems={menuItemsSupport} />} />
-                              <Route path="/sessionHistory" element={<SessionHistory menuItems={menuItemsSupport} />} />
+                                <Route path="/sessionHistory" element={<SessionHistory menuItems={menuItemsSupport} />} />
+                                <Route path="/session-detail" element={<SupportSessionReport menuItems={menuItemsSupport} />} />
                             </Route>
                         </Route>
 
