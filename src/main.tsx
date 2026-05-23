@@ -4,6 +4,10 @@ import { registerSW } from 'virtual:pwa-register'
 
 import '@/app/styles/global.css'
 import App from '@/app/app'
+import { setupGlobalAxiosInterceptor } from '@/services/axiosInterceptor'
+
+// Initialize the global axios interceptor for token refreshing
+setupGlobalAxiosInterceptor()
 
 // ── PWA Service Worker (autoUpdate) ──────────────────────────
 registerSW({

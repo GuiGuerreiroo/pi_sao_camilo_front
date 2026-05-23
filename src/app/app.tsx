@@ -3,7 +3,6 @@ import { Login } from './pages/default/login'
 import { Unauthorized } from './pages/default/unauthorized'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import type { MenuItems } from "./services/menuItems";
 import SupportHome from './pages/support/support_home';
 import { AthleteHome } from './pages/athlete/athlete_home';
 import AdminHome from './pages/admin/admin_home';
@@ -44,14 +43,10 @@ const SupportLayout = () => {
 const menuItemsAthlete: MenuItems[] = [
     { name: "Tela Principal", route: "/paginaInicialAthlete" },
     { name: "Novo Treino", route: "/new-session" },
-    { name: "Relatório", route: "/athleteReport" },
-    { name: "Configurações", route: "/configuracao" },
-    { name: "Sair", route: "/" }
+    { name: "Relatórios", route: "/athleteReport" }
 ];
 const menuItemsSupport: MenuItems[] = [
-    { name: "Tela Principal", route: "/paginaInicialSupport" },
-    { name: "Configurações", route: "/support/configuracao" },
-    { name: "Sair", route: "/" }
+    { name: "Tela Principal", route: "/paginaInicialSupport" }
 ];
 
 export default function App() {
