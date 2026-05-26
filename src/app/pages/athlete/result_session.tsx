@@ -104,6 +104,11 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
             <div>
               {renderFeedback(results.aiFeedback)}
             </div>
+            <div className="mt-4 rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-3">
+              <p className="text-sm text-yellow-700 leading-relaxed">
+                <span className="font-bold">Aviso:</span> As recomendações acima são geradas por inteligência artificial e podem conter erros. Sempre priorize a orientação de profissionais de saúde qualificados antes de tomar qualquer decisão.
+              </p>
+            </div>
           </div>
 
           {/* Botão voltar ao início */}
