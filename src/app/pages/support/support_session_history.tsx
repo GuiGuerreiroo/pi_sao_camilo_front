@@ -118,12 +118,12 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate(-1)}
-                className="text-red-600 hover:opacity-75 transition-opacity"
+                className="text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-full shadow-sm transition-all focus:ring-2 focus:ring-red-200 active:scale-95"
                 aria-label="Voltar"
               >
-                <FaChevronLeft className="text-lg" />
+                <FaChevronLeft className="text-xl" />
               </button>
-              <h1 className="text-2xl font-bold text-red-600">Histórico de Sessões</h1>
+              <h1 className="text-2xl font-bold text-red-600 ml-2">Histórico de Sessões</h1>
             </div>
             <button
               onClick={() => setShowFilter(prev => !prev)}
@@ -146,7 +146,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                 {hasActiveFilter && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs text-red-500 flex items-center gap-1 hover:opacity-75 transition-opacity"
+                    className="text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm transition-all focus:ring-2 focus:ring-red-200 active:scale-95"
                   >
                     <FaTimes className="text-[10px]" /> Limpar filtros
                   </button>

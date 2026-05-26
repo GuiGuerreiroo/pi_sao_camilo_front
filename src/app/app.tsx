@@ -21,6 +21,7 @@ import PostSession from './pages/athlete/post_session';
 import ResultSession from './pages/athlete/result_session';
 import { AthleteContextProvider } from './contexts/AthleteContext';
 import { SupportContextProvider } from './contexts/SupportContext';
+import { CreateTrainingProvider } from './contexts/CreateTrainingContext';
 import SupportAthleteDetails from './pages/support/support_athlete_details';
 import SessionHistory from './pages/support/support_session_history';
 import SupportSessionReport from './pages/support/support_session_report';
@@ -54,7 +55,8 @@ export default function App() {
     return (
         <SyncProvider>
             <div>
-                <BrowserRouter>
+                <CreateTrainingProvider>
+                    <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/createAccount" element={<CreateAccount />} />
@@ -102,6 +104,7 @@ export default function App() {
 
                     </Routes>
                 </BrowserRouter>
+            </CreateTrainingProvider>
                 <ToastContainer
                     position="top-right"
                     autoClose={3000}

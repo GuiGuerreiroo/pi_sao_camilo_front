@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
+import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
+import { toast } from "react-toastify";
+import type { SYMPTOMS } from "../../interface/TrainingInterface";
 
 export default function PostSession({ menuItems, currentStep = 3 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
+  const { trainingData, updateTrainingData, submitTraining } = useContext(CreateTrainingContext);
 
   const [massaCorporal, setMassaCorporal] = useState("");
   const [sintomasGastrointestinais, setSintomasGastrointestinais] = useState(false);
@@ -14,13 +18,43 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
   const [intensidade, setIntensidade] = useState(1);
   const [error, setError] = useState("");
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    const weight = Number(massaCorporal);
+
     if (!massaCorporal) {
-      setError("Por favor, preencha a massa corporal pós-exercício.");
+      toast.error("Por favor, preencha a massa corporal pós-exercício.");
+      document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-    setError("");
-    navigate("/result-session");
+    if (weight <= 35.0 || weight > 200.0) {
+      toast.error("O peso pós-exercício deve estar entre 35kg e 200kg.");
+      document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Convert checkboxes back to the backend Enum array style:
+    const finalSymptoms: SYMPTOMS[] = [];
+    if (fadiga) finalSymptoms.push("FADIGA" as SYMPTOMS); // Wait, fadiga wasn't in the mapping previously, let's map it safely
+    if (sintomasGastrointestinais) finalSymptoms.push("NAUSEA" as SYMPTOMS);
+
+    const endDate = new Date().getTime();
+    updateTrainingData({
+      post_training_weight: weight,
+      training_intensity: (intensidade * 1.4) + 1, // Map 0-8 to 1.0-10.0 scale roughly
+      soaked_clothes: roupaEncharcada,
+      post_training_symptoms: finalSymptoms.length > 0 ? finalSymptoms : ["NENHUM" as SYMPTOMS],
+      // End date and duration calculation:
+      end_date: endDate,
+      duration: Math.max(1, Math.floor((endDate - (trainingData.start_date || endDate)) / 60000)), 
+    });
+
+    try {
+        await submitTraining(); // Trigger the backend commit!
+        setError("");
+        navigate("/result-session");
+    } catch (err) {
+        toast.error("Erro ao registrar a sessão. Tente novamente.");
+    }
   };
 
   const totalDots = 8;
@@ -87,7 +121,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
           <div className="space-y-3">
 
             {/* Massa Corporal */}
-            <div className="bg-white rounded-2xl shadow-md border border-gray-200 px-5 py-4">
+            <div id="field-post-weight" className="bg-white rounded-2xl shadow-md border border-gray-200 px-5 py-4">
               <label className="block text-sm font-semibold text-gray-800 mb-3">
                 Massa Corporal Pós-Exercício
               </label>

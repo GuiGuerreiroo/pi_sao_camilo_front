@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
+import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
+import type { MODALITY } from "../../interface/TrainingInterface";
 import {
   FaRunning, FaWalking,
   FaSwimmer,
@@ -16,19 +18,19 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { MdSportsTennis } from "react-icons/md";
-import { GiMuscleUp } from "react-icons/gi";
+import { GiMuscleUp, GiYinYang } from "react-icons/gi";
 
-const activities = [
-  { label: "Caminhada",    icon: <FaWalking className="text-4xl" /> },
-  { label: "Corrida",    icon: <FaRunning className="text-4xl" /> },
-  { label: "Natação",    icon: <FaSwimmer className="text-4xl" /> },
-  { label: "Musculação", icon: <FaDumbbell className="text-4xl" /> },
-  { label: "Ciclismo",   icon: <FaBicycle className="text-4xl" /> },
-  { label: "Futebol",    icon: <FaFutbol className="text-4xl" /> },
-  { label: "Vôlei",      icon: <FaVolleyballBall className="text-4xl" /> },
-  { label: "Basquete",   icon: <FaBasketballBall className="text-4xl" /> },
-  { label: "Tênis",      icon: <MdSportsTennis className="text-4xl" /> },
-  { label: "Outro",      icon: <GiMuscleUp className="text-4xl" /> },
+// Mapping exactly as defined in MODALITY Enum
+const activities: { label: string; icon: JSX.Element; modality: MODALITY }[] = [
+  { label: "Caminhada",    icon: <FaWalking className="text-4xl" />, modality: "CAMINHADA" },
+  { label: "Corrida",    icon: <FaRunning className="text-4xl" />, modality: "CORRIDA" },
+  { label: "Natação",    icon: <FaSwimmer className="text-4xl" />, modality: "NATACAO" },
+  { label: "Academia", icon: <FaDumbbell className="text-4xl" />, modality: "ACADEMIA" },
+  { label: "Ciclismo",   icon: <FaBicycle className="text-4xl" />, modality: "CICLISMO" },
+  { label: "Futebol",    icon: <FaFutbol className="text-4xl" />, modality: "FUTEBOL" },
+  { label: "Basquete",   icon: <FaBasketballBall className="text-4xl" />, modality: "BASQUETE" },
+  { label: "Yoga",      icon: <GiYinYang className="text-4xl" />, modality: "YOGA" },
+  { label: "Outro",      icon: <GiMuscleUp className="text-4xl" />, modality: "OUTRO" },
 ];
 
 const checklist = [
@@ -40,9 +42,17 @@ const checklist = [
 
 export default function NovaSession({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
+  const { updateTrainingData, resetTrainingData } = useContext(CreateTrainingContext);
 
-  const handleStart = (label: string) => {
-    navigate("/pre-session", { state: { activity: label } });
+  const handleStart = (modality: MODALITY) => {
+    // Reset previous leftover states
+    resetTrainingData();
+    // Initialize starting variables
+    updateTrainingData({
+      modality: modality,
+      start_date: new Date().getTime()
+    });
+    navigate("/pre-session");
   };
 
   return (
@@ -73,7 +83,7 @@ export default function NovaSession({ menuItems }: { menuItems: MenuItems[] }) {
 
           {/* Lista de atividades */}
           <div className="space-y-3">
-            {activities.map(({ label, icon }) => (
+            {activities.map(({ label, icon, modality }) => (
               <div
                 key={label}
                 className="bg-white rounded-2xl shadow-md border border-gray-200 flex items-center justify-between px-5 py-4"
@@ -83,7 +93,7 @@ export default function NovaSession({ menuItems }: { menuItems: MenuItems[] }) {
                   <span className="text-base font-semibold text-gray-800">{label}</span>
                 </div>
                 <button
-                  onClick={() => handleStart(label)}
+                  onClick={() => handleStart(modality)}
                   aria-label={`Iniciar ${label}`}
                   className="text-gray-400 hover:text-red-500 active:scale-95 transition-all"
                 >

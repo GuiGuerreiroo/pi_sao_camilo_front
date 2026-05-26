@@ -1,10 +1,11 @@
 import type { AxiosInstance } from "axios";
 import type { UserInterface } from "../interface/UserInterface";
-import type { TrainingInterface } from "../interface/TrainingInterface";
+import type { TrainingInterface, CreateTrainingInterface } from "../interface/TrainingInterface";
 
 export interface IAthleteRepository {
   getUser(): Promise<UserInterface>;
   get_all_trainings(): Promise<TrainingInterface[]>;
+  create_training(data: CreateTrainingInterface): Promise<TrainingInterface>;
 }
 
 export class AthleteRepositoryHttp implements IAthleteRepository {
@@ -51,6 +52,33 @@ export class AthleteRepositoryHttp implements IAthleteRepository {
       console.error('Detailed get_all_trainings Error:', error.response?.data);
       const errorMessage = error.response?.data?.message || error.message;
       throw new Error(`Error fetching trainings: ${errorMessage}`);
+    }
+  }
+
+  async create_training(data: CreateTrainingInterface): Promise<TrainingInterface> {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token not found');
+
+      const payload = {
+        ...data,
+        during_training_hydration: data.during_training_hydration ?? 0.0,
+        during_training_urine_elimination: data.during_training_urine_elimination ?? 0.0,
+        pre_training_symptoms: data.pre_training_symptoms ?? [],
+        post_training_symptoms: data.post_training_symptoms ?? []
+      };
+
+      const response = await this.http.post<{ training: TrainingInterface }>(
+        `${this.baseURL}/create-training`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      return response.data.training;
+    } catch (error: any) {
+      console.error('Detailed create_training Error:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message;
+      throw new Error(`Error creating training: ${errorMessage}`);
     }
   }
 }

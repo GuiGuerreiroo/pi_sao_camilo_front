@@ -1,13 +1,17 @@
- import React, { useState, useEffect } from "react";
+ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
 import { FaCalendarAlt, FaClock, FaPlay, FaPause, FaMinus, FaPlus } from "react-icons/fa";
 import { GiWaterBottle } from "react-icons/gi";
+import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
+import { toast } from "react-toastify";
 
 export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
+  const { updateTrainingData } = useContext(CreateTrainingContext);
+
   const [fluidIntake, setFluidIntake] = useState(0);
   const [timer, setTimer] = useState(0);
   const [isActive, setIsActive] = useState(false);
@@ -15,10 +19,25 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
   const [error, setError] = useState("");
 
   const handleNext = () => {
-    if (!urineVolume) {
-      setError("Por favor, preencha o volume urinário.");
+    let uVol = Number(urineVolume);
+    if (urineVolume === "") uVol = 0.0;
+
+    if (uVol > 4000.0) {
+      toast.error("O volume urinário não pode ser maior que 4000ml.");
+      document.getElementById('field-urine-volume')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+    if (fluidIntake > 5000.0) {
+      toast.error("A ingestão de fluidos não pode ser maior que 5000ml.");
+      document.getElementById('field-fluid-intake')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    updateTrainingData({
+      during_training_hydration: fluidIntake,
+      during_training_urine_elimination: uVol
+    });
+
     setError("");
     navigate('/post-session');
   };
@@ -120,7 +139,7 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
           </div>
 
           {/* Fluid Intake */}
-          <div>
+          <div id="field-fluid-intake">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Ingestão de Fluidos</label>
             <div className="bg-gray-200 rounded-xl py-8 px-6 flex flex-col items-center justify-center relative">
               <div className="flex items-center justify-center gap-8 w-full">
@@ -145,7 +164,7 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
           </div>
 
           {/* Urine Volume */}
-          <div>
+          <div id="field-urine-volume">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Volume Urinário</label>
             <input 
               type="number" 

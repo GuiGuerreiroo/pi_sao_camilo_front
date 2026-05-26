@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -7,12 +7,18 @@ import { FaThermometerHalf, FaSun, FaTint, FaWind, FaPlus } from "react-icons/fa
 import { GiWaterBottle } from "react-icons/gi";
 import { useGeolocation } from "../../hooks/getGeoloc";
 import { useWeather } from "../../hooks/apiWether";
+import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
+import type { SYMPTOMS, URINE_COLOR } from "../../interface/TrainingInterface";
+import { toast } from "react-toastify";
 
 export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
+  const { updateTrainingData } = useContext(CreateTrainingContext);
+
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
   const [massaCorporal, setMassaCorporal] = useState("");
   const [hydration, setHydration] = useState<number | null>(null);
+  const [symptom, setSymptom] = useState<SYMPTOMS>("NENHUM");
   const [error, setError] = useState("");
   const [manualTemp, setManualTemp] = useState<string>("");
   const [manualSolar, setManualSolar] = useState<string>("Baixa");
@@ -33,11 +39,58 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
     return "Baixa";
   };
 
+  const urineColorEnumMap: URINE_COLOR[] = [
+    "TRANSLUCIDO", "AMARELO_CLARO", "AMARELO", "AMARELO_ESCURO",
+    "LARANJA", "VERDE", "VERDE", "VERDE_ESCURO"
+  ];
+
   const handleNext = () => {
+    const weight = Number(massaCorporal);
+
     if (!massaCorporal) {
-      setError("Por favor, preencha a massa corporal pré-exercício.");
+      toast.error("Por favor, preencha a massa corporal pré-exercício.");
+      document.getElementById('field-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+    if (weight <= 35.0 || weight > 200.0) {
+      toast.error("O peso deve estar entre 35kg e 200kg.");
+      document.getElementById('field-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (selectedColor === null) {
+      toast.error("Por favor, selecione a cor da urina.");
+      document.getElementById('field-urine')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (hydration === null) {
+      toast.error("Por favor, selecione o histórico de hidratação.");
+      document.getElementById('field-hydration')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const finalTemp = (geoError || weatherError) ? Number(manualTemp) : (weather?.temperature || 0);
+    const finalHumidity = (geoError || weatherError) ? Number(manualHumidity) : (weather?.relative_humidity || 0);
+
+    if ((geoError || weatherError) && (manualTemp === "" || manualHumidity === "")) {
+       toast.error("Por favor, preencha as condições ambientais manualmente.");
+       document.getElementById('field-environment')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+       return;
+    }
+    if (finalTemp < -40.0 || finalTemp > 50.0) {
+       toast.error("Temperatura fora do intervalo permitido (-40 a 50 °C).");
+       document.getElementById('field-environment')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+       return;
+    }
+
+    updateTrainingData({
+      pre_training_weight: weight,
+      pre_training_hydration: hydration,
+      urine_color: urineColorEnumMap[selectedColor],
+      pre_training_symptoms: symptom !== "NENHUM" ? [symptom] : [],
+      environment_temperature: finalTemp,
+      environment_humidity: finalHumidity
+    });
+
     setError("");
     navigate('/mid-session');
   };
@@ -75,7 +128,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
         
         <div className="space-y-6">
           {/* Massa Corporal */}
-          <div>
+          <div id="field-weight">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Massa Corporal Pré-Exercício</label>
             <input 
               type="number" 
@@ -88,7 +141,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
           </div>
 
           {/* Cor da Urina */}
-          <div>
+          <div id="field-urine">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Cor da Urina</label>
             <div className="grid grid-cols-4 gap-2">
               {urineColors.map((color, idx) => (
@@ -104,14 +157,21 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
           </div>
 
           {/* Sintomas */}
-          <div>
+          <div id="field-symptoms">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Sintomas</label>
             <div className="relative">
-              <select className="w-full bg-gray-200 rounded-lg p-3 outline-none text-gray-700 appearance-none focus:ring-2 focus:ring-red-200 transition-all">
-                <option>Nenhum</option>
-                <option>Fadiga</option>
-                <option>Dor de Cabeça</option>
-                <option>Tontura</option>
+              <select 
+                value={symptom}
+                onChange={(e) => setSymptom(e.target.value as SYMPTOMS)}
+                className="w-full bg-gray-200 rounded-lg p-3 outline-none text-gray-700 appearance-none focus:ring-2 focus:ring-red-200 transition-all"
+              >
+                <option value="NENHUM">Nenhum</option>
+                <option value="FADIGA">Fadiga</option>
+                <option value="DOR_DE_CABECA">Dor de Cabeça</option>
+                <option value="NAUSEA">Náusea</option>
+                <option value="DOR_MUSCULAR">Dor Muscular</option>
+                <option value="ESTRESSE">Estresse</option>
+                <option value="CAIMBRA">Cãibra</option>
               </select>
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +182,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
           </div>
 
           {/* Hidratação */}
-          <div>
+          <div id="field-hydration">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Histórico Recente de Hidratação</label>
             <div className="flex justify-between items-end px-2">
               {[
@@ -145,7 +205,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
           </div>
 
           {/* Condições Ambientais */}
-          <div>
+          <div id="field-environment">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Condições Ambientais</label>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-3">

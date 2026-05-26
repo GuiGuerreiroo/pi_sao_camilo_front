@@ -1,18 +1,33 @@
-export type MODALITY = "FUTEBOL" | "CORRIDA" | "NATACAO" | "CICLISMO" | "BASQUETE" | "VOLEI" | "TENIS" | "ACADEMIA" | "OUTRO";
+export type MODALITY = "CORRIDA" | "CAMINHADA" | "CICLISMO" | "NATACAO" | "ACADEMIA" | "OUTRO" | "YOGA" | "FUTEBOL" | "BASQUETE";
 
-export type URINE_COLOR = "TRANSPARENTE" | "AMARELO_CLARO" | "AMARELO" | "AMARELO_ESCURO" | "LARANJA" | "MARROM";
+export type URINE_COLOR = "TRANSLUCIDO" | "AMARELO_CLARO" | "AMARELO" | "AMARELO_ESCURO" | "LARANJA" | "VERDE" | "VERDE_ESCURO";
 
 export type SYMPTOMS =
-    | "NENHUM"
-    | "DOR_DE_CABECA"
-    | "TONTURA"
+    | "CAIMBRA"
+    | "ESTRESSE"
+    | "DOR_MUSCULAR"
     | "NAUSEA"
-    | "FADIGA"
-    | "CAIBRA"
-    | "SEDE_EXCESSIVA"
-    | "BOCA_SECA"
-    | "FRAQUEZA"
-    | "CONFUSAO_MENTAL";
+    | "DOR_DE_CABECA"
+    | "NENHUM";
+
+export interface CreateTrainingInterface {
+    modality: MODALITY;
+    start_date: number;
+    end_date: number;
+    duration: number;
+    environment_temperature: number;
+    environment_humidity: number;
+    pre_training_weight: number;
+    post_training_weight: number;
+    pre_training_hydration: number;
+    during_training_hydration?: number;
+    during_training_urine_elimination?: number;
+    urine_color: URINE_COLOR;
+    soaked_clothes?: boolean;
+    training_intensity: number;
+    pre_training_symptoms?: SYMPTOMS[];
+    post_training_symptoms?: SYMPTOMS[];
+}
 
 export interface TrainingInterface {
     training_id: string;
