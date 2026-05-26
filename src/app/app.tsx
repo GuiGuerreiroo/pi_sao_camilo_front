@@ -54,14 +54,21 @@ const menuItemsSupport: MenuItems[] = [
     { name: "Perfil", route: "/configuracao" }
 ];
 
+const TrainingFlowLayout = () => {
+    return (
+        <CreateTrainingProvider>
+            <Outlet />
+        </CreateTrainingProvider>
+    );
+};
+
 export default function App() {
     return (
         <SyncProvider>
             <div>
-                <CreateTrainingProvider>
-                    <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<Login />} />
+                <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<Login />} />
                         <Route path="/createAccount" element={<CreateAccount />} />
                         <Route path="/verifyAccount" element={<VerifyAccount />} />
                         <Route path="/error" element={<Unauthorized />} />
@@ -86,14 +93,19 @@ export default function App() {
 
                         <Route element={<PrivateRoute requiredRole="USER" />}>
                             <Route element={<AthleteLayout />}>
-                                <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
-                                <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
-                                <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
+                                {/* Training creation flow bounded within CreateTrainingProvider */}
+                                <Route element={<TrainingFlowLayout />}>
+                                    <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
+                                    <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
+                                    <Route path="/mid-session" element={<MidSession menuItems={menuItemsAthlete} />} />
+                                    <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />} />
+                                    <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />} />
+                                </Route>
+                                
+                                {/* Standard pages inside Athlete layout */}
                                 <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />} />
-                                <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />} />
                                 <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />} />
                                 <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />} />
-                                <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />} />
                                 <Route path="/paginaInicialAthlete" element={<AthleteHome menuItems={menuItemsAthlete} />} />
                                 <Route path="/configuracao" element={<Perfil menuItems={menuItemsAthlete} />} />
                             </Route>
@@ -107,7 +119,6 @@ export default function App() {
 
                     </Routes>
                 </BrowserRouter>
-            </CreateTrainingProvider>
                 <ToastContainer
                     position="top-right"
                     autoClose={3000}

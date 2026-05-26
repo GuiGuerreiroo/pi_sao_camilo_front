@@ -21,7 +21,7 @@ import { MdSportsTennis } from "react-icons/md";
 import { GiMuscleUp, GiYinYang } from "react-icons/gi";
 
 // Mapping exactly as defined in MODALITY Enum
-const activities: { label: string; icon: JSX.Element; modality: MODALITY }[] = [
+const activities: { label: string; icon: React.ReactNode; modality: MODALITY }[] = [
   { label: "Caminhada",    icon: <FaWalking className="text-4xl" />, modality: "CAMINHADA" },
   { label: "Corrida",    icon: <FaRunning className="text-4xl" />, modality: "CORRIDA" },
   { label: "Natação",    icon: <FaSwimmer className="text-4xl" />, modality: "NATACAO" },
@@ -42,16 +42,11 @@ const checklist = [
 
 export default function NovaSession({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
-  const { updateTrainingData, resetTrainingData } = useContext(CreateTrainingContext);
+  const { startTrainingFlow } = useContext(CreateTrainingContext);
 
   const handleStart = (modality: MODALITY) => {
-    // Reset previous leftover states
-    resetTrainingData();
-    // Initialize starting variables
-    updateTrainingData({
-      modality: modality,
-      start_date: new Date().getTime()
-    });
+    // Replaces all previous state natively instead of relying on sequenced batched updates
+    startTrainingFlow(modality);
     navigate("/pre-session");
   };
 

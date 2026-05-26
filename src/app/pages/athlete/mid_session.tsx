@@ -168,6 +168,7 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
             <label className="block text-sm font-semibold text-gray-700 mb-2">Volume Urinário</label>
             <input 
               type="number" 
+              onWheel={(e) => (e.target as HTMLInputElement).blur()}
               value={urineVolume}
               onChange={(e) => { setUrineVolume(e.target.value); setError(""); }}
               className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`} 

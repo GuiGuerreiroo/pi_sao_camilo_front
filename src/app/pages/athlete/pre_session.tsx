@@ -52,7 +52,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
       document.getElementById('field-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-    if (weight <= 35.0 || weight > 200.0) {
+    if (weight < 35.0 || weight > 200.0) {
       toast.error("O peso deve estar entre 35kg e 200kg.");
       document.getElementById('field-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -132,6 +132,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
             <label className="block text-sm font-semibold text-gray-700 mb-2">Massa Corporal Pré-Exercício</label>
             <input 
               type="number" 
+              onWheel={(e) => (e.target as HTMLInputElement).blur()}
               value={massaCorporal}
               onChange={(e) => { setMassaCorporal(e.target.value); setError(""); }}
               className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`} 
@@ -214,6 +215,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
                   {geoError || weatherError ? (
                     <input
                       type="number"
+                      onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       value={manualTemp}
                       onChange={(e) => setManualTemp(e.target.value)}
                       className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -255,6 +257,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
                   {geoError || weatherError ? (
                     <input
                       type="number"
+                      onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       value={manualHumidity}
                       onChange={(e) => setManualHumidity(e.target.value)}
                       className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -273,6 +276,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
                   {geoError || weatherError ? (
                     <input
                       type="number"
+                      onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       value={manualWind}
                       onChange={(e) => setManualWind(e.target.value)}
                       className="w-20 h-8 bg-gray-200 rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-red-200 transition-all text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

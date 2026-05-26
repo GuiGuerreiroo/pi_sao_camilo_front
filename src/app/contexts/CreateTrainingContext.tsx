@@ -1,5 +1,5 @@
 import { createContext, useState, type ReactNode } from 'react';
-import type { CreateTrainingInterface, TrainingInterface } from '../interface/TrainingInterface';
+import type { CreateTrainingInterface, TrainingInterface, MODALITY } from '../interface/TrainingInterface';
 import { AthleteRepositoryHttp } from '../repositories/AthleteRepositoryHttp';
 import axios from 'axios';
 
@@ -9,6 +9,7 @@ const athleteRepository = new AthleteRepositoryHttp(http);
 export interface CreateTrainingContextType {
     trainingData: Partial<CreateTrainingInterface>;
     updateTrainingData: (data: Partial<CreateTrainingInterface>) => void;
+    startTrainingFlow: (modality: MODALITY) => void;
     submitTraining: () => Promise<TrainingInterface | void>;
     resetTrainingData: () => void;
     isLoading: boolean;
@@ -18,6 +19,7 @@ export interface CreateTrainingContextType {
 export const defaultCreateTrainingContext: CreateTrainingContextType = {
     trainingData: {},
     updateTrainingData: () => {},
+    startTrainingFlow: () => {},
     submitTraining: async () => {},
     resetTrainingData: () => {},
     isLoading: false,
@@ -32,7 +34,18 @@ export const CreateTrainingProvider = ({ children }: { children: ReactNode }) =>
     const [error, setError] = useState<string | null>(null);
 
     const updateTrainingData = (data: Partial<CreateTrainingInterface>) => {
-        setTrainingData((prev) => ({ ...prev, ...data }));
+        setTrainingData((prev) => {
+            console.log("Updating training data. Previous:", prev, "New:", data);
+            return { ...prev, ...data };
+        });
+    };
+
+    const startTrainingFlow = (modality: MODALITY) => {
+        setTrainingData({
+            modality,
+            start_date: new Date().getTime()
+        });
+        setError(null);
     };
 
     const resetTrainingData = () => {
@@ -62,6 +75,7 @@ export const CreateTrainingProvider = ({ children }: { children: ReactNode }) =>
             value={{
                 trainingData,
                 updateTrainingData,
+                startTrainingFlow,
                 submitTraining,
                 resetTrainingData,
                 isLoading,

@@ -26,7 +26,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
       document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-    if (weight <= 35.0 || weight > 200.0) {
+    if (weight < 35.0 || weight > 200.0) {
       toast.error("O peso pós-exercício deve estar entre 35kg e 200kg.");
       document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -127,6 +127,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
               </label>
               <input
                 type="number"
+                onWheel={(e) => (e.target as HTMLInputElement).blur()}
                 value={massaCorporal}
                 onChange={e => { setMassaCorporal(e.target.value); setError(""); }}
                 className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all text-gray-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`}
