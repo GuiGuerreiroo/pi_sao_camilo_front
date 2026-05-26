@@ -58,6 +58,11 @@ export function setupGlobalAxiosInterceptor() {
                   if (token && config.headers && config.headers.Authorization) {
                     config.headers.Authorization = `Bearer ${token}`;
                   }
+                  
+                  // Se o corpo da requisição já possuía um access_token (como na rota update_user), atualize-o
+                  if (config.data && typeof config.data === 'object' && 'access_token' in config.data) {
+                    config.data.access_token = localStorage.getItem('access_token');
+                  }
                 } catch (error) {
                   // Refresh failed, kick user to login
                   localStorage.removeItem('token');
