@@ -46,10 +46,12 @@ const SupportLayout = () => {
 const menuItemsAthlete: MenuItems[] = [
     { name: "Tela Principal", route: "/paginaInicialAthlete" },
     { name: "Novo Treino", route: "/new-session" },
-    { name: "Relatórios", route: "/athleteReport" }
+    { name: "Relatórios", route: "/athleteReport" },
+    { name: "Perfil", route: "/configuracao" }
 ];
 const menuItemsSupport: MenuItems[] = [
-    { name: "Tela Principal", route: "/paginaInicialSupport" }
+    { name: "Tela Principal", route: "/paginaInicialSupport" },
+    { name: "Perfil", route: "/configuracao" }
 ];
 
 export default function App() {

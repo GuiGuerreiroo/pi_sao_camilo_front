@@ -50,12 +50,12 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         }
     }, [])
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        navigate("/");
-    };
+    // const handleLogout = () => {
+    //     localStorage.removeItem('token');
+    //     localStorage.removeItem('refresh_token');
+    //     localStorage.removeItem('user');
+    //     navigate("/");
+    // };
 
     // Esconder no login
     if (location.pathname === "/") return null;
@@ -78,7 +78,6 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                         </div>
                     </button>
                     
-                    {/* Right: Navigation Links */}
                     <div className="flex items-center gap-x-8">
                         {menuItems.map((item, index) => (
                             <Link
@@ -90,21 +89,6 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                             </Link>
                         ))}
 
-                        {/* Configurações */}
-                        <button
-                            onClick={() => navigate(role === 'Suporte' ? '/support/configuracao' : '/configuracao')}
-                            className="text-red-100 hover:text-white transition-colors font-semibold"
-                        >
-                            Perfil
-                        </button>
-
-                        {/* Sair */}
-                        <button
-                            onClick={handleLogout}
-                            className="text-red-100 hover:text-white transition-colors font-semibold"
-                        >
-                            Sair
-                        </button>
                     </div>
                 </div>
             </nav>
