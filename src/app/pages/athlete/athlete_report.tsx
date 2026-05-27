@@ -9,9 +9,20 @@ import {
     FaArrowLeft,
     FaClock,
     FaChevronRight,
-    FaPersonRunning,
     FaChartLine
 } from "react-icons/fa6";
+import {
+    FaRunning,
+    FaSwimmer,
+    FaBicycle,
+    FaBasketballBall,
+    FaFutbol,
+    FaDumbbell,
+    FaWalking,
+} from "react-icons/fa";
+import { MdSportsTennis } from "react-icons/md";
+import { GiMuscleUp, GiMeditation } from "react-icons/gi";
+import type { MODALITY } from "../../interface/TrainingInterface";
 
 function formatDuration(totalMinutes: number): string {
     const h = Math.floor(totalMinutes / 60);
@@ -34,6 +45,32 @@ function getIntensityLabel(intensity: number): string {
     if (intensity <= 8) return "Alta";
     return "Máxima";
 }
+
+const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
+    FUTEBOL: <FaFutbol />,
+    CORRIDA: <FaRunning />,
+    NATACAO: <FaSwimmer />,
+    CICLISMO: <FaBicycle />,
+    BASQUETE: <FaBasketballBall />,
+    TENIS: <MdSportsTennis />,
+    ACADEMIA: <FaDumbbell />,
+    CAMINHADA: <FaWalking />,
+    YOGA: <GiMeditation />,
+    OUTRO: <GiMuscleUp />,
+};
+
+const MODALITY_LABELS: Record<MODALITY, string> = {
+    FUTEBOL: "Futebol",
+    CORRIDA: "Corrida",
+    NATACAO: "Natação",
+    CICLISMO: "Ciclismo",
+    BASQUETE: "Basquete",
+    TENIS: "Tênis",
+    ACADEMIA: "Academia",
+    CAMINHADA: "Caminhada",
+    YOGA: "Yoga",
+    OUTRO: "Outro",
+};
 
 export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
     const navigate = useNavigate();
@@ -108,12 +145,12 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl shrink-0 group-hover:bg-red-100 transition-colors">
-                                        <FaPersonRunning />
+                                        {MODALITY_ICONS[training.modality as MODALITY] || <FaRunning />}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-semibold text-gray-800 text-lg">
-                                                {formatDate(training.start_date)}
+                                                {MODALITY_LABELS[training.modality as MODALITY] || "Outro"} - {formatDate(training.start_date)}
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
