@@ -9,9 +9,20 @@ import {
     FaArrowLeft,
     FaClock,
     FaChevronRight,
-    FaPersonRunning,
     FaChartLine
 } from "react-icons/fa6";
+import {
+    FaRunning,
+    FaSwimmer,
+    FaBicycle,
+    FaBasketballBall,
+    FaFutbol,
+    FaDumbbell,
+    FaWalking,
+} from "react-icons/fa";
+import { MdSportsTennis } from "react-icons/md";
+import { GiMuscleUp, GiMeditation } from "react-icons/gi";
+import type { MODALITY } from "../../interface/TrainingInterface";
 
 function formatDuration(totalMinutes: number): string {
     const h = Math.floor(totalMinutes / 60);
@@ -35,12 +46,31 @@ function getIntensityLabel(intensity: number): string {
     return "Máxima";
 }
 
-function intensityColor(intensity: number): string {
-    if (intensity <= 3) return "#22c55e"; // green
-    if (intensity <= 6) return "#eab308"; // yellow
-    if (intensity <= 8) return "#f97316"; // orange
-    return "#ef4444"; // red
-}
+const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
+    FUTEBOL: <FaFutbol />,
+    CORRIDA: <FaRunning />,
+    NATACAO: <FaSwimmer />,
+    CICLISMO: <FaBicycle />,
+    BASQUETE: <FaBasketballBall />,
+    TENIS: <MdSportsTennis />,
+    ACADEMIA: <FaDumbbell />,
+    CAMINHADA: <FaWalking />,
+    YOGA: <GiMeditation />,
+    OUTRO: <GiMuscleUp />,
+};
+
+const MODALITY_LABELS: Record<MODALITY, string> = {
+    FUTEBOL: "Futebol",
+    CORRIDA: "Corrida",
+    NATACAO: "Natação",
+    CICLISMO: "Ciclismo",
+    BASQUETE: "Basquete",
+    TENIS: "Tênis",
+    ACADEMIA: "Academia",
+    CAMINHADA: "Caminhada",
+    YOGA: "Yoga",
+    OUTRO: "Outro",
+};
 
 export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
     const navigate = useNavigate();
@@ -114,16 +144,13 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                                 className="bg-white rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div 
-                                        className="w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 transition-colors"
-                                        style={{ backgroundColor: `${intensityColor(training.training_intensity)}15`, color: intensityColor(training.training_intensity) }}
-                                    >
-                                        <FaPersonRunning />
+                                    <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl shrink-0 group-hover:bg-red-100 transition-colors">
+                                        {MODALITY_ICONS[training.modality as MODALITY] || <FaRunning />}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-semibold text-gray-800 text-lg">
-                                                {formatDate(training.start_date)}
+                                                {MODALITY_LABELS[training.modality as MODALITY] || "Outro"} - {formatDate(training.start_date)}
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
