@@ -51,7 +51,7 @@ const menuItemsAthlete: MenuItems[] = [
 ];
 const menuItemsSupport: MenuItems[] = [
     { name: "Tela Principal", route: "/paginaInicialSupport" },
-    { name: "Perfil", route: "/configuracao" }
+    { name: "Perfil", route: "/support/configuracao" }
 ];
 
 const TrainingFlowLayout = () => {

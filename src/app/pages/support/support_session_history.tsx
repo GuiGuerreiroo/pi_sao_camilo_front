@@ -28,6 +28,13 @@ function formatDate(ts: number): string {
   });
 }
 
+function intensityColor(intensity: number): string {
+  if (intensity <= 3) return "#22c55e"; // green
+  if (intensity <= 6) return "#eab308"; // yellow
+  if (intensity <= 8) return "#f97316"; // orange
+  return "#ef4444"; // red
+}
+
 export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -122,7 +129,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
               >
                 <FaChevronLeft className="text-xl" />
               </button>
-              <h1 className="text-2xl font-bold text-red-600 ml-2">Histórico de Sessões</h1>
+              <h1 className="text-2xl font-bold text-black ml-2">Histórico de Sessões</h1>
             </div>
             <button
               onClick={() => setShowFilter(prev => !prev)}
@@ -235,7 +242,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                     <button
                       key={t.training_id || i}
                       onClick={() => navigate("/session-detail", { state: { training: t } })}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left"
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left group"
                     >
                       <div>
                         <p className="text-sm font-semibold text-gray-800">
@@ -243,7 +250,9 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                         </p>
                         <p className="text-xs text-gray-400">{formatDate(t.start_date)}</p>
                       </div>
-                      <FiChevronRight className="text-red-500 text-lg flex-shrink-0" />
+                      <FiChevronRight 
+                        className="text-lg flex-shrink-0 group-hover:translate-x-1 transition-transform text-black" 
+                      />
                     </button>
                   ))
                 )}

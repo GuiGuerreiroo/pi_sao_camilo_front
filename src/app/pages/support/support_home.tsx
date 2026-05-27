@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
     const { get_all_groups_by_supporter, groups, supportError } = useContext(SupportContext);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(groups === undefined);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -61,7 +61,7 @@ export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
                         <button className="text-[#c81925] hover:bg-red-50 p-1 rounded-full transition-colors mr-2">
                             <FiChevronLeft className="w-6 h-6" />
                         </button>
-                        <h2 className="text-3xl font-medium text-[#c81925] tracking-wide">Grupos</h2>
+                        <h2 className="text-2xl font-bold text-black tracking-wide">Grupos</h2>
                     </div>
 
                     {/* Groups Grid */}
@@ -76,7 +76,7 @@ export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
 
                                     {/* Card Header */}
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="text-2xl font-medium text-[#c81925]">Grupo {index + 1}</h3>
+                                        <h3 className="text-2xl font-bold text-black">Grupo {index + 1}</h3>
                                     </div>
                                     <hr className="mb-5 border-gray-200" />
 

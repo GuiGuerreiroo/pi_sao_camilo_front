@@ -58,7 +58,7 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
 
         <div className="px-4 pt-8 pb-4 max-w-lg mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-red-600">Resultados</h1>
+            <h1 className="text-2xl font-bold text-black">Resultados</h1>
             {/* <button
               onClick={() => navigate("/paginaInicialAthlete")}
               className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white hover:bg-red-700 active:scale-95 transition-all"

@@ -243,7 +243,7 @@ export function Login() {
             {showResendModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                     <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-                        <h3 className="mb-4 text-xl font-bold text-gray-900">Validar E-mail</h3>
+                        <h3 className="mb-4 text-2xl font-bold text-black">Validar E-mail</h3>
                         <p className="mb-6 text-gray-700">
                             Sua conta já existe, mas seu email não foi validado! Deseja reenviar o código?
                         </p>

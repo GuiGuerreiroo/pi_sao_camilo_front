@@ -83,10 +83,10 @@ export function CreateAccount() {
               {['atleta', 'treinador', 'nutricionista', 'médico'].map((cat) => (
                 <label
                   key={cat}
-                  className={`flex cursor-pointer items-center justify-center rounded-md border py-3 text-base font-medium capitalize transition-all ${
+                  className={`flex cursor-pointer items-center justify-center rounded-md py-3 text-base font-medium capitalize transition-all ${
                     categoria === cat
-                      ? 'border-[#c81925] bg-[#c81925] text-white shadow-md'
-                      : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
+                      ? 'border-2 border-red-600 text-red-600 bg-red-50 shadow-sm'
+                      : 'border border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   <input

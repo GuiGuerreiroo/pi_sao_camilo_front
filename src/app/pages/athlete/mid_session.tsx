@@ -16,9 +16,15 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
   const [timer, setTimer] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [urineVolume, setUrineVolume] = useState("");
+  const [showUrineVolume, setShowUrineVolume] = useState(false);
   const [error, setError] = useState("");
 
   const handleNext = () => {
+    if (isActive) {
+      toast.error("Por favor, pause ou pare o cronômetro para avançar.");
+      return;
+    }
+
     let uVol = Number(urineVolume);
     if (urineVolume === "") uVol = 0.0;
 
@@ -74,7 +80,7 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
         <NavBar menuItems={menuItems} />
 
       <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold text-red-600 mb-6">Durante a Sessão</h1>
+        <h1 className="text-2xl font-bold text-black mb-6">Durante a Sessão</h1>
 
         {/* Stepper */}
         <div className="flex items-center mb-10 px-2 w-full">
@@ -165,16 +171,34 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
 
           {/* Urine Volume */}
           <div id="field-urine-volume">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Volume Urinário</label>
-            <input 
-              type="number" 
-              onWheel={(e) => (e.target as HTMLInputElement).blur()}
-              value={urineVolume}
-              onChange={(e) => { setUrineVolume(e.target.value); setError(""); }}
-              className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`} 
-              placeholder="0 ml" 
-            />
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            <button 
+              onClick={() => setShowUrineVolume(!showUrineVolume)}
+              className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2 hover:text-gray-900 transition-colors w-full text-left outline-none"
+            >
+              <span>Volume Urinário (Opcional)</span>
+              <svg 
+                className={`w-4 h-4 transition-transform duration-300 ${showUrineVolume ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            
+            {showUrineVolume && (
+              <div className="animate-fade-in mt-2">
+                <input 
+                  type="number" 
+                  onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                  value={urineVolume}
+                  onChange={(e) => { setUrineVolume(e.target.value); setError(""); }}
+                  className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-gray-400 border border-transparent'}`} 
+                  placeholder="0 ml" 
+                />
+                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+              </div>
+            )}
           </div>
 
           <div className="pt-6">

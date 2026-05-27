@@ -182,7 +182,7 @@ export function VerifyAccount() {
 
                 {/* Título */}
                 <div className="mb-8 text-center">
-                    <h2 className="mb-2 text-2xl font-bold text-[#23262b]">Verifique seu e-mail</h2>
+                    <h2 className="mb-2 text-2xl font-bold text-black">Verifique seu e-mail</h2>
                     <p className="text-sm text-[#7a7a7a]">
                         Enviamos um código de 6 dígitos para
                     </p>

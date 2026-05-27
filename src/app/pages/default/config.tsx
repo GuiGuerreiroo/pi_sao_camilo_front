@@ -8,6 +8,7 @@ import { updateUser } from '../../api/user/update_user';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { z } from 'zod';
+import { getDecodedToken } from '../../hooks/tokenDecode';
 
 const updateSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres.').optional(),
@@ -20,11 +21,28 @@ const updateSchema = z.object({
 
 export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState({
-    name: '',
-    email: '',
-    role: '',
-    height: ''
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+
+      return {
+        name: userData.name || '',
+        email: userData.email || '',
+        role: userData.role || '',
+        height: userData.height ? String(userData.height).replace('.', ',') : ''
+      };
+    }
+
+    const tokenData = getDecodedToken();
+
+    return {
+      name: tokenData?.name || '',
+      email: tokenData?.email || '',
+      role: tokenData?.role || '',
+      height: ''
+    };
   });
 
   useEffect(() => {
@@ -165,7 +183,7 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                 <User className="text-[#BD2024]" size={28} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Meu Perfil</h1>
+                <h1 className="text-2xl font-bold text-black">Meu Perfil</h1>
                 <p className="text-gray-500 text-sm mt-1">Gerencie suas informações pessoais</p>
               </div>
             </div>

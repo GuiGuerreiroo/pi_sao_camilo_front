@@ -245,7 +245,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                         <FiChevronLeft className="w-7 h-7" />
                     </button>
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900">Relatório do Atleta</h2>
+                        <h2 className="text-2xl font-bold text-black">Relatório do Atleta</h2>
                         <p className="text-gray-500 text-sm mt-1">{member.name} &middot; {member.email}</p>
                     </div>
                     <button

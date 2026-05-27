@@ -35,6 +35,13 @@ function getIntensityLabel(intensity: number): string {
     return "Máxima";
 }
 
+function intensityColor(intensity: number): string {
+    if (intensity <= 3) return "#22c55e"; // green
+    if (intensity <= 6) return "#eab308"; // yellow
+    if (intensity <= 8) return "#f97316"; // orange
+    return "#ef4444"; // red
+}
+
 export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
     const navigate = useNavigate();
     const { trainings, get_all_trainings } = useContext(AthleteContext);
@@ -89,7 +96,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                         <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
                         </button>
-                        <h1 className="text-2xl font-light">Histórico de Treinos</h1>
+                        <h1 className="text-2xl font-bold text-black">Histórico de Treinos</h1>
                     </div>
                 </div>
 
@@ -107,7 +114,10 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                                 className="bg-white rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl shrink-0 group-hover:bg-red-100 transition-colors">
+                                    <div 
+                                        className="w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 transition-colors"
+                                        style={{ backgroundColor: `${intensityColor(training.training_intensity)}15`, color: intensityColor(training.training_intensity) }}
+                                    >
                                         <FaPersonRunning />
                                     </div>
                                     <div>
@@ -129,7 +139,9 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                                     </div>
                                 </div>
                                 
-                                <div className="hidden md:flex items-center gap-2 text-red-700 font-medium group-hover:translate-x-1 transition-transform">
+                                <div 
+                                    className="hidden md:flex items-center gap-2 font-medium group-hover:translate-x-1 transition-transform text-black"
+                                >
                                     <span>Ver detalhes</span>
                                     <FaChevronRight className="text-sm" />
                                 </div>

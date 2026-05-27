@@ -157,7 +157,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                         <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
                         </button>
-                        <h1 className="text-2xl font-light">Relatório</h1>
+                        <h1 className="text-2xl font-bold text-black">Relatório</h1>
                     </div>
                 </div>
 

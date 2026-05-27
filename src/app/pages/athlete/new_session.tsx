@@ -56,7 +56,7 @@ export default function NovaSession({ menuItems }: { menuItems: MenuItems[] }) {
         <NavBar menuItems={menuItems} />
 
         <div className="px-4 pt-6 pb-4 max-w-lg mx-auto">
-          <h1 className="text-2xl font-bold text-red-600 mb-6">Nova Sessão</h1>
+          <h1 className="text-2xl font-bold text-black mb-6">Nova Sessão</h1>
 
           {/* Checklist de Padronização */}
           <div className="bg-yellow-50 border border-yellow-300 rounded-2xl p-4 mb-5 shadow-sm">

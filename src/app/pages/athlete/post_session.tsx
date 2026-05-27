@@ -15,7 +15,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
   const [sintomasGastrointestinais, setSintomasGastrointestinais] = useState(false);
   const [fadiga, setFadiga] = useState(false);
   const [roupaEncharcada, setRoupaEncharcada] = useState(false);
-  const [intensidade, setIntensidade] = useState(1);
+  const [intensidade, setIntensidade] = useState(0);
   const [error, setError] = useState("");
 
   const handleNext = async () => {
@@ -40,12 +40,12 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
     const endDate = new Date().getTime();
     updateTrainingData({
       post_training_weight: weight,
-      training_intensity: (intensidade * 1.4) + 1, // Map 0-8 to 1.0-10.0 scale roughly
+      training_intensity: parseFloat(((intensidade * 1.4) + 1).toFixed(1)), // Map 0-8 to 1.0-10.0 scale roughly
       soaked_clothes: roupaEncharcada,
-      post_training_symptoms: finalSymptoms.length > 0 ? finalSymptoms : ["NENHUM" as SYMPTOMS],
+      post_training_symptoms: finalSymptoms,
       // End date and duration calculation:
       end_date: endDate,
-      duration: Math.max(1, Math.floor((endDate - (trainingData.start_date || endDate)) / 60000)), 
+      duration: parseFloat(Math.max(1, (endDate - (trainingData.start_date || endDate)) / 60000).toFixed(2)), 
     });
 
     try {
@@ -96,7 +96,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
         <NavBar menuItems={menuItems} />
 
         <div className="px-4 pt-6 pb-4 max-w-lg mx-auto">
-          <h1 className="text-2xl font-bold text-red-600 mb-6">Pós-Sessão</h1>
+          <h1 className="text-2xl font-bold text-black mb-6">Pós-Sessão</h1>
 
           {/* Stepper */}
           <div className="flex items-center mb-8 px-2 w-full">
@@ -130,7 +130,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
                 value={massaCorporal}
                 onChange={e => { setMassaCorporal(e.target.value); setError(""); }}
-                className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all text-gray-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-red-200 border border-transparent'}`}
+                className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all text-gray-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-gray-400 border border-transparent'}`}
                 placeholder="0 kg"
               />
               {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
