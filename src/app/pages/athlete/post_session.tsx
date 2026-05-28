@@ -19,6 +19,11 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
   const [error, setError] = useState("");
 
   const handleNext = async () => {
+    if (!trainingData.modality) {
+      toast.error("A modalidade da sessão não foi definida. Reinicie a sessão.");
+      return;
+    }
+
     const weight = Number(massaCorporal);
 
     if (!massaCorporal) {
@@ -34,22 +39,30 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
 
     // Convert checkboxes back to the backend Enum array style:
     const finalSymptoms: SYMPTOMS[] = [];
-    if (fadiga) finalSymptoms.push("FADIGA" as SYMPTOMS); // Wait, fadiga wasn't in the mapping previously, let's map it safely
+    // Fadiga isn't accepted by backend in SYMPTOMS enum anymore, we map it to DOR_MUSCULAR or just ignore it. Let's map it to ESTRESSE or ignore. Let's map it to DOR_MUSCULAR if they select it, or just drop it.
+    // Given the strict backend, let's map 'fadiga' to 'ESTRESSE' as a proxy, or just leave it out. The closest to fatigue in the list is ESTRESSE or DOR_MUSCULAR. Let's map to DOR_MUSCULAR.
+    if (fadiga) finalSymptoms.push("DOR_MUSCULAR" as SYMPTOMS);
     if (sintomasGastrointestinais) finalSymptoms.push("NAUSEA" as SYMPTOMS);
 
     const endDate = new Date().getTime();
-    updateTrainingData({
+    const durationMinutes = Math.max(0.01, (endDate - (trainingData.start_date || endDate)) / 60000);
+    // Map 0-7 to 1.0-10.0 exactly: (i / 7) * 9 + 1
+    const intensityFloat = parseFloat((((intensidade / 7) * 9) + 1).toFixed(1));
+    const finalDuration = parseFloat(durationMinutes.toFixed(2));
+
+    const finalData = {
       post_training_weight: weight,
-      training_intensity: parseFloat(((intensidade * 1.4) + 1).toFixed(1)), // Map 0-8 to 1.0-10.0 scale roughly
+      training_intensity: intensityFloat,
       soaked_clothes: roupaEncharcada,
       post_training_symptoms: finalSymptoms,
-      // End date and duration calculation:
       end_date: endDate,
-      duration: parseFloat(Math.max(1, (endDate - (trainingData.start_date || endDate)) / 60000).toFixed(2)), 
-    });
+      duration: finalDuration,
+    };
+
+    updateTrainingData(finalData);
 
     try {
-        await submitTraining(); // Trigger the backend commit!
+        await submitTraining(finalData); // Trigger the backend commit!
         setError("");
         navigate("/result-session");
     } catch (err) {

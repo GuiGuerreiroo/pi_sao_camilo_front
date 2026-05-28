@@ -17,6 +17,8 @@ const MODALITY_LABELS: Record<MODALITY, string> = {
   BASQUETE: "Basquete",
   TENIS: "Tênis",
   ACADEMIA: "Academia",
+  CAMINHADA: "Caminhada",
+  YOGA: "Yoga",
   OUTRO: "Outro",
 };
 

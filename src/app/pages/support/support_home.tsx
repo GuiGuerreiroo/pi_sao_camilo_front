@@ -58,9 +58,6 @@ export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
                 <main className="flex-1 p-10 bg-[#fbfbfb]">
                     {/* Header Title */}
                     <div className="flex items-center mb-8">
-                        <button className="text-[#c81925] hover:bg-red-50 p-1 rounded-full transition-colors mr-2">
-                            <FiChevronLeft className="w-6 h-6" />
-                        </button>
                         <h2 className="text-2xl font-bold text-black tracking-wide">Grupos</h2>
                     </div>
 

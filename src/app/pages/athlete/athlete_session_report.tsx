@@ -130,10 +130,10 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                     <div className="flex flex-col justify-center items-center h-64 gap-4">
                         <p className="text-gray-500">Sessão não encontrada.</p>
                         <button
-                            onClick={() => navigate("/paginaInicialAthlete")}
+                            onClick={() => navigate("/athleteReport")}
                             className="text-red-700 underline"
                         >
-                            Voltar para o Início
+                            Voltar para Relatórios
                         </button>
                     </div>
                 </main>
@@ -154,7 +154,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                 {/* Title Section */}
                 <div className="w-full max-w-7xl px-4 py-6 text-gray-800 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate("/paginaInicialAthlete")} className="text-2xl hover:text-red-500 transition-colors">
+                        <button onClick={() => navigate("/athleteReport")} className="text-2xl hover:text-red-500 transition-colors">
                             <FaArrowLeft />
                         </button>
                         <h1 className="text-2xl font-bold text-black">Relatório</h1>

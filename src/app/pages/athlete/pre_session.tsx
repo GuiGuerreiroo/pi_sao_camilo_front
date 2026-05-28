@@ -102,11 +102,10 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
   ];
 
   const symptomsOptions = [
-    { value: "FADIGA", label: "Fadiga" },
+    { value: "ESTRESSE", label: "Estresse" },
     { value: "DOR_DE_CABECA", label: "Dor de Cabeça" },
     { value: "NAUSEA", label: "Náusea" },
     { value: "DOR_MUSCULAR", label: "Dor Muscular" },
-    { value: "ESTRESSE", label: "Estresse" },
     { value: "CAIMBRA", label: "Cãibra" }
   ];
 

@@ -6,9 +6,9 @@ import NavBar from '../../components/navbar';
 import type { MenuItems } from '../../interface/menuItems';
 import type { TrainingInterface, MODALITY } from '../../interface/TrainingInterface';
 import type { AthleteInGroup } from '../../interface/GroupInterface';
-import { FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory } from 'react-icons/fa';
+import { FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory, FaWalking } from 'react-icons/fa';
 import { MdSportsTennis } from 'react-icons/md';
-import { GiMuscleUp } from 'react-icons/gi';
+import { GiMuscleUp, GiMeditation } from 'react-icons/gi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ReferenceArea } from "recharts";
 
 const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
@@ -19,6 +19,8 @@ const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
     BASQUETE: <FaBasketballBall />,
     TENIS: <MdSportsTennis />,
     ACADEMIA: <FaDumbbell />,
+    CAMINHADA: <FaWalking />,
+    YOGA: <GiMeditation />,
     OUTRO: <GiMuscleUp />,
 };
 
@@ -30,6 +32,8 @@ const MODALITY_LABELS: Record<MODALITY, string> = {
     BASQUETE: "Basquete",
     TENIS: "Tênis",
     ACADEMIA: "Academia",
+    CAMINHADA: "Caminhada",
+    YOGA: "Yoga",
     OUTRO: "Outro",
 };
 
