@@ -17,56 +17,57 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
   const [roupaEncharcada, setRoupaEncharcada] = useState(false);
   const [intensidade, setIntensidade] = useState(0);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNext = async () => {
-    if (!trainingData.modality) {
-      toast.error("A modalidade da sessão não foi definida. Reinicie a sessão.");
-      return;
-    }
-
-    const weight = Number(massaCorporal);
-
-    if (!massaCorporal) {
-      toast.error("Por favor, preencha a massa corporal pós-exercício.");
-      document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-    if (weight < 35.0 || weight > 200.0) {
-      toast.error("O peso pós-exercício deve estar entre 35kg e 200kg.");
-      document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    // Convert checkboxes back to the backend Enum array style:
-    const finalSymptoms: SYMPTOMS[] = [];
-    // Fadiga isn't accepted by backend in SYMPTOMS enum anymore, we map it to DOR_MUSCULAR or just ignore it. Let's map it to ESTRESSE or ignore. Let's map it to DOR_MUSCULAR if they select it, or just drop it.
-    // Given the strict backend, let's map 'fadiga' to 'ESTRESSE' as a proxy, or just leave it out. The closest to fatigue in the list is ESTRESSE or DOR_MUSCULAR. Let's map to DOR_MUSCULAR.
-    if (fadiga) finalSymptoms.push("DOR_MUSCULAR" as SYMPTOMS);
-    if (sintomasGastrointestinais) finalSymptoms.push("NAUSEA" as SYMPTOMS);
-
-    const endDate = new Date().getTime();
-    const durationMinutes = Math.max(0.01, (endDate - (trainingData.start_date || endDate)) / 60000);
-    // Map 0-7 to 1.0-10.0 exactly: (i / 7) * 9 + 1
-    const intensityFloat = parseFloat((((intensidade / 7) * 9) + 1).toFixed(1));
-    const finalDuration = parseFloat(durationMinutes.toFixed(2));
-
-    const finalData = {
-      post_training_weight: weight,
-      training_intensity: intensityFloat,
-      soaked_clothes: roupaEncharcada,
-      post_training_symptoms: finalSymptoms,
-      end_date: endDate,
-      duration: finalDuration,
-    };
-
-    updateTrainingData(finalData);
-
+    setIsSubmitting(true);
     try {
-        await submitTraining(finalData); // Trigger the backend commit!
-        setError("");
-        navigate("/result-session");
+      if (!trainingData.modality) {
+        toast.error("A modalidade da sessão não foi definida. Reinicie a sessão.");
+        return;
+      }
+
+      const weight = Number(massaCorporal);
+
+      if (!massaCorporal) {
+        toast.error("Por favor, preencha a massa corporal pós-exercício.");
+        document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      if (weight < 35.0 || weight > 200.0) {
+        toast.error("O peso pós-exercício deve estar entre 35kg e 200kg.");
+        document.getElementById('field-post-weight')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // Convert checkboxes back to the backend Enum array style:
+      const finalSymptoms: SYMPTOMS[] = [];
+      if (fadiga) finalSymptoms.push("DOR_MUSCULAR" as SYMPTOMS);
+      if (sintomasGastrointestinais) finalSymptoms.push("NAUSEA" as SYMPTOMS);
+
+      const endDate = new Date().getTime();
+      const durationMinutes = Math.max(0.01, (endDate - (trainingData.start_date || endDate)) / 60000);
+      const intensityFloat = parseFloat((((intensidade / 7) * 9) + 1).toFixed(1));
+      const finalDuration = parseFloat(durationMinutes.toFixed(2));
+
+      const finalData = {
+        post_training_weight: weight,
+        training_intensity: intensityFloat,
+        soaked_clothes: roupaEncharcada,
+        post_training_symptoms: finalSymptoms,
+        end_date: endDate,
+        duration: finalDuration,
+      };
+
+      updateTrainingData(finalData);
+
+      await submitTraining(finalData); // Trigger the backend commit!
+      setError("");
+      navigate("/result-session");
     } catch (err) {
-        toast.error("Erro ao registrar a sessão. Tente novamente.");
+      toast.error("Erro ao registrar a sessão. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -103,6 +104,14 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
     </div>
   );
 
+  if (isSubmitting) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="w-12 h-12 border-4 border-gray-200 border-t-[#c81925] rounded-full animate-spin"></div>
+        <p className="text-gray-500 ml-3">Registrando...</p>
+      </div>
+    );
+  }
   return (
     <SlideBarContextProvider>
       <main className="min-h-screen bg-gray-50 pb-24 font-sans text-gray-800">
