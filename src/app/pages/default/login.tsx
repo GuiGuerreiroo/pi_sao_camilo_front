@@ -161,7 +161,7 @@ export function Login() {
                 <img
                     src="/sao_camilo_logo.svg"
                     alt="São Camilo"
-                    className="mx-auto mb-10 w-full max-w-[16rem]"
+                    className="mx-auto mb-10 w-full max-w-[30rem]"
                 />
 
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
