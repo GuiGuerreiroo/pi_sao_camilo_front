@@ -208,8 +208,8 @@ export function VerifyAccount() {
                             disabled={isLoading || timerExpired}
                             aria-label={`Dígito ${index + 1} de ${CODE_LENGTH}`}
                             className={[
-                                'h-14 w-12 rounded-md text-center text-2xl font-bold text-[#23262b] outline-none transition-all',
-                                'bg-[#f5f5f5] shadow-inner',
+                                'h-14 w-12 rounded-xl text-center text-2xl font-bold text-[#2f394e] outline-none transition-all',
+                                'bg-white border border-[#94a3b8] focus:ring-2 focus:ring-gray-400/50',
                                 timerExpired
                                     ? 'opacity-40 cursor-not-allowed ring-1 ring-gray-300'
                                     : digit

@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { z } from 'zod';
 import { getDecodedToken } from '../../hooks/tokenDecode';
+import { Input } from '@/app/components/input';
 
 const updateSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres.').optional(),
@@ -46,7 +47,7 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
   });
 
   useEffect(() => {
-    const user= localStorage.getItem('user');
+    const user = localStorage.getItem('user');
     if (user) {
       const userData = JSON.parse(user);
       setUser({
@@ -145,7 +146,7 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
     } catch (error: any) {
       console.error("CATCH BLOCK ERROR:", error);
       let errorMessage = error.response?.data?.detail || error.response?.data?.message || 'Erro ao atualizar dados.';
-      
+
       if (typeof errorMessage === 'string') {
         if (errorMessage.includes("New password does not meet security requirements")) {
           errorMessage = "A nova senha não atende aos requisitos de segurança. Certifique-se de que tenha no mínimo 6 caracteres e uma letra maiúscula.";
@@ -170,12 +171,12 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
 
   return (
     <SlideBarContextProvider>
-        <NavBar menuItems={menuItems} />
+      <NavBar menuItems={menuItems} />
 
-    {/* <main> */}
+      {/* <main> */}
       <div className="min-h-screen bg-gray-50 font-sans p-4 pb-28 md:p-8">
         <div className="max-w-5xl mx-auto space-y-6">
-          
+
           {/* Header Card */}
           <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -190,8 +191,8 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
             <div className="flex items-center gap-3 w-full sm:w-auto flex-col sm:flex-row">
               {!isEditing ? (
                 <>
-                  <button 
-                    onClick={handleLogout} 
+                  <button
+                    onClick={handleLogout}
                     className="flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,10 +217,10 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
               )}
             </div>
           </div>
-  
+
           {/* Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+
             {/* Left Column: Informações Pessoais */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center gap-3 mb-6">
@@ -228,34 +229,32 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">Informações Pessoais</h2>
               </div>
-  
+
               <div className="space-y-6">
                 {/* Nome Completo */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
-                  <div className={`flex items-center border rounded-lg px-4 py-3 transition-colors ${isEditing ? 'bg-white border-gray-300 focus-within:border-gray-500' : 'bg-gray-50 border-gray-100'}`}>
-                    <User size={18} className="text-gray-400 mr-3" />
-                    <input 
-                      type="text" 
-                      readOnly={!isEditing} 
-                      value={isEditing ? editForm.name : user.name} 
-                      onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                      className={`bg-transparent w-full outline-none placeholder-gray-400 ${isEditing ? 'text-gray-800' : 'text-gray-500'}`} 
-                    />
-                  </div>
-                  {isEditing && <p className="text-xs text-gray-400 mt-2">Atual: {user.name}</p>}
+                  <Input
+                    label="Nome Completo"
+                    icon={<User size={18} />}
+                    type="text"
+                    readOnly={!isEditing}
+                    value={isEditing ? editForm.name : user.name}
+                    onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                    className={!isEditing ? 'bg-gray-50 border-gray-100' : undefined}
+                    helperText={isEditing ? `Atual: ${user.name}` : undefined}
+                  />
                 </div>
-  
+
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 transition-colors">
                     <Mail size={18} className="text-gray-400 mr-3" />
-                    <input 
-                      type="email" 
-                      readOnly={true} 
-                      value={user.email} 
-                      className="bg-transparent w-full outline-none placeholder-gray-400 text-gray-500 cursor-not-allowed" 
+                    <input
+                      type="email"
+                      readOnly={true}
+                      value={user.email}
+                      className="bg-transparent w-full outline-none placeholder-gray-400 text-gray-500 cursor-not-allowed"
                     />
                   </div>
                   <div className="flex justify-between items-start mt-2">
@@ -266,25 +265,23 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                 {/* Altura */}
                 {user.role === 'USER' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Altura (m)</label>
-                    <div className={`flex items-center border rounded-lg px-4 py-3 transition-colors ${isEditing ? 'bg-white border-gray-300 focus-within:border-gray-500' : 'bg-gray-50 border-gray-100'}`}>
-                      <User size={18} className="text-gray-400 mr-3" />
-                      <input 
-                        type="text" 
-                        inputMode="decimal"
-                        readOnly={!isEditing} 
-                        value={isEditing ? editForm.height : user.height} 
-                        onChange={(e) => setEditForm({...editForm, height: e.target.value})}
-                        className={`bg-transparent w-full outline-none placeholder-gray-400 ${isEditing ? 'text-gray-800' : 'text-gray-500'}`} 
-                        placeholder="Ex: 1,75"
-                      />
-                    </div>
-                    {isEditing && <p className="text-xs text-gray-400 mt-2">Atual: {user.height}</p>}
+                    <Input
+                      label="Altura (m)"
+                      icon={<User size={18} />}
+                      type="text"
+                      inputMode="decimal"
+                      readOnly={!isEditing}
+                      value={isEditing ? editForm.height : user.height}
+                      onChange={(e) => setEditForm({...editForm, height: e.target.value})}
+                      className={!isEditing ? 'bg-gray-50 border-gray-100' : undefined}
+                      placeholder="Ex: 1,75"
+                      helperText={isEditing ? `Atual: ${user.height}` : undefined}
+                    />
                   </div>
                 )}
               </div>
             </div>
-  
+
             {/* Right Column: Alterar Senha */}
             <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
               <div className="flex items-center gap-3 mb-6">
@@ -293,60 +290,60 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                 </div>
                 <h2 className="text-xl font-bold text-gray-800">Alterar Senha</h2>
               </div>
-  
+
               <div className="space-y-6 flex-1">
                 {/* Senha Atual */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Senha Atual</label>
-                  <div className={`flex items-center border rounded-lg px-4 py-3 transition-colors ${isEditing ? 'bg-white border-gray-300 focus-within:border-gray-500' : 'bg-gray-50 border-gray-100'}`}>
-                    <Lock size={18} className="text-gray-400 mr-3" />
-                    <input 
-                      type={showCurrentPassword ? "text" : "password"}
-                      placeholder="Digite sua senha atual" 
-                      value={passwordForm.current}
-                      readOnly={!isEditing}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
-                      className={`bg-transparent w-full outline-none placeholder-gray-400 ${isEditing ? 'text-gray-800' : 'text-gray-500'}`} 
-                    />
-                    {isEditing && (
-                      <button 
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="text-gray-400 hover:text-gray-600 focus:outline-none ml-2"
-                      >
-                        {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    )}
-                  </div>
+                  <Input
+                    label="Senha Atual"
+                    icon={<Lock size={18} />}
+                    type={showCurrentPassword ? "text" : "password"}
+                    placeholder="Digite sua senha atual"
+                    value={passwordForm.current}
+                    readOnly={!isEditing}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
+                    className={!isEditing ? 'bg-gray-50 border-gray-100' : undefined}
+                    suffix={
+                      isEditing && (
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="text-gray-400 hover:text-gray-600 focus:outline-none ml-2"
+                        >
+                          {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      )
+                    }
+                  />
                 </div>
-  
+
                 {/* Nova Senha */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Nova Senha</label>
-                  <div className={`flex items-center border rounded-lg px-4 py-3 transition-colors ${isEditing ? 'bg-white border-gray-300 focus-within:border-gray-500' : 'bg-gray-50 border-gray-100'}`}>
-                    <Lock size={18} className="text-gray-400 mr-3" />
-                    <input 
-                      type={showNewPassword ? "text" : "password"}
-                      placeholder="Digite sua nova senha" 
-                      value={passwordForm.new}
-                      readOnly={!isEditing}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, new: e.target.value })}
-                      className={`bg-transparent w-full outline-none placeholder-gray-400 ${isEditing ? 'text-gray-800' : 'text-gray-500'}`} 
-                    />
-                    {isEditing && (
-                      <button 
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="text-gray-400 hover:text-gray-600 focus:outline-none ml-2"
-                      >
-                        {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">Mínimo de 6 caracteres e uma maíuscula</p>
+                  <Input
+                    label="Nova Senha"
+                    icon={<Lock size={18} />}
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="Digite sua nova senha"
+                    value={passwordForm.new}
+                    readOnly={!isEditing}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, new: e.target.value })}
+                    className={!isEditing ? 'bg-gray-50 border-gray-100' : undefined}
+                    helperText="Mínimo de 6 caracteres e uma maíuscula"
+                    suffix={
+                      isEditing && (
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="text-gray-400 hover:text-gray-600 focus:outline-none ml-2"
+                        >
+                          {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      )
+                    }
+                  />
                 </div>
               </div>
-  
+
               {/* Dica Box */}
               {!isEditing && (
                 <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-4 mt-8">
@@ -355,15 +352,15 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
                   </p>
                 </div>
               )}
-  
+
             </div>
           </div>
         </div>
-  
 
-  
+
+
       </div>
-    {/* </main> */}
+      {/* </main> */}
     </SlideBarContextProvider>
-    );
+  );
 }

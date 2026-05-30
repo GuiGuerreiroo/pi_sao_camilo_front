@@ -6,6 +6,8 @@ import type { MenuItems } from "../../interface/menuItems";
 import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
 import { toast } from "react-toastify";
 import type { SYMPTOMS } from "../../interface/TrainingInterface";
+import { Input } from "../../components/input";
+import { FiActivity } from "react-icons/fi";
 
 export default function PostSession({ menuItems, currentStep = 3 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
@@ -91,9 +93,8 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
         tabIndex={0}
         onClick={onToggle}
         onKeyDown={e => e.key === " " && onToggle()}
-        className={`w-6 h-6 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${
-          checked ? "bg-red-600 border-red-600" : "bg-white border-gray-400"
-        }`}
+        className={`w-6 h-6 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${checked ? "bg-red-600 border-red-600" : "bg-white border-gray-400"
+          }`}
       >
         {checked && (
           <svg width="12" height="10" viewBox="0 0 11 9" fill="none">
@@ -124,13 +125,12 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
           <div className="flex items-center mb-8 px-2 w-full">
             {[1, 2, 3].map((step, i) => (
               <React.Fragment key={step}>
-                <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 transition-colors ${
-                  step < currentStep
+                <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 transition-colors ${step < currentStep
                     ? "bg-red-600 border-red-600 text-white"
                     : step === currentStep
-                    ? "bg-red-600 border-red-600 text-white"
-                    : "bg-white border-gray-300 text-gray-400"
-                }`}>
+                      ? "bg-red-600 border-red-600 text-white"
+                      : "bg-white border-gray-300 text-gray-400"
+                  }`}>
                   {step}
                 </div>
                 {i < 2 && (
@@ -143,19 +143,18 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
           <div className="space-y-3">
 
             {/* Massa Corporal */}
-            <div id="field-post-weight" className="bg-white rounded-2xl shadow-md border border-gray-200 px-5 py-4">
-              <label className="block text-sm font-semibold text-gray-800 mb-3">
-                Massa Corporal Pós-Exercício
-              </label>
-              <input
+            <div id="field-post-weight" className="bg-white rounded-2xl shadow-md border border-gray-200 px-5 py-4 mb-4">
+              <Input
+                label="Massa Corporal Pós-Exercício"
                 type="number"
                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
                 value={massaCorporal}
                 onChange={e => { setMassaCorporal(e.target.value); setError(""); }}
-                className={`w-full bg-gray-200 rounded-lg p-3 outline-none focus:ring-2 transition-all text-gray-700 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${error ? 'focus:ring-red-500 border border-red-500' : 'focus:ring-gray-400 border border-transparent'}`}
-                placeholder="0 kg"
+                className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                placeholder="0.0"
+                error={error}
+                suffix={<span className="text-sm font-semibold text-gray-500">kg</span>}
               />
-              {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
             </div>
 
             {/* Checkboxes */}
@@ -197,13 +196,12 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
                       className="relative z-10 w-10 h-10 flex items-center justify-center cursor-pointer group"
                     >
                       <div
-                        className={`rounded-full transition-all flex-shrink-0 group-hover:scale-110 ${
-                          i === intensidade
+                        className={`rounded-full transition-all flex-shrink-0 group-hover:scale-110 ${i === intensidade
                             ? "w-6 h-6 bg-red-600 ring-4 ring-white shadow-md"
                             : i < intensidade
-                            ? "w-3 h-3 bg-red-600"
-                            : "w-3 h-3 bg-gray-300"
-                        }`}
+                              ? "w-3 h-3 bg-red-600"
+                              : "w-3 h-3 bg-gray-300"
+                          }`}
                       />
                     </div>
                   ))}
