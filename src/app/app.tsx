@@ -13,6 +13,7 @@ import type { MenuItems } from './interface/menuItems';
 import Perfil from './pages/default/config';
 import { CreateAccount } from './pages/default/createAccount';
 import { VerifyAccount } from './pages/default/verifyAccount'
+import { ForgotPassword } from './pages/default/forgot_password'
 import { SyncProvider } from './contexts/SyncContext';
 import NewSession from './pages/athlete/new_session';
 import PreSession from './pages/athlete/pre_session';
@@ -77,7 +78,7 @@ export default function App() {
                         {/* Placeholder for future screens */}
                         {/* <Route path='/verify' element={<VerifyEmail />} /> */}
                         {/* <Route path='/register' element={<CreateUser />} /> */}
-                        {/* <Route path='/alterarSenha' element={<ChangePassword />} /> */}
+                        <Route path='/forgotPassword' element={<ForgotPassword />} />
 
                         <Route element={<PrivateRoute requiredRole="SUPPORT" />}>
                             <Route element={<SupportLayout />}>

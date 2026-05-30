@@ -224,7 +224,7 @@ export function Login() {
                     {/* Links */}
                     <div className="mt-6 flex items-center justify-between text-base">
                         <a
-                            href="#"
+                            href="/forgotPassword"
                             className="text-[#7a7a7a] underline-offset-2 transition-colors hover:text-[#555] hover:underline"
                         >
                             Esqueci minha senha
