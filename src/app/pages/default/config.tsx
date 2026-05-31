@@ -185,7 +185,7 @@ export default function Perfil({ menuItems }: { menuItems: MenuItems[] }) {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-black">Meu Perfil</h1>
-                <p className="text-gray-500 text-sm mt-1">Gerencie suas informações pessoais</p>
+                <p className="text-gray-500 text-sm mt-1">Gerencie suas informações</p>
               </div>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto flex-col sm:flex-row">

@@ -39,21 +39,33 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
         <>
             {/* Desktop Navbar */}
             <nav className="hidden md:block">
-                <div className="flex justify-between items-center bg-red-800 border-b border-[#c81925] w-full py-4 px-6 text-white shadow-md">
-                    {/* Left: User Info */}
-                    <button 
-                        onClick={() => handleNav(role === 'Suporte' ? '/support/configuracao' : '/configuracao')}
-                        className="flex items-center gap-x-3 hover:bg-white/10 p-2 -ml-2 rounded-lg transition-colors text-left cursor-pointer"
-                    >
-                        <div className="bg-white/20 rounded-full w-10 h-10 flex items-center justify-center">
-                            <FaUserCircle className="text-2xl text-white" />
+                <div className="flex items-center bg-red-700 border-b border-[#c81925] w-full py-3 px-8 text-white shadow-md">
+                    {/* Left: Logo (clicável) + nome da conta (visual) */}
+                    <div className="flex items-center gap-x-4 shrink-0">
+                        <button
+                            onClick={() => handleNav(
+                                role === 'Suporte' ? '/paginaInicialSupport' :
+                                    role === 'Admin' ? '/admin' :
+                                        '/paginaInicialAthlete'
+                            )}
+                            className="flex items-center hover:opacity-80 transition-opacity"
+                            aria-label="Ir para página inicial"
+                        >
+                            <img
+                                src="/sao_camilo_logo_branco.svg"
+                                alt="São Camilo"
+                                className="h-20"
+                            />
+                        </button>
+
+                        <div className="flex items-center gap-x-2 pl-2 border-l border-white/30">
+
+                            <span className="text-base text-white font-medium">{userName}</span>
                         </div>
-                        <div className="flex items-center gap-x-1.5">
-                            <span className="text-lg text-white font-medium">{userName}</span>
-                        </div>
-                    </button>
-                    
-                    <div className="flex items-center gap-x-8">
+                    </div>
+
+                    {/* Right: menu links */}
+                    <div className="flex items-center gap-x-8 ml-auto">
                         {menuItems.map((item, index) => (
                             <Link
                                 key={index}
@@ -68,10 +80,11 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                                 {item.name}
                             </Link>
                         ))}
-
                     </div>
                 </div>
             </nav>
+
+
 
             {/* Mobile Navbar (bottom bar) */}
             <div className="fixed bottom-0 left-0 w-full bg-gray-200 flex justify-around items-center py-5 shadow-lg z-50 md:hidden">
