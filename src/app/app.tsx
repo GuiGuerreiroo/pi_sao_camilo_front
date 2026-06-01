@@ -70,7 +70,7 @@ const menuItemsSupport: MenuItems[] = [
 
 const menuItemsAdmin: MenuItems[] = [
     // { name: "Dashboard", route: "/paginaInicialADM" },
-    { name: "Configurações", route: "/admin/configuracoes" },
+    { name: "Perfil", route: "/admin/configuracoes" },
     // { name: "Sair", route: "/" }
 ];
 

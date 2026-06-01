@@ -60,8 +60,6 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
       <NavBar menuItems={menuItems} />
       <main className="min-h-screen bg-[#f8f9fa] p-10">
 
-        <h1 className="text-3xl font-bold text-[#c81925] mb-8">Dashboard</h1>
-
         {adminError && (
           <p className="text-red-500 text-sm mb-4">Erro: {adminError}</p>
         )}
