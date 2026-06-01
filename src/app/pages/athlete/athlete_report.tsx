@@ -144,7 +144,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                                 className="bg-white rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl shrink-0 group-hover:bg-red-100 transition-colors">
+                                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-xl shrink-0 group-hover:bg-gray-100 transition-colors">
                                         {MODALITY_ICONS[training.modality as MODALITY] || <FaRunning />}
                                     </div>
                                     <div>

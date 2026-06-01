@@ -45,7 +45,7 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
                         <button
                             onClick={() => handleNav(
                                 role === 'Suporte' ? '/paginaInicialSupport' :
-                                    role === 'Admin' ? '/admin' :
+                                    role === 'Admin' ? '/paginaInicialADM' :
                                         '/paginaInicialAthlete'
                             )}
                             className="flex items-center hover:opacity-80 transition-opacity"
@@ -89,31 +89,41 @@ export default function NavBar({ menuItems }: { menuItems: MenuItems[] }) {
             {/* Mobile Navbar (bottom bar) */}
             <div className="fixed bottom-0 left-0 w-full bg-gray-200 flex justify-around items-center py-5 shadow-lg z-50 md:hidden">
 
-                {role === 'Suporte' ? (
+                {role === 'Admin' ? (
                     <>
-                        <button onClick={() => handleNav("/paginaInicialSupport")}>
+                        <button className="p-2" onClick={() => handleNav("/paginaInicialADM")}>
                             <FaThLarge className="text-red-700 text-2xl" />
                         </button>
 
-                        <button onClick={() => handleNav("/support/configuracao")}>
+                        <button className="p-2" onClick={() => handleNav("/admin/configuracoes")}>
+                            <FaUserCircle className="text-red-700 text-2xl" />
+                        </button>
+                    </>
+                ) : role === 'Suporte' ? (
+                    <>
+                        <button className="p-2" onClick={() => handleNav("/paginaInicialSupport")}>
+                            <FaThLarge className="text-red-700 text-2xl" />
+                        </button>
+
+                        <button className="p-2" onClick={() => handleNav("/support/configuracao")}>
                             <FaUserCircle className="text-red-700 text-2xl" />
                         </button>
                     </>
                 ) : (
                     <>
-                        <button onClick={() => handleNav("/paginaInicialAthlete")}>
+                        <button className="p-2" onClick={() => handleNav("/paginaInicialAthlete")}>
                             <FaThLarge className="text-red-700 text-2xl" />
                         </button>
 
-                        <button onClick={() => handleNav("/new-session")}>
+                        <button className="p-2" onClick={() => handleNav("/new-session")}>
                             <FaPlus className="text-red-700 text-2xl" />
                         </button>
 
-                        <button onClick={() => handleNav("/athleteReport")}>
+                        <button className="p-2" onClick={() => handleNav("/athleteReport")}>
                             <FaFileAlt className="text-red-700 text-2xl" />
                         </button>
 
-                        <button onClick={() => handleNav("/configuracao")}>
+                        <button className="p-2" onClick={() => handleNav("/configuracao")}>
                             <FaUserCircle className="text-red-700 text-2xl" />
                         </button>
                     </>
