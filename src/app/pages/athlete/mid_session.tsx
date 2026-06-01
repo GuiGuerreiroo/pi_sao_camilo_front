@@ -25,6 +25,11 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
       return;
     }
 
+    if (timer < 60) {
+      toast.error("A sessão deve ter duração de pelo menos 1 minuto.");
+      return;
+    }
+
     let uVol = Number(urineVolume);
     if (urineVolume === "") uVol = 0.0;
 
@@ -41,7 +46,8 @@ export default function MidSession({ menuItems, currentStep = 2 }: { menuItems: 
 
     updateTrainingData({
       during_training_hydration: fluidIntake,
-      during_training_urine_elimination: uVol
+      during_training_urine_elimination: uVol,
+      duration: Math.max(1, Math.round(timer / 60))
     });
 
     setError("");

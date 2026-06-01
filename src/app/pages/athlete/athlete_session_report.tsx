@@ -21,12 +21,7 @@ import {
 import { FaExclamationCircle, FaTshirt } from "react-icons/fa";
 
 function formatDuration(totalMinutes: number): string {
-    const h = Math.floor(totalMinutes / 60);
-    const m = Math.floor(totalMinutes % 60);
-    // Para minutos quebrados, se houver (ex: 30.5), pegamos os segundos
-    const s = Math.floor((totalMinutes * 60) % 60);
-    const pad = (num: number) => num.toString().padStart(2, "0");
-    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+    return `${Math.round(totalMinutes)} min`;
 }
 
 function formatDate(ts: number): string {
@@ -39,12 +34,14 @@ function formatDate(ts: number): string {
 
 function getUrineColorHex(color: URINE_COLOR): string {
     switch (color) {
-        case "TRANSPARENTE": return "#f8fafc"; // Quase branco
-        case "AMARELO_CLARO": return "#fef08a"; // Amarelo claro
-        case "AMARELO": return "#fde047"; // Amarelo
-        case "AMARELO_ESCURO": return "#eab308"; // Amarelo escuro
-        case "LARANJA": return "#f97316"; // Laranja
-        case "MARROM": return "#854d0e"; // Marrom
+        case "TRANSLUCIDO": return "#f8fafc";
+        case "AMARELO_CLARO": return "#fef08a";
+        case "AMARELO": return "#fde047";
+        case "AMARELO_ESCURO": return "#eab308";
+        case "LARANJA": return "#f97316";
+        case "VERDE": return "#854d0e";
+        case "VERDE_ESCURO": return "#854d0e";
+        case "MARROM": return "#854d0e";
         default: return "#e5e7eb";
     }
 }
@@ -150,7 +147,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                 <div className="w-full">
                     <NavBar menuItems={menuItems} />
                 </div>
-                
+
                 {/* Title Section */}
                 <div className="w-full max-w-7xl px-4 py-6 text-gray-800 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -180,9 +177,9 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
 
                         {/* Grid Content */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12 md:gap-y-6">
-                            
+
                             {/* --- ROW 1: Resultados e Massa corporal --- */}
-                            
+
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Resultados</span>
@@ -224,7 +221,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                             <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
 
                             {/* --- ROW 2: Ingestão de fluidos e Sintomas --- */}
-                            
+
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Ingestão de fluidos</span>
@@ -248,16 +245,16 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                 <div className="flex justify-between text-sm text-gray-600 mb-1">
                                     <span>Pré:</span>
                                     <span className="text-right">
-                                        {(training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0 
-                                            ? (training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
+                                        {(training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0
+                                            ? (training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ")
                                             : "Nenhum"}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
                                     <span>Pós:</span>
                                     <span className="text-right">
-                                        {(training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0 
-                                            ? (training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ") 
+                                        {(training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0
+                                            ? (training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ")
                                             : "Nenhum"}
                                     </span>
                                 </div>
@@ -266,7 +263,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                             <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
 
                             {/* --- ROW 3: Tempo da sessão e Intensidade --- */}
-                            
+
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Tempo da sessão</span>
@@ -290,13 +287,13 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                             <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
 
                             {/* --- ROW 4: Cor da urina e Volume urinário --- */}
-                            
+
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Cor da urina</span>
                                     <FaDroplet className="text-gray-400" />
                                 </div>
-                                <div 
+                                <div
                                     className="w-16 h-8 rounded mt-1 border border-gray-200 shadow-sm"
                                     style={{ backgroundColor: getUrineColorHex(training.urine_color) }}
                                 />
@@ -315,7 +312,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                             <div className="hidden md:block col-span-2 h-px bg-gray-100 my-1"></div>
 
                             {/* --- ROW 5: Condições ambientais e Roupas --- */}
-                            
+
                             <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:border-0 md:pb-0">
                                 <div className="flex items-center gap-2 text-gray-700 font-medium mb-1">
                                     <span>Condições ambientais</span>

@@ -46,13 +46,18 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
       if (sintomasGastrointestinais) finalSymptoms.push("NAUSEA" as SYMPTOMS);
 
       const endDate = new Date().getTime();
-      const durationMinutes = Math.max(0.01, (endDate - (trainingData.start_date || endDate)) / 60000);
-      const intensityFloat = parseFloat((((intensidade / 7) * 9) + 1).toFixed(1));
-      const finalDuration = parseFloat(durationMinutes.toFixed(2));
+      const finalDuration = trainingData.duration || Math.max(1, Math.round((endDate - (trainingData.start_date || endDate)) / 60000));
+      
+      if (finalDuration < 1) {
+        toast.error("A duração da sessão deve ser de pelo menos 1 minuto.");
+        return;
+      }
+      
+      const intensityInt = Math.round(((intensidade / 7) * 9) + 1);
 
       const finalData = {
         post_training_weight: weight,
-        training_intensity: intensityFloat,
+        training_intensity: intensityInt,
         soaked_clothes: roupaEncharcada,
         post_training_symptoms: finalSymptoms,
         end_date: endDate,

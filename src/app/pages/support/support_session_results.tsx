@@ -9,24 +9,26 @@ import { FaThermometerHalf, FaTint, FaClock, FaTshirt, FaExclamationCircle, FaCh
 import { GiWaterBottle } from "react-icons/gi";
 
 const URINE_COLOR_MAP: Record<URINE_COLOR, { label: string; color: string }> = {
-  TRANSPARENTE:   { label: "Transparente",   color: "#e0f2fe" },
-  AMARELO_CLARO:  { label: "Amarelo Claro",  color: "#fef9c3" },
-  AMARELO:        { label: "Amarelo",        color: "#fde047" },
-  AMARELO_ESCURO: { label: "Amarelo Escuro", color: "#ca8a04" },
-  LARANJA:        { label: "Laranja",        color: "#f97316" },
-  MARROM:         { label: "Marrom",         color: "#92400e" },
+  TRANSLUCIDO: { label: "Translúcido", color: "#f8fafc" },
+  AMARELO_CLARO: { label: "Amarelo Claro", color: "#fef08a" },
+  AMARELO: { label: "Amarelo", color: "#fde047" },
+  AMARELO_ESCURO: { label: "Amarelo Escuro", color: "#eab308" },
+  LARANJA: { label: "Laranja", color: "#f97316" },
+  VERDE: { label: "Marrom", color: "#854d0e" },
+  VERDE_ESCURO: { label: "Marrom", color: "#854d0e" },
+  MARROM: { label: "Marrom", color: "#854d0e" },
 };
 
 const SYMPTOMS_MAP: Record<SYMPTOMS, string> = {
-  NENHUM:          "Nenhum",
-  DOR_DE_CABECA:   "Dor de Cabeça",
-  TONTURA:         "Tontura",
-  NAUSEA:          "Náusea",
-  FADIGA:          "Fadiga",
-  CAIBRA:          "Cãibra",
-  SEDE_EXCESSIVA:  "Sede Excessiva",
-  BOCA_SECA:       "Boca Seca",
-  FRAQUEZA:        "Fraqueza",
+  NENHUM: "Nenhum",
+  DOR_DE_CABECA: "Dor de Cabeça",
+  TONTURA: "Tontura",
+  NAUSEA: "Náusea",
+  FADIGA: "Fadiga",
+  CAIBRA: "Cãibra",
+  SEDE_EXCESSIVA: "Sede Excessiva",
+  BOCA_SECA: "Boca Seca",
+  FRAQUEZA: "Fraqueza",
   CONFUSAO_MENTAL: "Confusão Mental",
 };
 
@@ -40,7 +42,7 @@ function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
-  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function intensityLabel(v: number): string {
@@ -75,13 +77,13 @@ const renderFeedback = (text: string) => {
   return text.split("\n").map((line, index) => {
     if (!line.trim()) return <div key={index} className="my-2 border-t border-gray-100" />;
     if (line.startsWith("## ")) return <h3 key={index} className="text-sm font-bold text-gray-900 mt-4 mb-1">{line.replace("## ", "")}</h3>;
-    if (line.startsWith("# "))  return <h2 key={index} className="text-base font-extrabold text-gray-900 mt-2 mb-3">{line.replace("# ", "")}</h2>;
+    if (line.startsWith("# ")) return <h2 key={index} className="text-base font-extrabold text-gray-900 mt-2 mb-3">{line.replace("# ", "")}</h2>;
     const parts = line.split(/(\*\*.*?\*\*)/g);
     return (
       <p key={index} className="text-sm text-gray-700 leading-relaxed mb-1 text-justify">
         {parts.map((part, i) =>
           part.startsWith("**") && part.endsWith("**")
-            ? <strong key={i} className="font-semibold text-gray-900">{part.slice(2,-2)}</strong>
+            ? <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>
             : part
         )}
       </p>
