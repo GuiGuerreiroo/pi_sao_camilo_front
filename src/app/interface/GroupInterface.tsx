@@ -13,4 +13,5 @@ export interface AthleteInGroup {
 export interface GroupInterface {
     group_id: string;
     athletes_list: AthleteInGroup[];
+    supporter_list: AthleteInGroup[];
 }

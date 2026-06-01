@@ -28,6 +28,9 @@ import SupportAthleteDetails from './pages/support/support_athlete_details';
 import SessionHistory from './pages/support/support_session_history';
 import SupportSessionReport from './pages/support/support_session_report';
 import SessionResults from './pages/support/support_session_results';
+import AdminGroups from './pages/admin/admin_groups';
+import AdminEditGroup from './pages/admin/admin_edit_group';
+import AdminUsers from './pages/admin/admin_users';
 
 const AthleteLayout = () => {
     return (
@@ -123,6 +126,10 @@ export default function App() {
                     <Route element={<PrivateRoute requiredRole="ADM" />}>
                         <Route element={<AdminLayout />}>
                             <Route path="/paginaInicialADM" element={<AdminHome menuItems={menuItemsAdmin} />} />
+                            <Route path="/admin/configuracoes" element={<Perfil menuItems={menuItemsAdmin} />} />
+                            <Route path="/admin/grupos" element={<AdminGroups menuItems={menuItemsAdmin} />} />
+                            <Route path="/admin/grupos/editar" element={<AdminEditGroup menuItems={menuItemsAdmin} />} />
+                            <Route path="/admin/usuarios" element={<AdminUsers menuItems={menuItemsAdmin} />} />
                         </Route>
                     </Route>
 

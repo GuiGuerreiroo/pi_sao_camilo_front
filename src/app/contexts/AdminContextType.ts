@@ -1,9 +1,8 @@
-import type { GroupInterface } from '../interface/GroupInterface';
-import type { AthleteInGroup } from '../interface/GroupInterface';
+import type { GroupInterface, AthleteInGroup } from '../interface/GroupInterface';
 
 export interface AdminContextInterface {
   get_all_groups: () => Promise<GroupInterface[]>;
-  update_group: (group_id: string, athletes_list: AthleteInGroup[]) => Promise<void>;
+  update_group: (group_id: string, athletes_list: AthleteInGroup[], supporter_list: AthleteInGroup[]) => Promise<void>;
   delete_group: (group_id: string) => Promise<void>;
   handleLogout: () => void;
   groups: GroupInterface[] | undefined;
