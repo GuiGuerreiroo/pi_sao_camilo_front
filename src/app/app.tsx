@@ -22,6 +22,7 @@ import PostSession from './pages/athlete/post_session';
 import ResultSession from './pages/athlete/result_session';
 import { AthleteContextProvider } from './contexts/AthleteContext';
 import { SupportContextProvider } from './contexts/SupportContext';
+import { AdminContextProvider } from './contexts/AdminContext';
 import { CreateTrainingProvider } from './contexts/CreateTrainingContext';
 import SupportAthleteDetails from './pages/support/support_athlete_details';
 import SessionHistory from './pages/support/support_session_history';
@@ -44,15 +45,30 @@ const SupportLayout = () => {
     );
 };
 
+const AdminLayout = () => {
+    return (
+        <AdminContextProvider>
+            <Outlet />
+        </AdminContextProvider>
+    );
+};
+
 const menuItemsAthlete: MenuItems[] = [
-    { name: "Tela Principal", route: "/paginaInicialAthlete" },
+    // { name: "Tela Principal", route: "/paginaInicialAthlete" },
     { name: "Novo Treino", route: "/new-session" },
     { name: "Relatórios", route: "/athleteReport" },
     { name: "Perfil", route: "/configuracao" }
 ];
+
 const menuItemsSupport: MenuItems[] = [
-    { name: "Tela Principal", route: "/paginaInicialSupport" },
+    // { name: "Tela Principal", route: "/paginaInicialSupport" },
     { name: "Perfil", route: "/support/configuracao" }
+];
+
+const menuItemsAdmin: MenuItems[] = [
+    { name: "Dashboard", route: "/paginaInicialADM" },
+    { name: "Configurações", route: "/admin/configuracoes" },
+    { name: "Sair", route: "/" }
 ];
 
 const TrainingFlowLayout = () => {
@@ -68,23 +84,18 @@ export default function App() {
         <SyncProvider>
             <div>
                 <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<Login />} />
+                    <Routes>
+                        <Route path="/" element={<Login />} />
                         <Route path="/createAccount" element={<CreateAccount />} />
                         <Route path="/verifyAccount" element={<VerifyAccount />} />
                         <Route path="/error" element={<Unauthorized />} />
                         <Route path="/unauthorized" element={<Unauthorized />} />
-
-                        {/* Placeholder for future screens */}
-                        {/* <Route path='/verify' element={<VerifyEmail />} /> */}
-                        {/* <Route path='/register' element={<CreateUser />} /> */}
                         <Route path='/forgotPassword' element={<ForgotPassword />} />
 
                         <Route element={<PrivateRoute requiredRole="SUPPORT" />}>
                             <Route element={<SupportLayout />}>
                                 <Route path="/paginaInicialSupport" element={<SupportHome menuItems={menuItemsSupport} />} />
                                 <Route path="/support/configuracao" element={<Perfil menuItems={menuItemsSupport} />} />
-
                                 <Route path="/support/athleteReport" element={<AthleteReport menuItems={menuItemsSupport} />} />
                                 <Route path="/support/athleteDetails" element={<SupportAthleteDetails menuItems={menuItemsSupport} />} />
                                 <Route path="/sessionHistory" element={<SessionHistory menuItems={menuItemsSupport} />} />
@@ -94,7 +105,6 @@ export default function App() {
 
                         <Route element={<PrivateRoute requiredRole="USER" />}>
                             <Route element={<AthleteLayout />}>
-                                {/* Training creation flow bounded within CreateTrainingProvider */}
                                 <Route element={<TrainingFlowLayout />}>
                                     <Route path="/new-session" element={<NewSession menuItems={menuItemsAthlete} />} />
                                     <Route path="/pre-session" element={<PreSession menuItems={menuItemsAthlete} />} />
@@ -102,8 +112,6 @@ export default function App() {
                                     <Route path="/post-session" element={<PostSession menuItems={menuItemsAthlete} />} />
                                     <Route path="/result-session" element={<ResultSession menuItems={menuItemsAthlete} />} />
                                 </Route>
-                                
-                                {/* Standard pages inside Athlete layout */}
                                 <Route path="/perfil" element={<Perfil menuItems={menuItemsAthlete} />} />
                                 <Route path="/athleteReport" element={<AthleteReport menuItems={menuItemsAthlete} />} />
                                 <Route path="/athleteSessionReport/:id" element={<AthleteSessionReport menuItems={menuItemsAthlete} />} />
@@ -112,10 +120,10 @@ export default function App() {
                             </Route>
                         </Route>
 
-                        {/* Example of adding the Admin route later */}
                         <Route element={<PrivateRoute requiredRole="ADM" />}>
-                            <Route path="/paginaInicialADM" element={<AdminHome />} />
-                            {/* <Route path="/perfilAdmin" element={<UserAccount menuItems={menuItemsAdmin}/> }/> */}
+                            <Route element={<AdminLayout />}>
+                                <Route path="/paginaInicialADM" element={<AdminHome menuItems={menuItemsAdmin} />} />
+                            </Route>
                         </Route>
 
                     </Routes>

@@ -395,7 +395,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                     <img
                         src="/sao_camilo_logo.svg"
                         alt="São Camilo"
-                        className="h-8 w-auto object-contain"
+                        className="h-15 w-auto object-contain"
                     />
                     <div className="h-5 w-[2px] bg-red-600/50 rounded-full mx-1"></div>
                     <span className="font-bold text-lg text-gray-800 tracking-tight">

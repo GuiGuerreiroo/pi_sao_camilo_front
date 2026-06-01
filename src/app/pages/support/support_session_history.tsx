@@ -135,11 +135,10 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
             </div>
             <button
               onClick={() => setShowFilter(prev => !prev)}
-              className={`flex items-center gap-2 border rounded-full px-4 py-1.5 text-sm transition-all active:scale-95 ${
-                hasActiveFilter
+              className={`flex items-center gap-2 border rounded-full px-4 py-1.5 text-sm transition-all active:scale-95 ${hasActiveFilter
                   ? "bg-red-50 border-red-400 text-red-600"
                   : "border-gray-300 text-gray-600 hover:bg-gray-100"
-              }`}
+                }`}
             >
               Filtrar
               <FaFilter className={`text-xs ${hasActiveFilter ? "text-red-500" : "text-red-400"}`} />
@@ -168,7 +167,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                   <select
                     value={selectedModality}
                     onChange={e => { setSelectedModality(e.target.value as MODALITY | ""); triggerToast(); }}
-                    className="w-full bg-gray-100 rounded-lg p-2.5 text-sm text-gray-700 outline-none appearance-none focus:ring-2 focus:ring-red-200 transition-all"
+                    className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none appearance-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                   >
                     <option value="">Todas</option>
                     {availableModalities.map(mod => (
@@ -191,7 +190,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                     type="date"
                     value={dateFrom}
                     onChange={e => { setDateFrom(e.target.value); triggerToast(); }}
-                    className="w-full bg-gray-100 rounded-lg p-2.5 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-red-200 transition-all"
+                    className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                   />
                 </div>
                 <div>
@@ -200,7 +199,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                     type="date"
                     value={dateTo}
                     onChange={e => { setDateTo(e.target.value); triggerToast(); }}
-                    className="w-full bg-gray-100 rounded-lg p-2.5 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-red-200 transition-all"
+                    className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                   />
                 </div>
               </div>
@@ -215,7 +214,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                   <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
                   </svg>
                 </div>
                 <span className="text-sm font-semibold text-gray-700">{member?.name || "Atleta"}</span>
@@ -252,8 +251,8 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                         </p>
                         <p className="text-xs text-gray-400">{formatDate(t.start_date)}</p>
                       </div>
-                      <FiChevronRight 
-                        className="text-lg flex-shrink-0 group-hover:translate-x-1 transition-transform text-black" 
+                      <FiChevronRight
+                        className="text-lg flex-shrink-0 group-hover:translate-x-1 transition-transform text-black"
                       />
                     </button>
                   ))
