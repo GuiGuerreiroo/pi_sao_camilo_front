@@ -77,14 +77,9 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
       toast.error("Por favor, preencha as condições ambientais manualmente.");
       document.getElementById('field-environment')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
-      toast.error("Por favor, preencha as condições ambientais manualmente.");
-      document.getElementById('field-environment')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
     }
+    
     if (finalTemp < -40.0 || finalTemp > 50.0) {
-      toast.error("Temperatura fora do intervalo permitido (-40 a 50 °C).");
-      document.getElementById('field-environment')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
       toast.error("Temperatura fora do intervalo permitido (-40 a 50 °C).");
       document.getElementById('field-environment')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -102,7 +97,6 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
     setError("");
     navigate('/mid-session');
   };
-
 
   const urineColors = [
     "#f8fafc", "#fef08a", "#fde047", "#eab308",
@@ -127,8 +121,6 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
       <main className="min-h-screen bg-gray-50 pb-24 font-sans text-gray-800">
         <NavBar menuItems={menuItems} />
 
-        <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
-          <h1 className="text-2xl font-bold text-black mb-6">Pré-Sessão</h1>
         <div className="px-6 pt-8 pb-4 max-w-lg mx-auto">
           <h1 className="text-2xl font-bold text-black mb-6">Pré-Sessão</h1>
 
@@ -196,22 +188,6 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
                     </svg>
                   </div>
                 </div>
-            {/* Sintomas */}
-            <div id="field-symptoms">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Sintomas</label>
-              <div className="relative">
-                <div
-                  className="w-full bg-gray-200 rounded-lg p-3 outline-none text-gray-700 cursor-pointer flex justify-between items-center transition-all focus:ring-2 focus:ring-gray-400"
-                  onClick={() => setIsSymptomsOpen(!isSymptomsOpen)}
-                  tabIndex={0}
-                >
-                  <span className="truncate pr-4">{getSymptomsLabel()}</span>
-                  <div className="pointer-events-none shrink-0">
-                    <svg className={`w-4 h-4 text-gray-500 transition-transform ${isSymptomsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
-                </div>
 
                 {isSymptomsOpen && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -236,52 +212,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
                 )}
               </div>
             </div>
-                {isSymptomsOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {symptomsOptions.map(symp => (
-                      <label key={symp.value} className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0">
-                        <input
-                          type="checkbox"
-                          checked={symptoms.includes(symp.value as SYMPTOMS)}
-                          onChange={() => {
-                            setSymptoms(prev =>
-                              prev.includes(symp.value as SYMPTOMS)
-                                ? prev.filter(s => s !== symp.value)
-                                : [...prev, symp.value as SYMPTOMS]
-                            );
-                          }}
-                          className="w-4 h-4 accent-red-600 text-red-600 rounded border-gray-300 focus:ring-red-500"
-                        />
-                        <span className="ml-3 text-gray-700">{symp.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Hidratação */}
-            <div id="field-hydration">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Histórico Recente de Hidratação</label>
-              <div className="flex justify-between items-end px-2">
-                {[
-                  { label: "500ml", value: 500, icon: <GiWaterBottle className="text-3xl text-gray-400" /> },
-                  { label: "1L", value: 1000, icon: <GiWaterBottle className="text-4xl text-gray-400" /> },
-                  { label: "1,5L", value: 1500, icon: <GiWaterBottle className="text-5xl text-gray-400" /> },
-                  { label: "+1,5L", value: 2000, icon: <div className="flex items-center"><GiWaterBottle className="text-5xl text-gray-400" /><FaPlus className="text-xs text-gray-400 -ml-2" /></div> }
-                ].map((item, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setHydration(item.value)}
-                    className={`flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all ${hydration === item.value ? 'border-red-600 bg-red-50 scale-105' : 'border-gray-200 bg-white'}`}
-                    style={{ width: '70px', height: '80px' }}
-                  >
-                    <div className="flex-1 flex items-end justify-center pb-1">{item.icon}</div>
-                    <span className="text-xs font-bold text-gray-600">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
             {/* Hidratação */}
             <div id="field-hydration">
               <label className="block text-sm font-semibold text-gray-700 mb-2">Histórico Recente de Hidratação</label>
@@ -394,16 +325,6 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
               </div>
             </div>
 
-            <div className="pt-6">
-              <button
-                onClick={handleNext}
-                className="w-full py-3 rounded-xl border-2 border-red-600 text-red-600 font-bold text-center active:bg-red-50 hover:bg-red-50 transition-colors"
-              >
-                Registrar Pré-Sessão
-              </button>
-            </div>
-          </div>
-        </div>
             <div className="pt-6">
               <button
                 onClick={handleNext}
