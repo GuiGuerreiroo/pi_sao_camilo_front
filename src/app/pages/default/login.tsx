@@ -10,7 +10,7 @@ import { getDecodedToken } from '../../hooks/tokenDecode';
 import { resendCode } from '../../api/user/resendCode';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { refreshToken }from '../../api/user/refreshToken';
+import { refreshToken } from '../../api/user/refreshToken';
 
 export function Login() {
     const [showPassword, setShowPassword] = useState(false)
@@ -156,12 +156,12 @@ export function Login() {
 
     return (
         <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-            <section className="w-full max-w-md rounded-3xl bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
+            <section className="w-full max-w-md rounded-3xl bg-gray-50 px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
                 {/* Logo */}
                 <img
                     src="/sao_camilo_logo.svg"
                     alt="São Camilo"
-                    className="mx-auto mb-10 w-full max-w-[16rem]"
+                    className="mx-auto mb-10 w-full max-w-[30rem]"
                 />
 
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -178,7 +178,7 @@ export function Login() {
                             {...register("email")}
                             autoComplete="email"
                             placeholder="exemplo@saocamilo.edu.br"
-                            className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                            className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
                         />
                         {errors.email && <span className="text-sm text-red-500 mt-1">{errors.email.message}</span>}
                     </div>
@@ -197,7 +197,7 @@ export function Login() {
                                 {...register("password")}
                                 autoComplete="current-password"
                                 placeholder="••••••••"
-                                className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                                className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
                             />
                             <button
                                 type="button"

@@ -40,7 +40,7 @@ export function ForgotPassword() {
 
     useEffect(() => {
         if (step !== 2) return;
-        
+
         if (timeLeft <= 0) {
             setTimerExpired(true);
             return;
@@ -162,8 +162,8 @@ export function ForgotPassword() {
 
                 <div className="mb-8 text-center">
                     <h2 className="text-xl font-semibold text-[#23262b] px-4 leading-snug">
-                        {step === 1 
-                            ? 'Informe seu email para receber um código de recuperação.' 
+                        {step === 1
+                            ? 'Informe seu email para receber um código de recuperação.'
                             : 'Insira o código recebido no email e sua nova senha.'}
                     </h2>
                 </div>
@@ -182,7 +182,7 @@ export function ForgotPassword() {
                             />
                             {errorsStep1.email && <span className="mt-1 block text-sm text-red-500">{errorsStep1.email.message}</span>}
                         </div>
-                        
+
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
                             <button
                                 type="button"

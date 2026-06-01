@@ -63,7 +63,7 @@ export function CreateAccount() {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-      <section className="w-full max-w-md rounded-3xl bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
+      <section className="w-full max-w-md rounded-3xl bg-gray-50 px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
 
         {/* Logo */}
         <img
@@ -83,11 +83,10 @@ export function CreateAccount() {
               {['atleta', 'treinador', 'nutricionista', 'médico'].map((cat) => (
                 <label
                   key={cat}
-                  className={`flex cursor-pointer items-center justify-center rounded-md py-3 text-base font-medium capitalize transition-all ${
-                    categoria === cat
+                  className={`flex cursor-pointer items-center justify-center rounded-md py-3 text-base font-medium capitalize transition-all ${categoria === cat
                       ? 'border-2 border-red-600 text-red-600 bg-red-50 shadow-sm'
                       : 'border border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -118,7 +117,7 @@ export function CreateAccount() {
               {...register('nome')}
               autoComplete="name"
               placeholder="Seu nome completo"
-              className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+              className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
             />
             {errors.nome && (
               <span className="mt-1 block text-sm text-red-500">{errors.nome.message}</span>
@@ -139,7 +138,7 @@ export function CreateAccount() {
               {...register('email')}
               autoComplete="email"
               placeholder="exemplo@saocamilo.edu.br"
-              className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+              className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
             />
             {errors.email && (
               <span className="mt-1 block text-sm text-red-500">{errors.email.message}</span>
@@ -161,7 +160,7 @@ export function CreateAccount() {
                 {...register('senha')}
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
               />
               <button
                 type="button"

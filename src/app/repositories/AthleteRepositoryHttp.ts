@@ -90,8 +90,7 @@ export class AthleteRepositoryHttp implements IAthleteRepository {
         "post_training_weight",
         "pre_training_hydration",
         "during_training_hydration",
-        "during_training_urine_elimination",
-        "training_intensity"
+        "during_training_urine_elimination"
       ];
 
       floatFields.forEach(field => {

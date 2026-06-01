@@ -3,8 +3,8 @@ import type { CreateTrainingInterface, TrainingInterface } from "../../interface
 
 export async function create_training(data: CreateTrainingInterface): Promise<TrainingInterface> {
     const baseURL = import.meta.env.VITE_MSS_API_URL;
-    
-    // Setting default fallback values for optionals that backend might expect
+
+    // Setting default fallback values for optional fields
     const payload = {
         modality: data.modality,
         start_date: Number(data.start_date),
@@ -19,26 +19,24 @@ export async function create_training(data: CreateTrainingInterface): Promise<Tr
         during_training_urine_elimination: Number(data.during_training_urine_elimination ?? 0.0),
         urine_color: data.urine_color,
         soaked_clothes: Boolean(data.soaked_clothes ?? false),
-        training_intensity: Number(data.training_intensity ?? 0.0),
+        training_intensity: Number(data.training_intensity ?? 0),
         pre_training_symptoms: data.pre_training_symptoms ?? [],
         post_training_symptoms: data.post_training_symptoms ?? []
     };
 
     let payloadStr = JSON.stringify(payload);
     const floatFields = [
-        "duration",
         "environment_temperature",
         "environment_humidity",
         "pre_training_weight",
         "post_training_weight",
         "pre_training_hydration",
         "during_training_hydration",
-        "during_training_urine_elimination",
-        "training_intensity"
+        "during_training_urine_elimination"
     ];
 
     floatFields.forEach(field => {
-        const regex = new RegExp(`("${field}":\\s*-?\\d+)(?!\\.)([,}])`, 'g');
+        const regex = new RegExp(`(\"${field}\"\\s*-?\\d+)(?!\\.)([,}])`, "g");
         payloadStr = payloadStr.replace(regex, '$1.0$2');
     });
 
@@ -48,10 +46,10 @@ export async function create_training(data: CreateTrainingInterface): Promise<Tr
         {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json"
             }
         }
     );
-    
+
     return response.data.training;
 }
