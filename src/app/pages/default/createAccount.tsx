@@ -191,7 +191,7 @@ export function CreateAccount() {
                 inputMode="decimal"
                 {...register('altura')}
                 placeholder="Ex: 1,75"
-                className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
               />
               {errors.altura && (
                 <span className="mt-1 block text-sm text-red-500">{errors.altura.message}</span>
