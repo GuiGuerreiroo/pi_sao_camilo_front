@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -5,8 +6,15 @@ import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
 import type { GroupInterface, AthleteInGroup } from "../../interface/GroupInterface";
 import { AdminContext } from "../../contexts/AdminContext";
-import { FiChevronLeft, FiUser, FiEdit2, FiTrash2, FiPlus, FiX, FiCheck, FiSearch } from "react-icons/fi";
+import { FiChevronLeft, FiUser, FiEdit2, FiTrash2, FiPlus, FiX, FiCheck, FiSearch, FiCheckCircle } from "react-icons/fi";
 import axios from "axios";
+
+type ToastType = "success" | "error";
+
+interface Toast {
+  message: string;
+  type: ToastType;
+}
 
 export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
@@ -22,19 +30,40 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
   const [newGroupSearch, setNewGroupSearch] = useState("");
   const [newGroupMembers, setNewGroupMembers] = useState<AthleteInGroup[]>([]);
 
-  const allUsers: AthleteInGroup[] = React.useMemo(() => {
-    const seen = new Set<string>();
-    const result: AthleteInGroup[] = [];
-    for (const g of groups ?? []) {
-      for (const u of [...g.athletes_list, ...(g.supporter_list ?? [])]) {
-        if (!seen.has(u.user_id)) {
-          seen.add(u.user_id);
-          result.push(u);
-        }
+  const [allUsers, setAllUsers] = useState<AthleteInGroup[]>([]);
+
+  // Toast state
+  const [toast, setToast] = useState<Toast | null>(null);
+
+  const showToast = (message: string, type: ToastType = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Fetch groups + all users in parallel
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const baseURL = import.meta.env.VITE_MSS_API_URL;
+        const token = localStorage.getItem("token");
+
+        await Promise.all([
+          groups === undefined ? get_all_groups() : Promise.resolve(),
+          axios
+            .get(`${baseURL}/get-all-users`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => setAllUsers(res.data.users ?? res.data)),
+        ]);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    return result;
-  }, [groups]);
+    };
+    fetchData();
+  }, []);
 
   const filteredNewGroupUsers = allUsers.filter((u) =>
     u.name.toLowerCase().includes(newGroupSearch.toLowerCase()) ||
@@ -52,21 +81,6 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (groups !== undefined) { setIsLoading(false); return; }
-      setIsLoading(true);
-      try {
-        await get_all_groups();
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [groups, get_all_groups]);
-
   const handleDeleteGroup = async () => {
     if (!selectedGroup) return;
     setActionLoading(true);
@@ -81,6 +95,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
       setShowDeleteModal(false);
       setSelectedGroup(null);
       await get_all_groups();
+      showToast("Grupo removido com sucesso!");
     } catch (error: any) {
       setActionError(error.response?.data?.message || error.message);
     } finally {
@@ -125,6 +140,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
       setNewGroupMembers([]);
       setNewGroupSearch("");
       await get_all_groups();
+      showToast("Grupo criado com sucesso!");
     } catch (error: any) {
       setActionError(error.response?.data?.message || error.message);
     } finally {
@@ -150,6 +166,26 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
       <main className="min-h-screen bg-[#f8f9fa] p-10">
+
+        {/* Toast */}
+        {toast && (
+          <div
+            className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg transition-all animate-fade-in ${
+              toast.type === "success"
+                ? "bg-white border border-green-200"
+                : "bg-white border border-red-200"
+            }`}
+          >
+            {toast.type === "success" ? (
+              <FiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+            ) : (
+              <FiX className="w-5 h-5 text-red-500 flex-shrink-0" />
+            )}
+            <p className={`text-sm font-semibold ${toast.type === "success" ? "text-green-700" : "text-red-600"}`}>
+              {toast.message}
+            </p>
+          </div>
+        )}
 
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">

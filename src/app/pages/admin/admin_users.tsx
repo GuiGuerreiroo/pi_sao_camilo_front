@@ -1,39 +1,49 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
-import type { AthleteInGroup, GroupInterface } from "../../interface/GroupInterface";
-import { AdminContext } from "../../contexts/AdminContext";
+import type { AthleteInGroup } from "../../interface/GroupInterface";
 import { FiChevronLeft, FiUser, FiSearch, FiX, FiEdit2, FiCheck } from "react-icons/fi";
+import axios from "axios";
 
 const ROLES = ["USER", "SUPPORT", "ADM"];
 const STATUSES = ["CONFIRMED", "UNCONFIRMED", "DISABLED"];
 
 export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
-  const { groups } = useContext(AdminContext);
+
+  const [users, setUsers] = useState<AthleteInGroup[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
 
   const [search, setSearch] = useState("");
   const [editingUser, setEditingUser] = useState<AthleteInGroup | null>(null);
   const [editForm, setEditForm] = useState({ name: "", email: "", role: "", status: "" });
 
-  // Todos os usuários de todos os grupos sem duplicatas
-  const allUsers: AthleteInGroup[] = React.useMemo(() => {
-    const seen = new Set<string>();
-    const result: AthleteInGroup[] = [];
-    for (const g of groups ?? []) {
-      for (const u of [...g.athletes_list, ...g.supporter_list]) {
-        if (!seen.has(u.user_id)) {
-          seen.add(u.user_id);
-          result.push(u);
-        }
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      setFetchError("");
+      try {
+        const baseURL = import.meta.env.VITE_MSS_API_URL;
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${baseURL}/get-all-users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // Ajuste aqui se o retorno vier em outra chave (ex: response.data diretamente)
+        setUsers(response.data.users ?? response.data);
+      } catch (error: any) {
+        setFetchError(error.response?.data?.message || error.message);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    return result;
-  }, [groups]);
+    };
 
-  const filteredUsers = allUsers.filter((u) =>
+    fetchUsers();
+  }, []);
+
+  const filteredUsers = users.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     u.role.toLowerCase().includes(search.toLowerCase())
@@ -65,6 +75,20 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
     return "bg-yellow-50 text-yellow-600";
   };
 
+  if (isLoading) {
+    return (
+      <SlideBarContextProvider>
+        <main className="min-h-screen bg-[#f8f9fa]">
+          <NavBar menuItems={menuItems} />
+          <div className="flex flex-col justify-center items-center h-64 gap-3 mt-16">
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin"></div>
+            <p className="text-gray-500 text-sm font-medium">Carregando usuários...</p>
+          </div>
+        </main>
+      </SlideBarContextProvider>
+    );
+  }
+
   return (
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
@@ -80,6 +104,10 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
           </button>
           <h1 className="text-3xl font-medium text-[#c81925]">Usuários</h1>
         </div>
+
+        {fetchError && (
+          <p className="text-red-500 text-sm mb-4">Erro: {fetchError}</p>
+        )}
 
         {/* Search */}
         <div className="relative mb-6 max-w-md">

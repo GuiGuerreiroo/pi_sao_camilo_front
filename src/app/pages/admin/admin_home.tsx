@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
+import type { AthleteInGroup } from "../../interface/GroupInterface";
 import { AdminContext } from "../../contexts/AdminContext";
 import { FiChevronRight, FiUser } from "react-icons/fi";
+import axios from "axios";
 
 
 export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
@@ -12,24 +14,32 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
   const { get_all_groups, groups, adminError } = useContext(AdminContext);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [users, setUsers] = useState<AthleteInGroup[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
-      if (groups !== undefined) {
-        setIsLoading(false);
-        return;
-      }
       setIsLoading(true);
       try {
-        await get_all_groups();
+        const baseURL = import.meta.env.VITE_MSS_API_URL;
+        const token = localStorage.getItem("token");
+
+        await Promise.all([
+          groups === undefined ? get_all_groups() : Promise.resolve(),
+          axios
+            .get(`${baseURL}/get-all-users`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => setUsers(res.data.users ?? res.data)),
+        ]);
       } catch (error) {
-        console.error("Erro ao carregar grupos:", error);
+        console.error("Erro ao carregar dados:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [groups, get_all_groups]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -107,22 +117,33 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
               </button>
             </div>
             <hr className="mb-4 border-gray-100" />
-            {groups && groups.length > 0 ? (
+            {users.length > 0 ? (
               <ul className="space-y-3">
-                {groups.flatMap(g => g.athletes_list).slice(0, 5).map(member => (
+                {users.slice(0, 5).map((user) => (
                   <li
-                    key={member.user_id}
+                    key={user.user_id}
                     className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                       <FiUser className="w-4 h-4 text-gray-400" />
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">{member.name}</p>
-                      <p className="text-xs text-gray-400">{member.role}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-700 truncate">{user.name}</p>
+                      <p className="text-xs text-gray-400">{user.role}</p>
                     </div>
                   </li>
                 ))}
+                {users.length > 5 && (
+                  <li className="text-xs text-gray-400 text-center pt-1">
+                    +{users.length - 5} usuários —{" "}
+                    <button
+                      onClick={() => navigate("/admin/usuarios")}
+                      className="text-[#c81925] font-semibold hover:underline"
+                    >
+                      ver todos
+                    </button>
+                  </li>
+                )}
               </ul>
             ) : (
               <p className="text-sm text-gray-400 text-center py-4">Nenhum usuário encontrado.</p>
