@@ -1,7 +1,7 @@
 import type { GroupInterface, AthleteInGroup } from '../interface/GroupInterface';
 
 export interface AdminContextInterface {
-  get_all_groups: () => Promise<GroupInterface[]>;
+  get_all_groups: (force?: boolean) => Promise<GroupInterface[]>;
   update_group: (group_id: string, athletes_list: AthleteInGroup[], supporter_list: AthleteInGroup[]) => Promise<void>;
   delete_group: (group_id: string) => Promise<void>;
   handleLogout: () => void;

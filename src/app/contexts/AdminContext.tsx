@@ -17,10 +17,12 @@ export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
     Authorization: `Bearer ${localStorage.getItem('token')}`,
   });
 
-  async function get_all_groups(): Promise<GroupInterface[]> {
-    if (groups !== undefined) return groups;
-    if (inflightRequest.current) return inflightRequest.current;
+  // force=true ignora o cache e busca da API novamente
+  async function get_all_groups(force = false): Promise<GroupInterface[]> {
+    if (!force && groups !== undefined) return groups;
+    if (!force && inflightRequest.current) return inflightRequest.current;
 
+    // Se forçar, cancela qualquer inflight anterior
     inflightRequest.current = axios
       .get(`${baseURL}/get-all-groups`, { headers: getAuthHeaders() })
       .then((response) => {
@@ -62,6 +64,7 @@ export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
         { headers: getAuthHeaders() }
       );
 
+      // Atualiza o state local imediatamente e força refetch para garantir consistência
       setGroups((prev) =>
         prev?.map((g) =>
           g.group_id === group_id
@@ -69,6 +72,7 @@ export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
             : g
         )
       );
+      await get_all_groups(true);
     } catch (error: any) {
       const errorMsg = error.response?.data?.message ?? error.message;
       setAdminError(errorMsg);
@@ -83,7 +87,9 @@ export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
         data: { group_id },
       });
 
+      // Atualiza o state local imediatamente e força refetch
       setGroups((prev) => prev?.filter((g) => g.group_id !== group_id));
+      await get_all_groups(true);
     } catch (error: any) {
       const errorMsg = error.response?.data?.message ?? error.message;
       setAdminError(errorMsg);

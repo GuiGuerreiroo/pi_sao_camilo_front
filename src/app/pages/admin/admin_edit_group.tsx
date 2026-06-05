@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -6,6 +6,8 @@ import type { MenuItems } from "../../interface/menuItems";
 import type { AthleteInGroup, GroupInterface } from "../../interface/GroupInterface";
 import { AdminContext } from "../../contexts/AdminContext";
 import { FiChevronLeft, FiUser, FiSearch, FiX, FiCheck, FiMinus, FiPlus } from "react-icons/fi";
+import { HiCheckCircle } from "react-icons/hi";
+import axios from "axios";
 
 interface LocationState {
   groups: GroupInterface[];
@@ -27,34 +29,42 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
-  // Todos os usuários de todos os grupos sem duplicatas
-  const allUsers: AthleteInGroup[] = React.useMemo(() => {
-    const seen = new Set<string>();
-    const result: AthleteInGroup[] = [];
-    for (const g of state?.groups ?? []) {
-      for (const u of [...g.athletes_list, ...g.supporter_list]) {
-        if (!seen.has(u.user_id)) {
-          seen.add(u.user_id);
-          result.push(u);
-        }
+  const [allUsers, setAllUsers] = useState<AthleteInGroup[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
+  // Busca todos os usuários do sistema
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const baseURL = import.meta.env.VITE_MSS_API_URL;
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${baseURL}/get-all-users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAllUsers(res.data.users ?? res.data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoadingUsers(false);
       }
-    }
-    return result;
-  }, [state?.groups]);
+    };
+    fetchUsers();
+  }, []);
 
   const isMember = (user_id: string) =>
     athletes.some((a) => a.user_id === user_id) ||
     supporters.some((s) => s.user_id === user_id);
 
   const toggleUser = (user: AthleteInGroup) => {
-    if (user.role === 'USER') {
+    if (user.role === "USER") {
       if (athletes.some((a) => a.user_id === user.user_id)) {
         setAthletes((prev) => prev.filter((a) => a.user_id !== user.user_id));
       } else {
         setAthletes((prev) => [...prev, user]);
       }
-    } else if (user.role === 'SUPPORT') {
+    } else if (user.role === "SUPPORT") {
       if (supporters.some((s) => s.user_id === user.user_id)) {
         setSupporters((prev) => prev.filter((s) => s.user_id !== user.user_id));
       } else {
@@ -71,7 +81,11 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
     try {
       await update_group(group.group_id, athletes, supporters);
       setSaveSuccess(true);
-      setTimeout(() => navigate(-1), 1200);
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+        navigate(-1);
+      }, 2000);
     } catch (error: any) {
       setSaveError(error.response?.data?.message ?? error.message);
     } finally {
@@ -107,25 +121,33 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
       <NavBar menuItems={menuItems} />
       <main className="min-h-screen bg-[#f8f9fa] p-6 md:p-10">
 
+        {/* Toast */}
+        {showToast && (
+          <div className="fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border bg-white border-green-100">
+            <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+            <p className="text-sm font-semibold text-green-700">Grupo editado com sucesso!</p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center gap-2 mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="text-[#c81925] hover:bg-red-50 p-2 rounded-full transition-colors"
+            className="text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-colors"
           >
             <FiChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-3xl font-medium text-[#c81925]">
+          <h1 className="text-3xl font-bold text-gray-800">
             Editar Grupo {state.groupIndex}
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-5xl">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-4xl">
 
           {/* Membros atuais */}
           <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-semibold text-gray-800">Membros do Grupo</h2>
+              <h2 className="text-lg font-bold text-gray-800">Membros do Grupo</h2>
               <span className="text-xs font-semibold bg-red-50 text-[#c81925] px-3 py-1 rounded-full">
                 {allMembers.length} {allMembers.length === 1 ? "membro" : "membros"}
               </span>
@@ -144,14 +166,14 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-800 truncate">{member.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{member.role === 'USER' ? 'Atleta' : 'Support'}</p>
+                        <p className="text-xs text-gray-400 truncate">{member.role === "USER" ? "Atleta" : "Support"}</p>
                       </div>
                       <button
                         onClick={() => toggleUser(member)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-red-200 text-red-400 hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all flex-shrink-0"
+                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-100 border-2 border-red-300 text-red-500 hover:bg-red-200 hover:border-red-400 active:scale-95 transition-all flex-shrink-0"
                         title="Remover do grupo"
                       >
-                        <FiMinus className="w-3.5 h-3.5" />
+                        <FiMinus className="w-4 h-4" />
                       </button>
                     </li>
                     {idx < allMembers.length - 1 && <hr className="border-gray-100 ml-12" />}
@@ -163,7 +185,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
 
           {/* Adicionar usuários */}
           <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col">
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">Adicionar Membros</h2>
+            <h2 className="text-lg font-bold text-gray-800 mb-1">Adicionar Membros</h2>
             <hr className="mb-4 border-gray-100" />
 
             <div className="relative mb-4">
@@ -173,7 +195,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                 placeholder="Buscar por nome ou e-mail..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-9 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#c81925] focus:ring-1 focus:ring-red-100 transition-colors"
+                className="w-full pl-9 pr-9 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-100 transition-colors"
               />
               {search && (
                 <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
@@ -182,7 +204,11 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
               )}
             </div>
 
-            {filteredUsers.length === 0 ? (
+            {loadingUsers ? (
+              <div className="flex justify-center py-8">
+                <div className="w-8 h-8 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin"></div>
+              </div>
+            ) : filteredUsers.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-8">
                 {search ? "Nenhum usuário encontrado." : "Nenhum usuário disponível."}
               </p>
@@ -198,18 +224,18 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                          <p className="text-xs text-gray-400 truncate">{user.role === 'USER' ? 'Atleta' : 'Support'}</p>
+                          <p className="text-xs text-gray-400 truncate">{user.role === "USER" ? "Atleta" : "Support"}</p>
                         </div>
                         <button
                           onClick={() => toggleUser(user)}
-                          className={`w-8 h-8 flex items-center justify-center rounded-full border-2 active:scale-95 transition-all flex-shrink-0 ${
+                          className={`w-9 h-9 flex items-center justify-center rounded-xl border-2 active:scale-95 transition-all flex-shrink-0 ${
                             already
-                              ? "border-green-300 bg-green-50 text-green-500"
-                              : "border-gray-200 text-gray-400 hover:border-[#c81925] hover:text-[#c81925] hover:bg-red-50"
+                              ? "bg-green-100 border-green-400 text-green-600"
+                              : "bg-gray-100 border-gray-300 text-gray-500 hover:bg-red-100 hover:border-[#c81925] hover:text-[#c81925]"
                           }`}
                           title={already ? "Já no grupo" : "Adicionar ao grupo"}
                         >
-                          {already ? <FiCheck className="w-3.5 h-3.5" /> : <FiPlus className="w-3.5 h-3.5" />}
+                          {already ? <FiCheck className="w-4 h-4" /> : <FiPlus className="w-4 h-4" />}
                         </button>
                       </li>
                       {idx < filteredUsers.length - 1 && <hr className="border-gray-100 ml-12" />}
@@ -222,7 +248,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
         </div>
 
         {/* Save bar */}
-        <div className="max-w-5xl mt-6">
+        <div className="max-w-4xl mt-6">
           {(saveError || adminError) && (
             <p className="text-red-500 text-sm mb-3">{saveError || adminError}</p>
           )}
