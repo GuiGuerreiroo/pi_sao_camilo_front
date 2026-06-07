@@ -55,7 +55,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
         return;
       }
       
-      const intensityInt = Math.round(((intensidade / 7) * 9) + 1);
+      const intensityInt = intensidade + 1;
 
       const finalData = {
         post_training_weight: weight,
@@ -78,7 +78,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
     }
   };
 
-  const totalDots = 8;
+  const totalDots = 10;
 
 
   const Checkbox = ({
@@ -198,7 +198,7 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
                     <div
                       key={i}
                       onClick={() => setIntensidade(i)}
-                      className="relative z-10 w-10 h-10 flex items-center justify-center cursor-pointer group"
+                      className="relative z-10 w-10 h-10 flex flex-col items-center justify-center cursor-pointer group"
                     >
                       <div
                         className={`rounded-full transition-all flex-shrink-0 group-hover:scale-110 ${i === intensidade
@@ -208,11 +208,14 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
                               : "w-3 h-3 bg-gray-300"
                           }`}
                       />
+                      <span className="absolute top-9 text-xs text-gray-400 font-medium select-none">
+                        {i + 1}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="flex justify-between mt-2 px-1">
+              <div className="flex justify-between mt-6 px-1">
                 <span className="text-sm text-gray-500 leading-tight">Pouco<br />cansativo</span>
                 <span className="text-sm text-gray-500 leading-tight text-right">Muito<br />cansativo</span>
               </div>
