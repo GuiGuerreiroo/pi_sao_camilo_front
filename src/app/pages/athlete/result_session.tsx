@@ -1,19 +1,24 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
 import { FaExclamationCircle } from "react-icons/fa";
+import type { TrainingInterface } from "../../interface/TrainingInterface";
 
 export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Substituir pelos dados reais vindos da API ou navigation state
+  const trainingResult = location.state?.trainingResult as TrainingInterface | undefined;
+
+  const formatNumber = (num: number) => num.toFixed(2).replace('.', ',');
+
   const results = {
-    perdaMassaCorporal: "0,78kg",
-    percentualVariacao: "1,15%",
-    taxaSudorese: "0,94kg/h",
-    balancoHidrico: "0,94kg/h",
-    aiFeedback:
+    perdaMassaCorporal: trainingResult ? `${formatNumber(Math.abs(trainingResult.weight_difference))}kg` : "0,78kg",
+    percentualVariacao: trainingResult ? `${formatNumber(Math.abs(trainingResult.weight_variation_percentage))}%` : "1,15%",
+    taxaSudorese: trainingResult ? `${formatNumber(trainingResult.sudorese)}L/h` : "0,94L/h",
+    balancoHidrico: trainingResult ? `${formatNumber(trainingResult.ajusted_weight_difference)}L` : "0,94L",
+    aiFeedback: trainingResult?.ai_suggestion ||
       "# ANÁLISE DE HIDRATAÇÃO - TREINO DE ACADEMIA (30 MIN)\n\n" +
       "## FEEDBACK DO PRÉ-TREINO DE HOJE:\n" +
       "Você ingeriu 500 mL de água antes do treino, o que está dentro da faixa ideal (350-700 mL para seu peso). Isso foi ótimo porque seu corpo começou o exercício bem preparado, sem risco de desidratação logo no início.\n\n" +

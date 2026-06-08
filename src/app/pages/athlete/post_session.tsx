@@ -4,6 +4,7 @@ import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
 import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
+import { AthleteContext } from "../../contexts/AthleteContext";
 import { toast } from "react-toastify";
 import type { SYMPTOMS } from "../../interface/TrainingInterface";
 import { Input } from "../../components/input";
@@ -12,6 +13,7 @@ import { FiActivity } from "react-icons/fi";
 export default function PostSession({ menuItems, currentStep = 3 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();
   const { trainingData, updateTrainingData, submitTraining } = useContext(CreateTrainingContext);
+  const { get_all_trainings } = useContext(AthleteContext);
 
   const [massaCorporal, setMassaCorporal] = useState("");
   const [sintomasGastrointestinais, setSintomasGastrointestinais] = useState(false);
@@ -68,9 +70,17 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
 
       updateTrainingData(finalData);
 
-      await submitTraining(finalData); // Trigger the backend commit!
+      const response = await submitTraining(finalData); // Trigger the backend commit!
+      
+      // Update the global state so that when going back to the home screen it shows up immediately
+      try {
+        await get_all_trainings();
+      } catch (e) {
+        console.error("Failed to update trainings list", e);
+      }
+
       setError("");
-      navigate("/result-session");
+      navigate("/result-session", { state: { trainingResult: response } });
     } catch (err) {
       toast.error("Erro ao registrar a sessão. Tente novamente.");
     } finally {
