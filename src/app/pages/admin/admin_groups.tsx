@@ -171,7 +171,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
           </div>
           <button
             onClick={() => { setActionError(""); setNewGroupMembers([]); setNewGroupSearch(""); setShowNewGroupModal(true); }}
-            className="flex items-center gap-2 bg-[#c81925] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-700 active:scale-95 transition-all"
+            className="flex items-center gap-2 border border-[#c81925] text-[#c81925] px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-50 active:scale-95 transition-all"
           >
             <FiPlus className="w-4 h-4" />
             Novo Grupo

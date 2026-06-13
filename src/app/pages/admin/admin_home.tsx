@@ -72,30 +72,28 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
             <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-2xl font-bold text-black">Grupos</h3>
+                <button
+                  className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
+                  onClick={() => navigate("/admin/grupos")}
+                >
+                  <FiChevronRight className="w-4 h-4 ml-0.5" />
+                </button>
               </div>
               <hr className="mb-5 border-gray-200" />
               {groups && groups.length > 0 ? (
                 <ul className="space-y-0">
                   {groups.map((group, index) => (
                     <React.Fragment key={group.group_id}>
-                      <li className="flex items-center justify-between py-3">
-                        <div className="flex items-center gap-4 text-left">
-                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
-                            <FiUser className="w-5 h-5" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-gray-800 text-sm">Grupo {index + 1}</span>
-                            <span className="text-xs text-gray-500">
-                              {group.athletes_list.length} {group.athletes_list.length === 1 ? "atleta" : "atletas"}
-                            </span>
-                          </div>
+                      <li className="flex items-center gap-4 py-3">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
+                          <FiUser className="w-5 h-5" />
                         </div>
-                        <button
-                          className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
-                          onClick={() => navigate("/admin/grupos")}
-                        >
-                          <FiChevronRight className="w-4 h-4 ml-0.5" />
-                        </button>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-800 text-sm">Grupo {index + 1}</span>
+                          <span className="text-xs text-gray-500">
+                            {group.athletes_list.length} {group.athletes_list.length === 1 ? "atleta" : "atletas"}
+                          </span>
+                        </div>
                       </li>
                       {index < groups.length - 1 && (
                         <hr className="border-gray-200 ml-14" />
@@ -112,32 +110,30 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
             <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-2xl font-bold text-black">Usuários</h3>
+                <button
+                  className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
+                  onClick={() => navigate("/admin/usuarios")}
+                >
+                  <FiChevronRight className="w-4 h-4 ml-0.5" />
+                </button>
               </div>
               <hr className="mb-5 border-gray-200" />
               {users.length > 0 ? (
                 <ul className="space-y-0">
                   {users.slice(0, 5).map((user, idx) => (
                     <React.Fragment key={user.user_id}>
-                      <li className="flex items-center justify-between py-3">
-                        <div className="flex items-center gap-4 text-left">
-                          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
-                            <FiUser className="w-5 h-5" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-gray-800 text-sm overflow-hidden text-ellipsis whitespace-nowrap w-40">
-                              {user.name}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {user.role === "USER" ? "Atleta" : user.role}
-                            </span>
-                          </div>
+                      <li className="flex items-center gap-4 py-3">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
+                          <FiUser className="w-5 h-5" />
                         </div>
-                        <button
-                          className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
-                          onClick={() => navigate("/admin/usuarios")}
-                        >
-                          <FiChevronRight className="w-4 h-4 ml-0.5" />
-                        </button>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-800 text-sm overflow-hidden text-ellipsis whitespace-nowrap w-40">
+                            {user.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {user.role === "USER" ? "Atleta" : user.role}
+                          </span>
+                        </div>
                       </li>
                       {idx < Math.min(users.length, 5) - 1 && (
                         <hr className="border-gray-200 ml-14" />
