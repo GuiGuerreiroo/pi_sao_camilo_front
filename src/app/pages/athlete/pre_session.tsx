@@ -43,7 +43,7 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
 
   const urineColorEnumMap: URINE_COLOR[] = [
     "TRANSLUCIDO", "AMARELO_CLARO", "AMARELO", "AMARELO_ESCURO",
-    "LARANJA", "VERDE_ESCURO"
+    "LARANJA", "MARROM"
   ];
 
   const handleNext = () => {

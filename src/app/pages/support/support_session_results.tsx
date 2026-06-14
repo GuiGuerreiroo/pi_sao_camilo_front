@@ -14,8 +14,6 @@ const URINE_COLOR_MAP: Record<URINE_COLOR, { label: string; color: string }> = {
   AMARELO: { label: "Amarelo", color: "#fde047" },
   AMARELO_ESCURO: { label: "Amarelo Escuro", color: "#eab308" },
   LARANJA: { label: "Laranja", color: "#f97316" },
-  VERDE: { label: "Marrom", color: "#854d0e" },
-  VERDE_ESCURO: { label: "Marrom", color: "#854d0e" },
   MARROM: { label: "Marrom", color: "#854d0e" },
 };
 

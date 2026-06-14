@@ -37,8 +37,6 @@ function getUrineColorHex(color: URINE_COLOR): string {
         case "AMARELO": return "#fde047";
         case "AMARELO_ESCURO": return "#eab308";
         case "LARANJA": return "#f97316";
-        case "VERDE": return "#854d0e";
-        case "VERDE_ESCURO": return "#854d0e";
         case "MARROM": return "#854d0e";
         default: return "#e5e7eb";
     }
