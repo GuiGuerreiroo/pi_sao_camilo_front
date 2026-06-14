@@ -73,7 +73,7 @@ export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
 
                                     {/* Card Header */}
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="text-2xl font-bold text-black">Grupo {index + 1}</h3>
+                                        <h3 className="text-xl font-bold text-black">Grupo {index + 1}</h3>
                                     </div>
                                     <hr className="mb-5 border-gray-200" />
 
