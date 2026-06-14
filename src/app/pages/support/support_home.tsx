@@ -55,7 +55,7 @@ export default function SupportHome({ menuItems }: { menuItems: MenuItems[] }) {
             <NavBar menuItems={menuItems} />
             <div className="flex min-h-screen bg-[#f8f9fa]">
                 {/* Main Content Space */}
-                <main className="flex-1 p-10 bg-[#fbfbfb]">
+                <main className="flex-1 p-10 bg-[#fbfbfb] pb-28">
                     {/* Header Title */}
                     <div className="flex items-center mb-8">
                         <h2 className="text-2xl font-bold text-black tracking-wide">Grupos</h2>
