@@ -20,8 +20,7 @@ import {
     FaDumbbell,
     FaWalking,
     FaFilter,
-    FaTimes,
-    FaCheck
+    FaTimes
 } from "react-icons/fa";
 import { MdSportsTennis } from "react-icons/md";
 import { GiMuscleUp, GiMeditation } from "react-icons/gi";
@@ -81,22 +80,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
     const [loading, setLoading] = useState(trainings === undefined);
 
     const [showFilter, setShowFilter] = useState(false);
-    const [isSelecting, setIsSelecting] = useState<boolean>(() => {
-        const saved = sessionStorage.getItem("athlete_isSelecting");
-        return saved ? JSON.parse(saved) : false;
-    });
-    const [selectedSessions, setSelectedSessions] = useState<string[]>(() => {
-        const saved = sessionStorage.getItem("athlete_selectedSessions");
-        return saved ? JSON.parse(saved) : [];
-    });
 
-    useEffect(() => {
-        sessionStorage.setItem("athlete_isSelecting", JSON.stringify(isSelecting));
-    }, [isSelecting]);
-
-    useEffect(() => {
-        sessionStorage.setItem("athlete_selectedSessions", JSON.stringify(selectedSessions));
-    }, [selectedSessions]);
 
     const [selectedModality, setSelectedModality] = useState<MODALITY | "">("");
     const [dateFrom, setDateFrom] = useState("");
@@ -162,12 +146,6 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
         setTempMax("");
     };
 
-    const handleSelectSession = (id: string, e?: React.MouseEvent) => {
-        if (e) e.stopPropagation();
-        setSelectedSessions(prev => 
-            prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-        );
-    };
 
     if (loading) {
         return (
@@ -198,15 +176,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                         <h1 className="text-2xl font-bold text-black">Histórico de Treinos</h1>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setIsSelecting(!isSelecting)}
-                            className={`flex items-center gap-2 border rounded-full px-4 py-1.5 text-sm transition-all active:scale-95 ${isSelecting
-                                ? "bg-red-50 border-red-400 text-red-600"
-                                : "border-gray-300 text-gray-600 hover:bg-gray-100"
-                            }`}
-                        >
-                            Selecionar {selectedSessions.length > 0 && `(${selectedSessions.length})`}
-                        </button>
+
                         <button
                             onClick={() => setShowFilter(!showFilter)}
                             className={`flex items-center gap-2 border rounded-full px-4 py-1.5 text-sm transition-all active:scale-95 ${showFilter || hasActiveFilter
@@ -347,18 +317,6 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
                                         <FaChevronRight className="text-sm" />
                                     </div>
                                 </div>
-                                {isSelecting && (
-                                    <div 
-                                        onClick={(e) => handleSelectSession(training.training_id, e)}
-                                        className={`w-15 shrink-0 rounded-3xl border flex items-center justify-center cursor-pointer transition-colors shadow-sm ${
-                                            selectedSessions.includes(training.training_id) 
-                                            ? 'bg-green-500 border-green-500 text-white' 
-                                            : 'bg-white border-gray-200 text-transparent hover:border-gray-300'
-                                        }`}
-                                    >
-                                        <FaCheck className="text-xl" />
-                                    </div>
-                                )}
                             </div>
                         ))
                     )}

@@ -288,10 +288,10 @@ export default function SupportSessionReport({ menuItems }: { menuItems: MenuIte
                                     <span>Encharcadas:</span>
                                     <span>{training.soaked_clothes === true ? "Sim" : training.soaked_clothes === false ? "Não" : "Não informado"}</span>
                                 </div>
-                                <div className="flex justify-between text-sm text-gray-600">
+                                {/* <div className="flex justify-between text-sm text-gray-600">
                                     <span>Equipamento pesado:</span>
                                     <span>{training.clothing_equipment === true ? "Sim" : training.clothing_equipment === false ? "Não" : "Não informado"}</span>
-                                </div>
+                                </div> */}
                             </div>
 
                         </div>

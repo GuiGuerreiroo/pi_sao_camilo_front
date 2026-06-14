@@ -100,8 +100,8 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
 
     const safeTrainings = member?.trainings || [];
 
-    const [chartMetric, setChartMetric] = useState<string>("massa");
-    const [timeFilter, setTimeFilter] = useState<string>("1m");
+    const [chartMetric, setChartMetric] = useState<string>("sudorese");
+    const [sessionLimit, setSessionLimit] = useState<number>(7);
 
     const chartConfig = useMemo(() => {
         switch (chartMetric) {
@@ -124,20 +124,9 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
     }, [chartMetric]);
 
     const filteredTrainings = useMemo(() => {
-        const now = new Date();
-        const past = new Date();
-        switch (timeFilter) {
-            case '1w': past.setDate(now.getDate() - 7); break;
-            case '2w': past.setDate(now.getDate() - 14); break;
-            case '1m': past.setMonth(now.getMonth() - 1); break;
-            case '6m': past.setMonth(now.getMonth() - 6); break;
-            case '1y': past.setFullYear(now.getFullYear() - 1); break;
-            default: past.setMonth(now.getMonth() - 1); break;
-        }
-
-        const filtered = safeTrainings.filter(t => new Date(t.start_date) >= past);
+        const filtered = safeTrainings.slice(0, sessionLimit);
         return [...filtered].reverse(); // reverse makes it oldest to newest for the chart
-    }, [safeTrainings, timeFilter]);
+    }, [safeTrainings, sessionLimit]);
 
     const chartData = useMemo(() => {
         return filteredTrainings.map(t => {
@@ -202,16 +191,16 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
     }, [chartData, chartMetric]);
 
     const pieData = useMemo(() => {
-        if (safeTrainings.length === 0) return [];
+        if (filteredTrainings.length === 0) return [];
         const counts: Record<string, number> = {};
-        safeTrainings.forEach(t => {
+        filteredTrainings.forEach(t => {
             counts[t.modality] = (counts[t.modality] || 0) + 1;
         });
         return Object.entries(counts).map(([mod, count]) => ({
             name: MODALITY_LABELS[mod as MODALITY] || mod,
-            value: (count / safeTrainings.length) * 100
+            value: (count / filteredTrainings.length) * 100
         }));
-    }, [safeTrainings]);
+    }, [filteredTrainings]);
 
     const PIE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1'];
 
@@ -284,13 +273,13 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                 </div>
                                 
                                 <div className="flex bg-gray-100 rounded-lg p-1 overflow-x-auto">
-                                    {['1w', '2w', '1m', '6m', '1y'].map((tf) => (
+                                    {[7, 10, 15, 20, 30].map((limit) => (
                                         <button
-                                            key={tf}
-                                            onClick={() => setTimeFilter(tf)}
-                                            className={`px-2 py-1 text-[10px] font-medium rounded-md transition-colors whitespace-nowrap ${timeFilter === tf ? 'bg-white shadow-sm text-[#c81925]' : 'text-gray-500 hover:text-gray-700'}`}
+                                            key={limit}
+                                            onClick={() => setSessionLimit(limit)}
+                                            className={`px-2 py-1 text-[10px] font-medium rounded-md transition-colors whitespace-nowrap ${sessionLimit === limit ? 'bg-white shadow-sm text-[#c81925]' : 'text-gray-500 hover:text-gray-700'}`}
                                         >
-                                            {tf === '1w' ? '1 Sem' : tf === '2w' ? '2 Sem' : tf === '1m' ? '1 Mês' : tf === '6m' ? '6 Meses' : '1 Ano'}
+                                            {limit} Treinos
                                         </button>
                                     ))}
                                 </div>
@@ -437,6 +426,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                 innerRadius={40}
                                                 labelLine={false}
                                                 label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                                isAnimationActive={false}
                                             >
                                                 {pieData.map((_entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
