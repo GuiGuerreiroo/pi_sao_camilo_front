@@ -1,4 +1,4 @@
-import { createContext, useState, useRef, useCallback, type ReactNode } from 'react';
+import { createContext, useState, type ReactNode } from 'react';
 import type { GroupInterface, AthleteInGroup } from '../interface/GroupInterface';
 import { defaultAdminContext, type AdminContextInterface } from './AdminContextType';
 import axios from 'axios';
@@ -7,11 +7,8 @@ export const AdminContext = createContext<AdminContextInterface>(defaultAdminCon
 
 export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
   const [groups, setGroups] = useState<GroupInterface[] | undefined>(undefined);
+  const [users, setUsers] = useState<AthleteInGroup[] | undefined>(undefined);
   const [adminError, setAdminError] = useState<string>('');
-
-  // Ref espelha o state de groups para evitar problema de closure nas funções
-  const groupsRef = useRef<GroupInterface[] | undefined>(undefined);
-  const inflightRequest = useRef<Promise<GroupInterface[]> | null>(null);
 
   const baseURL = import.meta.env.VITE_MSS_API_URL;
 
@@ -19,41 +16,35 @@ export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
     Authorization: `Bearer ${localStorage.getItem('token')}`,
   });
 
-  const setGroupsSync = (data: GroupInterface[] | undefined) => {
-    groupsRef.current = data;
-    setGroups(data);
-  };
+  async function get_all_groups() {
+    try {
+      const response = await axios.get(`${baseURL}/get-all-groups`, { headers: getAuthHeaders() });
+      const data: GroupInterface[] = response.data.groups ?? response.data;
+      setGroups(data);
+      return data;
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message ?? error.message;
+      setAdminError(errorMsg);
+      console.error(error);
+      throw error;
+    }
+  }
 
-  // force=true ignora o cache e busca da API novamente
-  const get_all_groups = useCallback(async (force = false): Promise<GroupInterface[]> => {
-    // Usa a ref para ler o valor atual sem depender do closure
-    if (!force && groupsRef.current !== undefined) return groupsRef.current;
-    if (!force && inflightRequest.current) return inflightRequest.current;
+  async function get_all_users() {
+    try {
+      const response = await axios.get(`${baseURL}/get-all-users`, { headers: getAuthHeaders() });
+      const data: AthleteInGroup[] = response.data.users ?? response.data;
+      setUsers(data);
+      return data;
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message ?? error.message;
+      setAdminError(errorMsg);
+      console.error(error);
+      throw error;
+    }
+  }
 
-    inflightRequest.current = axios
-      .get(`${baseURL}/get-all-groups`, { headers: getAuthHeaders() })
-      .then((response) => {
-        const data: GroupInterface[] = response.data.groups ?? response.data;
-        setGroupsSync(data);
-        return data;
-      })
-      .catch((error: any) => {
-        const errorMsg = error.response?.data?.message ?? error.message;
-        setAdminError(errorMsg);
-        throw error;
-      })
-      .finally(() => {
-        inflightRequest.current = null;
-      });
-
-    return inflightRequest.current;
-  }, [baseURL]);
-
-  const update_group = useCallback(async (
-    group_id: string,
-    athletes_list: AthleteInGroup[],
-    supporter_list: AthleteInGroup[]
-  ): Promise<void> => {
+  async function update_group(group_id: string, athletes_list: AthleteInGroup[], supporter_list: AthleteInGroup[]) {
     try {
       const payload: any = { group_id };
 
@@ -71,44 +62,48 @@ export const AdminContextProvider = ({ children }: { children: ReactNode }) => {
         { headers: getAuthHeaders() }
       );
 
-      // Força refetch para garantir consistência
-      await get_all_groups(true);
+      // Force refetch to ensure consistency
+      await get_all_groups();
     } catch (error: any) {
       const errorMsg = error.response?.data?.message ?? error.message;
       setAdminError(errorMsg);
+      console.error(error);
       throw error;
     }
-  }, [baseURL, get_all_groups]);
+  }
 
-  const delete_group = useCallback(async (group_id: string): Promise<void> => {
+  async function delete_group(group_id: string) {
     try {
       await axios.delete(`${baseURL}/delete-group`, {
         headers: getAuthHeaders(),
         data: { group_id },
       });
 
-      // Atualiza local imediatamente para UI responsiva, depois força refetch
-      setGroupsSync(groupsRef.current?.filter((g) => g.group_id !== group_id));
-      await get_all_groups(true);
+      // Update local state immediately for responsive UI, then force refetch
+      setGroups((prev) => prev?.filter((g) => g.group_id !== group_id));
+      await get_all_groups();
     } catch (error: any) {
       const errorMsg = error.response?.data?.message ?? error.message;
       setAdminError(errorMsg);
+      console.error(error);
       throw error;
     }
-  }, [baseURL, get_all_groups]);
+  }
 
   function handleLogout() {
-    setGroupsSync(undefined);
+    setGroups(undefined);
+    setUsers(undefined);
     setAdminError('');
-    inflightRequest.current = null;
   }
 
   const value: AdminContextInterface = {
     get_all_groups,
+    get_all_users,
     update_group,
     delete_group,
     handleLogout,
     groups,
+    users,
     adminError,
   };
 

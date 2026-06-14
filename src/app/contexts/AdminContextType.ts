@@ -1,17 +1,22 @@
 import type { GroupInterface, AthleteInGroup } from '../interface/GroupInterface';
 
 export interface AdminContextInterface {
-  get_all_groups: (force?: boolean) => Promise<GroupInterface[]>;
+  get_all_groups: () => Promise<GroupInterface[]>;
+  get_all_users: () => Promise<AthleteInGroup[]>;
   update_group: (group_id: string, athletes_list: AthleteInGroup[], supporter_list: AthleteInGroup[]) => Promise<void>;
   delete_group: (group_id: string) => Promise<void>;
   handleLogout: () => void;
   groups: GroupInterface[] | undefined;
+  users: AthleteInGroup[] | undefined;
   adminError: string;
 }
 
 export const defaultAdminContext: AdminContextInterface = {
   get_all_groups: async () => {
     throw new Error('get_all_groups not implemented');
+  },
+  get_all_users: async () => {
+    throw new Error('get_all_users not implemented');
   },
   update_group: async () => {
     throw new Error('update_group not implemented');
@@ -23,5 +28,6 @@ export const defaultAdminContext: AdminContextInterface = {
     throw new Error('handleLogout not implemented');
   },
   groups: undefined,
+  users: undefined,
   adminError: '',
 };

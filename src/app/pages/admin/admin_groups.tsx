@@ -13,7 +13,7 @@ const MAX_GROUP_SIZE = 3;
 
 export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
-  const { get_all_groups, delete_group, groups, adminError } = useContext(AdminContext);
+  const { get_all_groups, get_all_users, delete_group, groups, users: allUsers, adminError } = useContext(AdminContext);
   const [isLoading, setIsLoading] = useState(true);
 
   const [showNewGroupModal, setShowNewGroupModal] = useState(false);
@@ -24,7 +24,6 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
 
   const [newGroupSearch, setNewGroupSearch] = useState("");
   const [newGroupMembers, setNewGroupMembers] = useState<AthleteInGroup[]>([]);
-  const [allUsers, setAllUsers] = useState<AthleteInGroup[]>([]);
 
   // Toast
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -40,12 +39,8 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
         const baseURL = import.meta.env.VITE_MSS_API_URL;
         const token = localStorage.getItem("token");
         await Promise.all([
-          get_all_groups(),
-          axios
-            .get(`${baseURL}/get-all-users`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-            .then((res) => setAllUsers(res.data.users ?? res.data)),
+          groups === undefined ? get_all_groups() : Promise.resolve(),
+          allUsers === undefined ? get_all_users() : Promise.resolve(),
         ]);
       } catch (e) {
         console.error(e);
@@ -56,10 +51,10 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
     fetchData();
   }, []);
 
-  const filteredNewGroupUsers = allUsers.filter((u) =>
+  const filteredNewGroupUsers = allUsers ? allUsers.filter((u) =>
     u.name.toLowerCase().includes(newGroupSearch.toLowerCase()) ||
     u.email.toLowerCase().includes(newGroupSearch.toLowerCase())
-  );
+  ) : [];
 
   const isNewGroupMember = (user_id: string) =>
     newGroupMembers.some((m) => m.user_id === user_id);
@@ -117,7 +112,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
       setShowNewGroupModal(false);
       setNewGroupMembers([]);
       setNewGroupSearch("");
-      await get_all_groups(true);
+      await get_all_groups();
       showToast("Grupo criado com sucesso!");
       showToast("Grupo criado com sucesso!");
     } catch (error: any) {
@@ -167,7 +162,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
             >
               <FiChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-3xl font-bold text-gray-800">Grupos</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Grupos</h1>
           </div>
           <button
             onClick={() => { setActionError(""); setNewGroupMembers([]); setNewGroupSearch(""); setShowNewGroupModal(true); }}

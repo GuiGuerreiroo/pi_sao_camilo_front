@@ -7,10 +7,13 @@ import type { AthleteInGroup } from "../../interface/GroupInterface";
 import { FiChevronLeft, FiUser, FiSearch, FiX } from "react-icons/fi";
 import axios from "axios";
 
+import { AdminContext } from "../../contexts/AdminContext";
+import { useContext } from "react";
+
 export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
+  const { get_all_users, users, adminError } = useContext(AdminContext);
 
-  const [users, setUsers] = useState<AthleteInGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
   const [search, setSearch] = useState("");
@@ -20,26 +23,23 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
       setIsLoading(true);
       setFetchError("");
       try {
-        const baseURL = import.meta.env.VITE_MSS_API_URL;
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`${baseURL}/get-all-users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(response.data.users ?? response.data);
+        if (users === undefined) {
+          await get_all_users();
+        }
       } catch (error: any) {
-        setFetchError(error.response?.data?.message || error.message);
+        setFetchError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
     fetchUsers();
-  }, []);
+  }, [users, get_all_users]);
 
-  const filteredUsers = users.filter((u) =>
+  const filteredUsers = users ? users.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     u.role.toLowerCase().includes(search.toLowerCase())
-  );
+  ) : [];
 
   const roleLabel = (role: string) => {
     if (role === "ADM") return "ADM";
@@ -86,7 +86,7 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
           >
             <FiChevronLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-3xl font-bold text-gray-800">Usuários</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Usuários</h1>
         </div>
 
         {fetchError && (

@@ -19,7 +19,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const { update_group, adminError } = useContext(AdminContext);
+  const { update_group, get_all_users, users: allUsers, adminError } = useContext(AdminContext);
 
   const group = state?.groups?.find((_, i) => i + 1 === state?.groupIndex);
 
@@ -31,19 +31,15 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  const [allUsers, setAllUsers] = useState<AthleteInGroup[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
 
   // Busca todos os usuários do sistema
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const baseURL = import.meta.env.VITE_MSS_API_URL;
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${baseURL}/get-all-users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAllUsers(res.data.users ?? res.data);
+        if (allUsers === undefined) {
+          await get_all_users();
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -51,7 +47,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
       }
     };
     fetchUsers();
-  }, []);
+  }, [allUsers, get_all_users]);
 
   const isMember = (user_id: string) =>
     athletes.some((a) => a.user_id === user_id) ||
@@ -93,10 +89,10 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
     }
   };
 
-  const filteredUsers = allUsers.filter((u) =>
+  const filteredUsers = allUsers ? allUsers.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
-  );
+  ) : [];
 
   if (!group) {
     return (

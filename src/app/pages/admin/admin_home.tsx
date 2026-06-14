@@ -10,9 +10,8 @@ import axios from "axios";
 
 export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
-  const { get_all_groups, groups, adminError } = useContext(AdminContext);
+  const { get_all_groups, get_all_users, groups, users, adminError } = useContext(AdminContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [users, setUsers] = useState<AthleteInGroup[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,11 +21,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
         const token = localStorage.getItem("token");
         await Promise.all([
           groups === undefined ? get_all_groups() : Promise.resolve(),
-          axios
-            .get(`${baseURL}/get-all-users`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-            .then((res) => setUsers(res.data.users ?? res.data)),
+          users === undefined ? get_all_users() : Promise.resolve(),
         ]);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
@@ -57,11 +52,6 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
       <div className="flex min-h-screen bg-[#f8f9fa]">
         <main className="flex-1 p-10 bg-[#fbfbfb]">
 
-          {/* Header */}
-          <div className="flex items-center mb-8">
-            <h2 className="text-2xl font-bold text-black tracking-wide">Dashboard</h2>
-          </div>
-
           {adminError && (
             <p className="text-red-500 text-sm mb-4">Erro: {adminError}</p>
           )}
@@ -71,7 +61,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
             {/* Card Grupos */}
             <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-2xl font-bold text-black">Grupos</h3>
+                <h3 className="text-xl font-bold text-black">Grupos</h3>
                 <button
                   className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
                   onClick={() => navigate("/admin/grupos")}
@@ -109,7 +99,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
             {/* Card Usuários */}
             <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-2xl font-bold text-black">Usuários</h3>
+                <h3 className="text-xl font-bold text-black">Usuários</h3>
                 <button
                   className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors"
                   onClick={() => navigate("/admin/usuarios")}
@@ -118,7 +108,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                 </button>
               </div>
               <hr className="mb-5 border-gray-200" />
-              {users.length > 0 ? (
+              {users && users.length > 0 ? (
                 <ul className="space-y-0">
                   {users.slice(0, 5).map((user, idx) => (
                     <React.Fragment key={user.user_id}>
@@ -140,7 +130,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                       )}
                     </React.Fragment>
                   ))}
-                  {users.length > 5 && (
+                  {users && users.length > 5 && (
                     <li className="text-xs text-gray-400 text-center pt-3">
                       +{users.length - 5} usuários
                     </li>
