@@ -26,6 +26,7 @@ import {
 import { MdSportsTennis } from "react-icons/md";
 import { GiMuscleUp, GiMeditation } from "react-icons/gi";
 import { SupportContext } from "../../contexts/SupportContext";
+import { toast } from 'react-toastify';
 
 const MODALITY_LABELS: Record<MODALITY, string> = {
   FUTEBOL: "Futebol",
@@ -88,8 +89,6 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
   const [isLoading, setIsLoading] = useState(!memberFromState);
 
   const [showFilter, setShowFilter] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const toastTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedModality, setSelectedModality] = useState<MODALITY | "">(preSelectedModality || "");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -177,11 +176,28 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
     );
   };
 
-  const triggerToast = () => {
-    setShowToast(true);
-    if (toastTimeout.current) clearTimeout(toastTimeout.current);
-    toastTimeout.current = setTimeout(() => setShowToast(false), 2500);
-  };
+  const isFirstRender = React.useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (hasActiveFilter) {
+      toast.dismiss("filter-toast");
+      if (filtered.length > 0) {
+        toast.success(`${filtered.length} ${filtered.length === 1 ? "sessão encontrada" : "sessões encontradas"}`, {
+          toastId: "filter-toast",
+          autoClose: 2500,
+        });
+      } else {
+        toast.error("Nenhuma sessão encontrada", {
+          toastId: "filter-toast",
+          autoClose: 2500,
+        });
+      }
+    }
+  }, [selectedModality, dateFrom, dateTo, tempMin, tempMax, filtered.length, hasActiveFilter]);
 
   return (
     <SlideBarContextProvider>
@@ -263,7 +279,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                     <div className="relative">
                       <select
                         value={selectedModality}
-                        onChange={e => { setSelectedModality(e.target.value as MODALITY | ""); triggerToast(); }}
+                        onChange={e => { setSelectedModality(e.target.value as MODALITY | ""); }}
                         className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none appearance-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                       >
                         <option value="">Todas</option>
@@ -286,7 +302,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                       <input
                         type="date"
                         value={dateFrom}
-                        onChange={e => { setDateFrom(e.target.value); triggerToast(); }}
+                        onChange={e => { setDateFrom(e.target.value); }}
                         className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                       />
                     </div>
@@ -295,7 +311,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                       <input
                         type="date"
                         value={dateTo}
-                        onChange={e => { setDateTo(e.target.value); triggerToast(); }}
+                        onChange={e => { setDateTo(e.target.value); }}
                         className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                       />
                     </div>
@@ -308,7 +324,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                         <input
                             type="number"
                             value={tempMin}
-                            onChange={e => { setTempMin(e.target.value ? Number(e.target.value) : ""); triggerToast(); }}
+                            onChange={e => { setTempMin(e.target.value ? Number(e.target.value) : ""); }}
                             placeholder="Ex: 15"
                             className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                         />
@@ -318,7 +334,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                         <input
                             type="number"
                             value={tempMax}
-                            onChange={e => { setTempMax(e.target.value ? Number(e.target.value) : ""); triggerToast(); }}
+                            onChange={e => { setTempMax(e.target.value ? Number(e.target.value) : ""); }}
                             placeholder="Ex: 30"
                             className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                         />
@@ -396,13 +412,6 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
           </div>
         )}
 
-        {/* Toast */}
-        {showToast && hasActiveFilter && (
-          <div className="fixed top-6 right-6 z-50 bg-red-600 text-white text-sm font-medium px-4 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-fade-in">
-            <span className="font-bold">{filtered.length}</span>
-            {filtered.length === 1 ? "sessão encontrada" : "sessões encontradas"}
-          </div>
-        )}
       </main>
     </SlideBarContextProvider>
   );

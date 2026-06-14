@@ -65,6 +65,19 @@ const MODALITY_LABELS: Record<MODALITY, string> = {
     OUTRO: "Outro",
 };
 
+const MODALITY_COLORS: Record<MODALITY, string> = {
+    FUTEBOL: '#ef4444',
+    CORRIDA: '#3b82f6',
+    NATACAO: '#22c55e',
+    CICLISMO: '#f59e0b',
+    BASQUETE: '#8b5cf6',
+    TENIS: '#ec4899',
+    ACADEMIA: '#14b8a6',
+    CAMINHADA: '#f97316',
+    YOGA: '#6366f1',
+    OUTRO: '#6b7280',
+};
+
 function formatDuration(totalMinutes: number): string {
     const h = Math.floor(totalMinutes / 60);
     const m = Math.floor(totalMinutes % 60);
@@ -353,11 +366,10 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
         });
         return Object.entries(counts).map(([mod, count]) => ({
             name: MODALITY_LABELS[mod as MODALITY],
-            value: (count / filteredTrainings.length) * 100
+            value: (count / filteredTrainings.length) * 100,
+            modality: mod as MODALITY
         }));
     }, [filteredTrainings]);
-
-    const PIE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1'];
 
     if (loading) {
         return (
@@ -671,8 +683,8 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                 label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                                                 isAnimationActive={false}
                                             >
-                                                {pieData.map((_entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={MODALITY_COLORS[entry.modality] || '#6b7280'} />
                                                 ))}
                                             </Pie>
                                             <Tooltip

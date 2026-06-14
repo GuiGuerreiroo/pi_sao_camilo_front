@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiChevronRight } from 'react-icons/fi';
 import { SlideBarContextProvider } from '../../contexts/slideBarContext';
 import NavBar from '../../components/navbar';
 import type { MenuItems } from '../../interface/menuItems';
 import type { TrainingInterface, MODALITY } from '../../interface/TrainingInterface';
 import type { AthleteInGroup } from '../../interface/GroupInterface';
-import { FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory, FaWalking } from 'react-icons/fa';
+import { FaChevronLeft, FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory, FaWalking } from 'react-icons/fa';
 import { MdSportsTennis } from 'react-icons/md';
 import { GiMuscleUp, GiMeditation } from 'react-icons/gi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ReferenceArea } from "recharts";
@@ -35,6 +35,19 @@ const MODALITY_LABELS: Record<MODALITY, string> = {
     CAMINHADA: "Caminhada",
     YOGA: "Yoga",
     OUTRO: "Outro",
+};
+
+const MODALITY_COLORS: Record<MODALITY, string> = {
+    FUTEBOL: '#ef4444',
+    CORRIDA: '#3b82f6',
+    NATACAO: '#22c55e',
+    CICLISMO: '#f59e0b',
+    BASQUETE: '#8b5cf6',
+    TENIS: '#ec4899',
+    ACADEMIA: '#14b8a6',
+    CAMINHADA: '#f97316',
+    YOGA: '#6366f1',
+    OUTRO: '#6b7280',
 };
 
 function formatDuration(totalMinutes: number): string {
@@ -198,11 +211,10 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
         });
         return Object.entries(counts).map(([mod, count]) => ({
             name: MODALITY_LABELS[mod as MODALITY] || mod,
-            value: (count / filteredTrainings.length) * 100
+            value: (count / filteredTrainings.length) * 100,
+            modality: mod as MODALITY
         }));
     }, [filteredTrainings]);
-
-    const PIE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1'];
 
     const aggregatedWorkouts = useMemo(() => {
         const groups: Record<string, { modality: MODALITY, count: number }> = {};
@@ -231,11 +243,12 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                 
                 {/* Header */}
                 <div className="flex items-center mb-8 gap-4">
-                    <button 
-                        className="text-[#c81925] hover:bg-red-50 p-2 rounded-full transition-colors flex items-center"
+                    <button
                         onClick={() => navigate(-1)}
+                        className="text-2xl hover:text-red-500 transition-colors"
+                        aria-label="Voltar"
                     >
-                        <FiChevronLeft className="w-7 h-7" />
+                        <FaChevronLeft />
                     </button>
                     <div>
                         <h2 className="text-2xl font-bold text-black">Relatório do Atleta</h2>
@@ -428,8 +441,8 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                 label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                                                 isAnimationActive={false}
                                             >
-                                                {pieData.map((_entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={MODALITY_COLORS[entry.modality] || '#6b7280'} />
                                                 ))}
                                             </Pie>
                                             <Tooltip 

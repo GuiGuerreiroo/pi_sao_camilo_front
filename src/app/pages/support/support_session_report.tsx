@@ -314,15 +314,6 @@ export default function SupportSessionReport({ menuItems }: { menuItems: MenuIte
                     </div>
                 </div>
 
-                {/* Action Button */}
-                <div className="w-full max-w-7xl px-4 flex justify-end mt-6 pb-6">
-                    <button className="flex items-center gap-2 bg-white text-red-700 font-semibold py-3 px-6 rounded-full shadow-md hover:bg-gray-50 transition-colors border border-gray-100">
-                        <span>Exportar Relatório</span>
-                        <div className="bg-gray-400 text-white rounded-full p-1 text-xs">
-                            <FaChevronRight />
-                        </div>
-                    </button>
-                </div>
             </main>
         </SlideBarContextProvider>
     );
