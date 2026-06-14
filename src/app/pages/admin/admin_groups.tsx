@@ -6,7 +6,7 @@ import type { MenuItems } from "../../interface/menuItems";
 import type { GroupInterface, AthleteInGroup } from "../../interface/GroupInterface";
 import { AdminContext } from "../../contexts/AdminContext";
 import { FiChevronLeft, FiUser, FiEdit2, FiTrash2, FiPlus, FiX, FiCheck, FiSearch, FiAlertTriangle } from "react-icons/fi";
-import { HiCheckCircle } from "react-icons/hi";
+import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 import axios from "axios";
 
 const MAX_GROUP_SIZE = 3;
@@ -25,7 +25,6 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
   const [newGroupSearch, setNewGroupSearch] = useState("");
   const [newGroupMembers, setNewGroupMembers] = useState<AthleteInGroup[]>([]);
 
-  // Toast
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
@@ -36,8 +35,6 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const baseURL = import.meta.env.VITE_MSS_API_URL;
-        const token = localStorage.getItem("token");
         await Promise.all([
           groups === undefined ? get_all_groups() : Promise.resolve(),
           allUsers === undefined ? get_all_users() : Promise.resolve(),
@@ -77,22 +74,29 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
       setSelectedGroup(null);
       showToast("Grupo removido com sucesso!");
     } catch (error: any) {
-      setActionError(error.response?.data?.message || error.message);
+      showToast(error.response?.data?.message || error.message, "error");
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleCreateGroup = async () => {
+    const hasAthlete = newGroupMembers.some((m) => m.role === "USER");
+    const hasSupport = newGroupMembers.some((m) => m.role === "SUPPORT");
+
     if (newGroupMembers.length === 0) {
       setActionError("Adicione pelo menos um membro ao grupo.");
       return;
     }
-    const hasAthlete = newGroupMembers.some((m) => m.role === "USER");
     if (!hasAthlete) {
       setActionError("Adicione pelo menos um atleta (USER) ao grupo.");
       return;
     }
+    if (!hasSupport) {
+      setActionError("Adicione pelo menos um suporte (SUPPORT) ao grupo.");
+      return;
+    }
+
     setActionLoading(true);
     setActionError("");
     try {
@@ -112,11 +116,12 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
       setShowNewGroupModal(false);
       setNewGroupMembers([]);
       setNewGroupSearch("");
+      setIsLoading(true);
       await get_all_groups();
-      showToast("Grupo criado com sucesso!");
+      setIsLoading(false);
       showToast("Grupo criado com sucesso!");
     } catch (error: any) {
-      setActionError(error.response?.data?.message || error.message);
+      showToast(error.response?.data?.message || error.message, "error");
     } finally {
       setActionLoading(false);
     }
@@ -143,10 +148,12 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
 
         {/* Toast */}
         {toast && (
-          <div className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border transition-all ${
-            toast.type === "success" ? "bg-white border-green-100" : "bg-white border-red-100"
+          <div className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border bg-white transition-all ${
+            toast.type === "success" ? "border-green-100" : "border-red-100"
           }`}>
-            <HiCheckCircle className={`w-5 h-5 flex-shrink-0 ${toast.type === "success" ? "text-green-500" : "text-red-500"}`} />
+            {toast.type === "success"
+              ? <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              : <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
             <p className={`text-sm font-semibold ${toast.type === "success" ? "text-green-700" : "text-red-600"}`}>
               {toast.message}
             </p>
@@ -156,10 +163,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate(-1)}
-              className="text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-colors"
-            >
+            <button onClick={() => navigate(-1)} className="text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-colors">
               <FiChevronLeft className="w-6 h-6" />
             </button>
             <h1 className="text-2xl font-bold text-gray-800">Grupos</h1>
@@ -182,7 +186,6 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
             {groups.map((group, index) => {
               const totalMembers = group.athletes_list.length + (group.supporter_list?.length ?? 0);
               const isOversize = totalMembers > MAX_GROUP_SIZE;
-
               return (
                 <div key={group.group_id} className={`bg-white border rounded-3xl p-6 shadow-sm flex flex-col ${isOversize ? "border-orange-300" : "border-gray-200"}`}>
                   <div className="flex items-center justify-between mb-2">
@@ -190,8 +193,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                       <h3 className="text-xl font-bold text-gray-800">Grupo {index + 1}</h3>
                       {isOversize && (
                         <span className="flex items-center gap-1 text-xs font-semibold text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">
-                          <FiAlertTriangle className="w-3 h-3" />
-                          {totalMembers} membros
+                          <FiAlertTriangle className="w-3 h-3" />{totalMembers} membros
                         </span>
                       )}
                     </div>
@@ -250,18 +252,14 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
               </div>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-gray-500">Membros selecionados</p>
-                <span className="text-xs font-semibold bg-red-50 text-[#c81925] px-2 py-0.5 rounded-full">
-                  {newGroupMembers.length}
-                </span>
+                <span className="text-xs font-semibold bg-red-50 text-[#c81925] px-2 py-0.5 rounded-full">{newGroupMembers.length}</span>
               </div>
               {newGroupMembers.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {newGroupMembers.map((m) => (
                     <span key={m.user_id} className="flex items-center gap-1 bg-red-50 text-[#c81925] text-xs font-semibold px-3 py-1 rounded-full">
                       {m.name}
-                      <button onClick={() => toggleNewGroupMember(m)} className="hover:text-red-700">
-                        <FiX className="w-3 h-3" />
-                      </button>
+                      <button onClick={() => toggleNewGroupMember(m)} className="hover:text-red-700"><FiX className="w-3 h-3" /></button>
                     </span>
                   ))}
                 </div>
@@ -304,11 +302,13 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                 )}
               </ul>
               {actionError && <p className="text-red-500 text-xs mb-3">{actionError}</p>}
-              <div className="flex gap-3">
-                <button onClick={() => setShowNewGroupModal(false)} className="flex-1 py-2 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-                  Cancelar
-                </button>
-                <button onClick={handleCreateGroup} disabled={actionLoading} className="flex-1 py-2 bg-[#c81925] text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50">
+              {/* Botão Criar centralizado, outline */}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleCreateGroup}
+                  disabled={actionLoading}
+                  className="w-full py-2.5 border-2 border-[#c81925] text-[#c81925] rounded-xl text-sm font-semibold hover:bg-red-50 active:scale-95 transition-all disabled:opacity-50"
+                >
                   {actionLoading ? "Criando..." : "Criar"}
                 </button>
               </div>
@@ -322,9 +322,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
             <div className="bg-white rounded-3xl p-8 shadow-xl w-full max-w-sm mx-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-gray-800">Remover Grupo</h2>
-                <button onClick={() => setShowDeleteModal(false)} className="text-gray-400 hover:text-gray-600">
-                  <FiX className="w-5 h-5" />
-                </button>
+                <button onClick={() => setShowDeleteModal(false)} className="text-gray-400 hover:text-gray-600"><FiX className="w-5 h-5" /></button>
               </div>
               <p className="text-sm text-gray-500 mb-6">Tem certeza que deseja remover este grupo? Esta ação não pode ser desfeita.</p>
               {actionError && <p className="text-red-500 text-xs mb-3">{actionError}</p>}
@@ -332,7 +330,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                 <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                   Cancelar
                 </button>
-                <button onClick={handleDeleteGroup} disabled={actionLoading} className="flex-1 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50">
+                <button onClick={handleDeleteGroup} disabled={actionLoading} className="flex-1 py-2 border-2 border-red-600 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-50 transition-all disabled:opacity-50">
                   {actionLoading ? "Removendo..." : "Remover"}
                 </button>
               </div>

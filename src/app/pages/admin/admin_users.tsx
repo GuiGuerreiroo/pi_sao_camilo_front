@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
-import type { AthleteInGroup } from "../../interface/GroupInterface";
-import { FiChevronLeft, FiUser, FiSearch, FiX } from "react-icons/fi";
-import axios from "axios";
-
 import { AdminContext } from "../../contexts/AdminContext";
-import { useContext } from "react";
+import { FiChevronLeft, FiUser, FiSearch, FiX } from "react-icons/fi";
 
 export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
@@ -23,9 +19,7 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
       setIsLoading(true);
       setFetchError("");
       try {
-        if (users === undefined) {
-          await get_all_users();
-        }
+        if (users === undefined) await get_all_users();
       } catch (error: any) {
         setFetchError(error.message);
       } finally {
@@ -80,71 +74,65 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-colors"
-          >
+          <button onClick={() => navigate(-1)} className="text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-colors">
             <FiChevronLeft className="w-6 h-6" />
           </button>
           <h1 className="text-2xl font-bold text-gray-800">Usuários</h1>
         </div>
 
-        {fetchError && (
-          <p className="text-red-500 text-sm mb-4">Erro: {fetchError}</p>
-        )}
+        {fetchError && <p className="text-red-500 text-sm mb-4">Erro: {fetchError}</p>}
 
-        {/* Search */}
-        <div className="relative mb-6 max-w-2xl">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar por nome, e-mail ou role..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-9 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-100 transition-colors"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500"
-            >
-              <FiX className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        {/* Centralizado com busca */}
+        <div className="flex flex-col items-center">
 
-        {/* Users list */}
-        <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden max-w-2xl">
-          {filteredUsers.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-12">
-              {search ? "Nenhum usuário encontrado." : "Nenhum usuário disponível."}
-            </p>
-          ) : (
-            <ul>
-              {filteredUsers.map((user, idx) => (
-                <React.Fragment key={user.user_id}>
-                  <li className="flex items-center gap-4 px-6 py-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiUser className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${roleColor(user.role)}`}>
-                        {roleLabel(user.role)}
-                      </span>
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(user.status)}`}>
-                        {user.status === "CONFIRMED" ? "Ativo" : user.status === "DISABLED" ? "Inativo" : "Pendente"}
-                      </span>
-                    </div>
-                  </li>
-                  {idx < filteredUsers.length - 1 && <hr className="border-gray-100 mx-6" />}
-                </React.Fragment>
-              ))}
-            </ul>
-          )}
+          <div className="relative mb-6 w-full max-w-2xl">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nome, e-mail ou role..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-9 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-gray-400 transition-colors"
+            />
+            {search && (
+              <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+                <FiX className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden w-full max-w-2xl">
+            {filteredUsers.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-12">
+                {search ? "Nenhum usuário encontrado." : "Nenhum usuário disponível."}
+              </p>
+            ) : (
+              <ul>
+                {filteredUsers.map((user, idx) => (
+                  <React.Fragment key={user.user_id}>
+                    <li className="flex items-center gap-4 px-6 py-4">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <FiUser className="w-5 h-5 text-gray-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${roleColor(user.role)}`}>
+                          {roleLabel(user.role)}
+                        </span>
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor(user.status)}`}>
+                          {user.status === "CONFIRMED" ? "Ativo" : user.status === "DISABLED" ? "Inativo" : "Pendente"}
+                        </span>
+                      </div>
+                    </li>
+                    {idx < filteredUsers.length - 1 && <hr className="border-gray-100 mx-6" />}
+                  </React.Fragment>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
       </main>
