@@ -195,11 +195,11 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                     <FaChartBar className="text-gray-400" />
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Perda de Massa Corporal:</span>
+                                    <span>Variação de Massa (kg):</span>
                                     <span>{(training.weight_difference || 0).toFixed(2)}kg</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Variação de Massa:</span>
+                                    <span>Variação de Massa (%):</span>
                                     <span>{training.weight_variation_percentage}%</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">

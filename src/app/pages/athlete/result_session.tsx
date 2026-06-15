@@ -14,23 +14,12 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
   const formatNumber = (num: number) => num.toFixed(2).replace('.', ',');
 
   const results = {
-    perdaMassaCorporal: trainingResult ? `${formatNumber(Math.abs(trainingResult.weight_difference))}kg` : "0,78kg",
-    percentualVariacao: trainingResult ? `${formatNumber(Math.abs(trainingResult.weight_variation_percentage))}%` : "1,15%",
-    taxaSudorese: trainingResult ? `${formatNumber(trainingResult.sudorese)}L/h` : "0,94L/h",
-    balancoHidrico: trainingResult ? `${formatNumber(trainingResult.ajusted_weight_difference)}L` : "0,94L",
+    perdaMassaCorporal: trainingResult ? `${formatNumber(trainingResult.weight_difference)}kg` : "-kg",
+    percentualVariacao: trainingResult ? `${formatNumber(trainingResult.weight_variation_percentage)}%` : "-%",
+    taxaSudorese: trainingResult ? `${formatNumber(trainingResult.sudorese)}L/h` : "-L/h",
+    balancoHidrico: trainingResult ? `${formatNumber(trainingResult.ajusted_weight_difference)}L` : "-L",
     aiFeedback: trainingResult?.ai_suggestion ||
-      "# ANÁLISE DE HIDRATAÇÃO - TREINO DE ACADEMIA (30 MIN)\n\n" +
-      "## FEEDBACK DO PRÉ-TREINO DE HOJE:\n" +
-      "Você ingeriu 500 mL de água antes do treino, o que está dentro da faixa ideal (350-700 mL para seu peso). Isso foi ótimo porque seu corpo começou o exercício bem preparado, sem risco de desidratação logo no início.\n\n" +
-      "## RECUPERAÇÃO HOJE:\n" +
-      "Você perdeu 200 mL durante o treino (0,29% do peso corporal) — uma perda muito pequena e saudável. Reponha **200 a 300 mL** nos próximos 30 a 60 minutos (o equivalente a **1 copo** ou pouco menos de **meia garrafinha de 500 mL**). Beba devagar e aproveite para hidratar bem.\n\n" +
-      "## PRÉ-TREINO DO PRÓXIMO TREINO:\n" +
-      "Mantenha a mesma estratégia: beba **500 mL de água** entre 2 e 4 horas antes de começar. Isso equivale a **2 copos** ou **1 garrafinha pequena de 500 mL**. Assim seu corpo já estará preparado.\n\n" +
-      "## DURANTE O PRÓXIMO TREINO (30 minutos):\n" +
-      "Como seu treino é curto (30 min) e de intensidade moderada (6/10), você pode beber **100 mL a cada 15 minutos** — o equivalente a **menos de meia xícara** ou **goles pequenos de água pura**. No total, **200 mL durante toda a sessão**. Esse volume pequeno evita desconforto gástrico.\n\n" +
-      "## ATENÇÃO PARA O PRÓXIMO TREINO:\n" +
-      "- **Sua taxa de sudorese (0,8 L/h) está confortável:** Está bem abaixo do limite máximo de absorção gástrica (1,0 L/h), então você consegue repor água sem problemas de inchaço ou desconforto.\n" +
-      "- **Urina amarela + sem sintomas = hidratação adequada:** Sua cor de urina indica bom estado geral. Continue monitorando: se ficar muito escura, aumente a ingestão pré-treino no próximo dia."
+      "Erro ao transmitir feedback da IA. Por favor, tente novamente mais tarde ou entre em contato com o suporte para assistência."
   };
 
   const renderFeedback = (text: string) => {
@@ -80,12 +69,12 @@ export default function ResultsSession({ menuItems }: { menuItems: MenuItems[] }
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
               <p className="text-lg font-bold text-gray-900 mb-1">{results.perdaMassaCorporal}</p>
-              <p className="text-xs text-gray-500 leading-snug">Perda de Massa Corporal</p>
+              <p className="text-xs text-gray-500 leading-snug">Variação de Massa Corporal (Kg)</p>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
               <p className="text-lg font-bold text-gray-900 mb-1">{results.percentualVariacao}</p>
-              <p className="text-xs text-gray-500 leading-snug">Percentual de Variação de Massa</p>
+              <p className="text-xs text-gray-500 leading-snug">Percentual de Variação de Massa (%)</p>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
