@@ -7,7 +7,7 @@ export function Unauthorized() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-white/50 px-4 py-6 sm:px-6 sm:py-8">
             <section className="w-full max-w-md rounded-lg bg-[#d7d7d7] px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11 text-center">
-                <h1 className="text-3xl font-bold text-[#c81925] mb-4">Acesso Negado</h1>
+                <h1 className="text-2xl font-bold text-black mb-4">Acesso Negado</h1>
                 <p className="text-lg text-[#23262b] mb-8">
                     Você não tem permissão para acessar esta página. Verifique se entrou com a conta correta.
                 </p>

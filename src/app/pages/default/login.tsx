@@ -1,4 +1,5 @@
-import { useState } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from 'react'
 import Button from '../../components/button'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
@@ -10,16 +11,59 @@ import { getDecodedToken } from '../../hooks/tokenDecode';
 import { resendCode } from '../../api/user/resendCode';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { refreshToken } from '../../api/user/refreshToken';
 
 export function Login() {
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
+    const [isAutoLoggingIn, setIsAutoLoggingIn] = useState(true)
 
     // New states for Resend Flow and Error Handling
     const [showResendModal, setShowResendModal] = useState(false);
     const [resendEmail, setResendEmail] = useState('');
     const [isResending, setIsResending] = useState(false);
+
+    useEffect(() => {
+        const localRefreshToken = localStorage.getItem('refresh_token');
+        if (localRefreshToken) {
+            handleAutoLogin(localRefreshToken);
+        } else {
+            setIsAutoLoggingIn(false);
+        }
+    }, []);
+
+    async function handleAutoLogin(localRefreshToken: string) {
+        setIsLoading(true);
+        try {
+            await refreshToken(localRefreshToken);
+
+            const tokenData = getDecodedToken();
+
+            switch (tokenData && tokenData.role) {
+                case 'ADM':
+                    navigate('/paginaInicialADM');
+                    break;
+                case 'SUPPORT':
+                    navigate('/paginaInicialSupport');
+                    break;
+                case 'USER':
+                    navigate('/paginaInicialAthlete');
+                    break;
+                default:
+                    navigate('/error');
+            }
+
+        } catch (error) {
+            console.error("Auto login failed", error);
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            setIsAutoLoggingIn(false);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const {
         register,
@@ -82,7 +126,7 @@ export function Login() {
             setShowResendModal(false);
             toast.success("Código reenviado com sucesso!");
             // Navigate to verify screen, passing the email in state
-            navigate('/verify', { state: { email: resendEmail } });
+            navigate('/verifyAccount', { state: { email: resendEmail } });
         } catch (error) {
             console.error(error);
             setShowResendModal(false);
@@ -100,14 +144,25 @@ export function Login() {
     }
 
 
+    if (isAutoLoggingIn) {
+        return (
+            <main className="flex min-h-screen items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-gray-200 border-t-[#c81925] rounded-full animate-spin"></div>
+                    <p className="text-gray-500 font-medium animate-pulse">Autenticando...</p>
+                </div>
+            </main>
+        )
+    }
+
     return (
         <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-            <section className="w-full max-w-md rounded-lg bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
+            <section className="w-full max-w-md rounded-3xl bg-gray-50 px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
                 {/* Logo */}
                 <img
                     src="/sao_camilo_logo.svg"
                     alt="São Camilo"
-                    className="mx-auto mb-10 w-full max-w-[16rem]"
+                    className="mx-auto mb-10 w-full max-w-[30rem]"
                 />
 
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
@@ -124,7 +179,7 @@ export function Login() {
                             {...register("email")}
                             autoComplete="email"
                             placeholder="exemplo@saocamilo.edu.br"
-                            className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                            className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
                         />
                         {errors.email && <span className="text-sm text-red-500 mt-1">{errors.email.message}</span>}
                     </div>
@@ -143,7 +198,7 @@ export function Login() {
                                 {...register("password")}
                                 autoComplete="current-password"
                                 placeholder="••••••••"
-                                className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                                className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
                             />
                             <button
                                 type="button"
@@ -170,7 +225,7 @@ export function Login() {
                     {/* Links */}
                     <div className="mt-6 flex items-center justify-between text-base">
                         <a
-                            href="#"
+                            href="/forgotPassword"
                             className="text-[#7a7a7a] underline-offset-2 transition-colors hover:text-[#555] hover:underline"
                         >
                             Esqueci minha senha
@@ -189,7 +244,7 @@ export function Login() {
             {showResendModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                     <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-                        <h3 className="mb-4 text-xl font-bold text-gray-900">Validar E-mail</h3>
+                        <h3 className="mb-4 text-2xl font-bold text-black">Validar E-mail</h3>
                         <p className="mb-6 text-gray-700">
                             Sua conta já existe, mas seu email não foi validado! Deseja reenviar o código?
                         </p>

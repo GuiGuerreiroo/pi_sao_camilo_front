@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, type Dispatch, type ReactNode, type SetStateAction } from "react"
 
 interface SlideBarContextProps {

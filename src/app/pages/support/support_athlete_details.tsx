@@ -1,43 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
-import type { MenuItems } from "../../interface/menuItems";
-import type { TrainingInterface, MODALITY } from "../../interface/TrainingInterface";
-import NavBar from "../../components/navbar";
-import { SlideBarContextProvider } from "../../contexts/slideBarContext";
-import { AthleteContext } from "../../contexts/AthleteContext";
-import { useState, useEffect, useMemo, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-    FaRunning,
-    FaSwimmer,
-    FaBicycle,
-    FaBasketballBall,
-    FaFutbol,
-    FaDumbbell,
-    FaWalking,
-    FaChevronRight,
-    FaExclamationTriangle,
-    FaTint,
-    FaThermometerHalf,
-    FaStar,
-    FaBolt,
-} from "react-icons/fa";
-import { MdSportsTennis } from "react-icons/md";
-import { GiMuscleUp, GiMeditation } from "react-icons/gi";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-    ReferenceArea
-} from "recharts";
-
-/* ───────────────────────── helpers ───────────────────────── */
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
+import React, { useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { FiChevronRight } from 'react-icons/fi';
+import { SlideBarContextProvider } from '../../contexts/slideBarContext';
+import NavBar from '../../components/navbar';
+import type { MenuItems } from '../../interface/menuItems';
+import type { MODALITY } from '../../interface/TrainingInterface';
+import type { AthleteInGroup } from '../../interface/GroupInterface';
+import { FaChevronLeft, FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaFutbol, FaDumbbell, FaHistory, FaWalking } from 'react-icons/fa';
+import { MdSportsTennis } from 'react-icons/md';
+import { GiMuscleUp, GiMeditation } from 'react-icons/gi';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ReferenceArea } from "recharts";
 
 const MODALITY_ICONS: Record<MODALITY, React.ReactNode> = {
     FUTEBOL: <FaFutbol />,
@@ -78,12 +51,12 @@ const MODALITY_COLORS: Record<MODALITY, string> = {
     OUTRO: '#6b7280',
 };
 
-function formatDuration(totalMinutes: number): string {
+/* function formatDuration(totalMinutes: number): string {
     const h = Math.floor(totalMinutes / 60);
     const m = Math.floor(totalMinutes % 60);
     if (h > 0) return `${h}h ${m}min`;
     return `${m}min`;
-}
+} */
 
 function formatDate(ts: number): string {
     return new Date(ts).toLocaleDateString("pt-BR", {
@@ -93,208 +66,81 @@ function formatDate(ts: number): string {
     });
 }
 
-/** intensity → color */
-function intensityColor(intensity: number): string {
-    if (intensity <= 3) return "#22c55e"; // green
-    if (intensity <= 6) return "#eab308"; // yellow
-    if (intensity <= 8) return "#f97316"; // orange
-    return "#ef4444"; // red
-}
+/* function intensityColor(intensity: number): string {
+    if (intensity <= 3) return "#22c55e";
+    if (intensity <= 6) return "#eab308";
+    if (intensity <= 8) return "#f97316";
+    return "#ef4444";
+} */
 
-/** weight variation → dehydration risk */
-function dehydrationLevel(pct: number): { label: string; color: string } {
+/* function dehydrationLevel(pct: number): { label: string; color: string } {
     const abs = Math.abs(pct);
     if (abs < 1) return { label: "Normal", color: "#22c55e" };
     if (abs < 2) return { label: "Leve", color: "#eab308" };
     if (abs < 3) return { label: "Moderado", color: "#f97316" };
-    return { label: "Alto", color: "#ef4444" };
-}
+    return { label: "Severo", color: "#ef4444" };
+} */
 
-/* ─────────────────────── sub-components ─────────────────────── */
-
-function SessionCard({
-    training,
-    onTap,
-}: {
-    training: TrainingInterface;
-    onTap: () => void;
-}) {
-    const risk = dehydrationLevel(training.weight_variation_percentage);
-    const showAlert = Math.abs(training.weight_variation_percentage) >= 2;
-
+function AggregatedSessionCard({ modality, count, onClick }: { modality: MODALITY, count: number, onClick?: () => void }) {
     return (
-        <button
-            onClick={onTap}
-            className="w-full flex items-center gap-3 py-3 px-1 border-b border-gray-100 last:border-0 text-left transition-colors active:bg-gray-50"
+        <div 
+            onClick={onClick}
+            className="w-full flex items-center justify-between p-4 border border-gray-100 bg-white rounded-xl mb-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:bg-gray-50"
         >
-            {/* icon */}
-            <span className="text-2xl text-blsck-600 shrink-0">
-                {MODALITY_ICONS[training.modality]}
-            </span>
-
-            {/* info */}
-            <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-gray-800 truncate">
-                    {MODALITY_LABELS[training.modality]}
-                </p>
-                <p className="text-xs text-gray-400">
-                    {formatDate(training.start_date)} &middot;{" "}
-                    {formatDuration(training.duration)}
-                </p>
-            </div>
-
-            {/* intensity bar */}
-            <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className="w-16 h-1.5 rounded-full bg-gray-200 overflow-hidden">
-                    <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                            width: `${training.training_intensity * 10}%`,
-                            backgroundColor: intensityColor(
-                                training.training_intensity
-                            ),
-                        }}
-                    />
+            <div className="flex items-center gap-4">
+                <span className="text-3xl text-gray-700 shrink-0">
+                    {MODALITY_ICONS[modality]}
+                </span>
+                <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-lg text-gray-800 truncate">
+                        {MODALITY_LABELS[modality] || modality}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                        Realizado {count} {count === 1 ? 'vez' : 'vezes'}
+                    </p>
                 </div>
-                <span className="text-[10px] text-gray-400">
-                    Intensidade {training.training_intensity}/10
-                </span>
             </div>
-
-            {/* alert */}
-            {showAlert && (
-                <span style={{ color: risk.color }} className="text-lg shrink-0">
-                    <FaExclamationTriangle />
-                </span>
-            )}
-        </button>
-    );
-}
-
-function QuickStatCard({
-    icon,
-    label,
-    value,
-    color,
-    // onClick,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-    color: string;
-    // onClick?: () => void;
-}) {
-    return (
-        <div
-            // onClick={onClick}
-            className="flex flex-col items-center justify-center bg-white rounded-2xl p-4 shadow-sm border border-gray-100 gap-2 transition-all w-full min-h-[120px]"
-        >
-            <span
-                className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                style={{ backgroundColor: `${color}18`, color }}
-            >
-                {icon}
-            </span>
-            <span className="text-sm font-bold text-gray-800 text-center leading-tight">
-                {value}
-            </span>
-            <span className="text-[11px] text-gray-400 text-center leading-tight">
-                {label}
-            </span>
+            <div className="text-gray-400 p-2 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center">
+                <FiChevronRight className="w-5 h-5 text-gray-500" />
+            </div>
         </div>
     );
 }
 
-/* ─────────────────────── main component ─────────────────────── */
-
-export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
+export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuItems[] }) {
+    const location = useLocation();
     const navigate = useNavigate();
-    const { trainings, get_all_trainings, user, getUser } = useContext(AthleteContext);
-    const [loading, setLoading] = useState(trainings === undefined || user === undefined);
+    const member = location.state?.member as AthleteInGroup | undefined;
 
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            if (trainings !== undefined && user !== undefined) {
-                setLoading(false);
-                return;
-            }
-
-            setLoading(true);
-            try {
-                const promises = [];
-                if (trainings === undefined) promises.push(get_all_trainings());
-                if (user === undefined) promises.push(getUser());
-                await Promise.all(promises);
-            } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInitialData();
-    }, []);  
-
-    const safeTrainings = trainings || [];
-
-    /* ── stats computados ── */
-    const stats = useMemo(() => {
-        if (safeTrainings.length === 0)
-            return {
-                avgSudorese: 0,
-                lastTemp: 0,
-                lastHumidity: 0,
-                totalSessions: 0,
-                alerts: 0,
-                avgIntensity: 0,
-            };
-
-        const avgSudorese =
-            safeTrainings.reduce((s, t) => s + (t.sudorese || 0), 0) / safeTrainings.length;
-        const last = safeTrainings[0];
-        const alerts = safeTrainings.filter(
-            (t) => Math.abs(t.weight_variation_percentage) >= 2
-        ).length;
-        const avgIntensity =
-            safeTrainings.reduce((s, t) => s + t.training_intensity, 0) /
-            safeTrainings.length;
-
-        return {
-            avgSudorese,
-            lastTemp: last.environment_temperature,
-            lastHumidity: last.environment_humidity,
-            totalSessions: safeTrainings.length,
-            alerts,
-            avgIntensity,
-        };
-    }, [safeTrainings]);
+    const safeTrainings = member?.trainings || [];
 
     const [chartMetric, setChartMetric] = useState<string>("sudorese");
+    const [sessionLimit, setSessionLimit] = useState<number>(7);
 
     const chartConfig = useMemo(() => {
         switch (chartMetric) {
-            case "urina":
+            case "urina": 
                 return { key: "urina", name: "Volume Urinário", unit: "ml", ticks: [0, 100, 200, 300, 400, 500] };
-            case "duracao":
+            case "duracao": 
                 return { key: "duracao", name: "Duração", unit: "min", ticks: [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180] };
-            case "intensidade":
+            case "intensidade": 
                 return { key: "intensidade", name: "Intensidade", unit: "", ticks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
-            case "sudorese":
+            case "sudorese": 
                 return { key: "sudorese", name: "Taxa de Sudorese", unit: "L/h", ticks: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
             case "diferenca_massa":
                 return { key: "diferenca_massa", name: "Variação de Massa", unit: "kg", ticks: [-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] };
             case "ajustada_massa":
                 return { key: "ajustada_massa", name: "Volume Total de Suor", unit: "L", ticks: [-0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5] };
             case "massa":
-            default:
+            default: 
                 return { key: "variação de massa", name: "Variação de Massa", unit: "%", ticks: [-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] };
         }
     }, [chartMetric]);
 
     const filteredTrainings = useMemo(() => {
-        const filtered = safeTrainings.slice(0, 7);
+        const filtered = safeTrainings.slice(0, sessionLimit);
         return [...filtered].reverse(); // reverse makes it oldest to newest for the chart
-    }, [safeTrainings]);
+    }, [safeTrainings, sessionLimit]);
 
     const chartData = useMemo(() => {
         return filteredTrainings.map(t => {
@@ -339,7 +185,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
 
         let min = dMin;
         let max = dMax;
-
+        
         if (chartMetric === 'sudorese') {
             min = Math.min(0, dMin);
             max = Math.max(3.5, dMax);
@@ -354,7 +200,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
         if (min >= dMin && dMin < 0) min = dMin - (Math.abs(dMin) * 0.1 || 1);
 
         return [
-            chartMetric === 'intensidade' ? 0 : Number(min.toFixed(1)),
+            chartMetric === 'intensidade' ? 0 : Number(min.toFixed(1)), 
             chartMetric === 'intensidade' ? 10 : Number(max.toFixed(1))
         ];
     }, [chartData, chartMetric]);
@@ -366,158 +212,61 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
             counts[t.modality] = (counts[t.modality] || 0) + 1;
         });
         return Object.entries(counts).map(([mod, count]) => ({
-            name: MODALITY_LABELS[mod as MODALITY],
+            name: MODALITY_LABELS[mod as MODALITY] || mod,
             value: (count / filteredTrainings.length) * 100,
             modality: mod as MODALITY
         }));
     }, [filteredTrainings]);
 
-    if (loading) {
+    const aggregatedWorkouts = useMemo(() => {
+        const groups: Record<string, { modality: MODALITY, count: number }> = {};
+        safeTrainings.forEach(t => {
+            if (!groups[t.modality]) {
+                groups[t.modality] = { modality: t.modality, count: 0 };
+            }
+            groups[t.modality].count += 1;
+        });
+        return Object.values(groups).sort((a, b) => b.count - a.count);
+    }, [safeTrainings]);
+
+    if (!member) {
         return (
-            <SlideBarContextProvider>
-                <main className="min-h-screen bg-gray-50 pb-28">
-                    <NavBar menuItems={menuItems} />
-                    <div className="flex flex-col justify-center items-center h-64 gap-3 mt-16">
-                        <div className="w-10 h-10 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin"></div>
-                        <p className="text-gray-500 text-sm font-medium">Carregando dados...</p>
-                    </div>
-                </main>
-            </SlideBarContextProvider>
+            <div className="flex justify-center items-center h-screen bg-gray-50 flex-col">
+                <p>Nenhum atleta selecionado.</p>
+                <button onClick={() => navigate(-1)} className="mt-4 text-blue-500 hover:text-blue-700 underline">Voltar</button>
+            </div>
         );
     }
 
     return (
         <SlideBarContextProvider>
-            <main className="min-h-screen bg-gray-50 pb-28">
-                {/* ── header ── */}
-                <NavBar menuItems={menuItems} />
-
-                <div className="px-4 pt-6 pb-2 md:hidden flex items-center gap-2">
-                    <img
-                        src="/sao_camilo_logo.svg"
-                        alt="São Camilo"
-                        className="h-15 w-auto object-contain"
-                    />
-                    <div className="h-5 w-[2px] bg-red-600/50 rounded-full mx-1"></div>
-                    <span className="font-bold text-lg text-gray-800 tracking-tight">
-                        Performance
-                    </span>
+            <NavBar menuItems={menuItems} />
+            <main className="min-h-screen bg-[#f8f9fa] pt-6 pb-20 px-8">
+                
+                {/* Header */}
+                <div className="flex items-center mb-8 gap-4">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="text-2xl hover:text-red-500 transition-colors"
+                        aria-label="Voltar"
+                    >
+                        <FaChevronLeft />
+                    </button>
+                    <div>
+                        <h2 className="text-2xl font-bold text-black">Relatório do Atleta</h2>
+                        <p className="text-gray-500 text-sm mt-1">{member.name} &middot; {member.email}</p>
+                    </div>
+                    <button
+                        className="ml-auto flex items-center gap-2 text-sm text-red-600 border border-red-200 rounded-full px-4 py-1.5 hover:bg-red-50 active:scale-95 transition-all"
+                        onClick={() => navigate("/sessionHistory", { state: { member, groupIndex: location.state?.groupIndex } })}
+                    >
+                        <FaHistory className="text-xs" />
+                        Histórico
+                    </button>
                 </div>
 
-                {/* ── seção: Atividade ── */}
-                <section className="px-4 mt-6">
-                    {/* <h2 className="text-lg font-bold text-gray-800 mb-3">
-                            Atividades
-                        </h2> */}
-
-                    {/* card: Histórico de Sessões */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-semibold text-sm text-gray-700">
-                                Histórico de Sessões
-                            </h3>
-                            <button
-                                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 active:bg-gray-200"
-                                onClick={() => navigate("/athleteReport")}
-                            >
-                                <FaChevronRight className="text-xs" />
-                            </button>
-                        </div>
-
-                        {safeTrainings.length === 0 ? (
-                            <p className="text-sm text-gray-400 py-6 text-center">
-                                Nenhum treino encontrado.
-                            </p>
-                        ) : (
-                            safeTrainings
-                                .slice(0, 3)
-                                .map((t) => (
-                                    <SessionCard
-                                        key={t.training_id}
-                                        training={t}
-                                        onTap={() =>
-                                            navigate(
-                                                `/athleteSessionReport/${t.training_id}`
-                                            )
-                                        }
-                                    />
-                                ))
-                        )}
-                    </div>
-                </section>
-
-                {/* ── grid 2×2 (mobile) / 4x1 (desktop): quick stats ── */}
-                <section className="px-4 mt-5">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <QuickStatCard
-                            icon={<FaExclamationTriangle />}
-                            label="Últimos Alertas"
-                            value={
-                                stats.alerts > 0
-                                    ? `${stats.alerts} Alerta${stats.alerts > 1 ? "s" : ""}`
-                                    : "Nenhum"
-                            }
-                            color={stats.alerts > 0 ? "#ef4444" : "#22c55e"}
-                        />
-                        <QuickStatCard
-                            icon={<FaTint />}
-                            label="Taxa Média de Sudorese"
-                            value={`${stats.avgSudorese.toFixed(2)} L/h`}
-                            color="#3b82f6"
-                        />
-                        <QuickStatCard
-                            icon={<FaThermometerHalf />}
-                            label="Condições Atuais"
-                            value={`${stats.lastTemp}°C · ${stats.lastHumidity}%`}
-                            color="#f59e0b"
-                        />
-                        <QuickStatCard
-                            icon={<FaStar />}
-                            label="Suas Avaliações"
-                            value={`${stats.totalSessions} sessões`}
-                            color="#FFBF00"
-                        />
-                    </div>
-                </section>
-
-                {/* ── card: Intensidade média ── */}
-                <section className="px-4 mt-5">
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
-                        <span
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-                            style={{
-                                backgroundColor: `${intensityColor(Math.round(stats.avgIntensity))}18`,
-                                color: intensityColor(
-                                    Math.round(stats.avgIntensity)
-                                ),
-                            }}
-                        >
-                            <FaBolt />
-                        </span>
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-700">
-                                Intensidade Média
-                            </p>
-                            <div className="mt-1 w-full h-2 rounded-full bg-gray-200 overflow-hidden">
-                                <div
-                                    className="h-full rounded-full transition-all"
-                                    style={{
-                                        width: `${stats.avgIntensity * 10}%`,
-                                        backgroundColor: intensityColor(
-                                            Math.round(stats.avgIntensity)
-                                        ),
-                                    }}
-                                />
-                            </div>
-                            <p className="text-xs text-gray-400 mt-1">
-                                {stats.avgIntensity.toFixed(1)} / 10
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── Gráficos ── */}
-                <section className="px-4 mt-5">
+                {/* Gráficos Lado a Lado */}
+                <section className="mb-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Gráfico de Linhas: Evolução Multi-Métrica */}
                         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
@@ -537,8 +286,18 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                         <option value="sudorese">Sudorese (L/h)</option>
                                     </select>
                                 </div>
-
-
+                                
+                                <div className="flex bg-gray-100 rounded-lg p-1 overflow-x-auto">
+                                    {[7, 10, 15, 20, 30].map((limit) => (
+                                        <button
+                                            key={limit}
+                                            onClick={() => setSessionLimit(limit)}
+                                            className={`px-2 py-1 text-[10px] font-medium rounded-md transition-colors whitespace-nowrap ${sessionLimit === limit ? 'bg-white shadow-sm text-[#c81925]' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >
+                                            {limit} Treinos
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                             <div className="flex-1 w-full min-h-0 relative">
                                 {safeTrainings.length === 0 ? (
@@ -549,24 +308,24 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                     <ResponsiveContainer width="100%" height="100%">
                                         <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="id" tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
-                                            <YAxis
+                                            <XAxis dataKey="id" tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+                                            <YAxis 
                                                 width={65}
-                                                tick={{ fill: '#6b7280', fontSize: 12 }}
-                                                axisLine={false}
-                                                tickLine={false}
+                                                tick={{fill: '#6b7280', fontSize: 12}} 
+                                                axisLine={false} 
+                                                tickLine={false} 
                                                 domain={yAxisDomain}
                                                 tickFormatter={(val: any) => `${Number(val).toLocaleString()}${chartConfig.unit ? ` ${chartConfig.unit}` : ''}`}
                                             />
-                                            <Tooltip
-                                                cursor={{ stroke: '#f9fafb', strokeWidth: 2 }}
+                                            <Tooltip 
+                                                cursor={{stroke: '#f9fafb', strokeWidth: 2}}
                                                 content={({ active, payload }: any) => {
                                                     if (active && payload && payload.length) {
                                                         const val = payload[0].value;
                                                         const fullDate = payload[0].payload.fullDate;
                                                         const name = chartConfig.name;
                                                         const unit = chartConfig.unit ? ` ${chartConfig.unit}` : '';
-
+                                                        
                                                         const ptWeight = payload[0].payload.raw?.pre_training_weight || 70;
                                                         let color = '#6b7280';
                                                         if (chartMetric === 'sudorese') {
@@ -588,7 +347,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                             if (val < 0) color = '#ef4444';
                                                             else color = '#6b7280';
                                                         }
-
+                                            
                                                         return (
                                                             <div className="bg-white p-3 rounded-xl shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] border border-gray-100">
                                                                 <p className="text-gray-900 font-medium text-lg mb-1">{fullDate}</p>
@@ -629,13 +388,13 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                 </>
                                             )}
 
-                                            <Line
-                                                type="monotone"
-                                                dataKey="value"
-                                                stroke="#6b7280"
-                                                strokeWidth={3}
-                                                dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#6b7280' }}
-                                                activeDot={{ r: 6, fill: '#6b7280', stroke: '#fff', strokeWidth: 2 }}
+                                            <Line 
+                                                type="monotone" 
+                                                dataKey="value" 
+                                                stroke="#6b7280" 
+                                                strokeWidth={3} 
+                                                dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#6b7280' }} 
+                                                activeDot={{ r: 6, fill: '#6b7280', stroke: '#fff', strokeWidth: 2 }} 
                                             />
                                         </LineChart>
                                     </ResponsiveContainer>
@@ -681,15 +440,15 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                 outerRadius={80}
                                                 innerRadius={40}
                                                 labelLine={false}
-                                                label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                                label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                                                 isAnimationActive={false}
                                             >
                                                 {pieData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={MODALITY_COLORS[entry.modality] || '#6b7280'} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            <Tooltip 
+                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
                                                 formatter={(value: any) => [`${Number(value).toFixed(1)}%`, 'Proporção']}
                                             />
                                         </PieChart>
@@ -699,6 +458,27 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                         </div>
                     </div>
                 </section>
+
+                {/* Lista de Sessões Agrupadas */}
+                <section>
+                    {aggregatedWorkouts.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {aggregatedWorkouts.map(item => (
+                                <AggregatedSessionCard 
+                                    key={item.modality}
+                                    modality={item.modality} 
+                                    count={item.count} 
+                                    onClick={() => navigate("/sessionHistory", { state: { member, groupIndex: location.state?.groupIndex, preSelectedModality: item.modality } })}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-sm">
+                            <p className="text-gray-500 text-lg">Este atleta não possui treinos cadastrados no momento.</p>
+                        </div>
+                    )}
+                </section>
+
             </main>
         </SlideBarContextProvider>
     );

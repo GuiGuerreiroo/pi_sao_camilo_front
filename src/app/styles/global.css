@@ -123,3 +123,10 @@
   --color-accent-900: var(--accent-900);
   --color-accent-950: var(--accent-950);
 }
+
+/* Force pointer cursors on all inherently clickable elements */
+@layer base {
+  button, select, [role="button"], input[type="submit"], input[type="button"], input[type="reset"] {
+    cursor: pointer;
+  }
+}

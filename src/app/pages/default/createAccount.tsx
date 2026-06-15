@@ -7,20 +7,23 @@ import { toast } from 'react-toastify'
 import axios from 'axios'
 import Button from '../../components/button'
 import { ICreateAccountFormSchema, type ICreateAccountForm } from '../../interface/createAccountValidation'
+import { createUser } from '../../api/user/createUser'
 
 export function CreateAccount() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const navigate = useNavigate()
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ICreateAccountForm>({
     resolver: zodResolver(ICreateAccountFormSchema),
   })
+
+  const categoria = watch('categoria')
 
   const onSubmit: SubmitHandler<ICreateAccountForm> = (data) => handleCreateAccount(data)
 
@@ -28,17 +31,28 @@ export function CreateAccount() {
     setIsLoading(true)
 
     try {
-      // Substitua pela sua chamada real de API, ex: await createUser(data)
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await createUser({
+        email: data.email,
+        name: data.nome,
+        password: data.senha,
+        role: data.categoria === 'atleta' ? 'USER' : "SUPPORT",
+        height: data.categoria === 'atleta' && data.altura ? Number(data.altura.replace(',', '.')) : undefined,
+      })
 
-      console.log('Dados do formulário:', data)
-
-      setShowSuccessModal(true)
+      navigate('/verifyAccount', { state: { email: data.email } })
     } catch (error) {
       console.error(error)
 
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        toast.error(error.response.data.message)
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          toast.error('Este e-mail já está em uso.')
+        } else if (typeof error.response?.data === 'string') {
+          toast.error(error.response.data)
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message)
+        } else {
+          toast.error('Erro ao criar conta. Tente novamente mais tarde.')
+        }
       } else {
         toast.error('Erro ao criar conta. Tente novamente mais tarde.')
       }
@@ -47,28 +61,9 @@ export function CreateAccount() {
     }
   }
 
-  function handleContinue() {
-    setShowSuccessModal(false)
-    navigate('/login')
-  }
-
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundImage: "url('/background_img_sao_camilo.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
-      <section className="w-full max-w-md rounded-lg bg-white px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
-
-        {/* Botão Voltar */}
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          disabled={isLoading}
-          aria-label="Voltar"
-          className="mb-6 flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-[#7a7a7a] transition-colors hover:bg-black/5 hover:text-[#23262b] disabled:opacity-50"
-        >
-          <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-            <path d="M11 4L6 9L11 14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Voltar
-        </button>
+      <section className="w-full max-w-md rounded-3xl bg-gray-50 px-8 py-14 shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:px-11">
 
         {/* Logo */}
         <img
@@ -78,6 +73,35 @@ export function CreateAccount() {
         />
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+
+          {/* Categoria */}
+          <div>
+            <label className="mb-2.5 block text-lg font-medium text-[#23262b]">
+              Categoria
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {['atleta', 'treinador', 'nutricionista', 'médico'].map((cat) => (
+                <label
+                  key={cat}
+                  className={`flex cursor-pointer items-center justify-center rounded-md py-3 text-base font-medium capitalize transition-all ${categoria === cat
+                      ? 'border-2 border-red-600 text-red-600 bg-red-50 shadow-sm'
+                      : 'border border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
+                    }`}
+                >
+                  <input
+                    type="radio"
+                    value={cat}
+                    {...register('categoria')}
+                    className="sr-only"
+                  />
+                  {cat}
+                </label>
+              ))}
+            </div>
+            {errors.categoria && (
+              <span className="mt-1 block text-sm text-red-500">{errors.categoria.message}</span>
+            )}
+          </div>
 
           {/* Nome */}
           <div>
@@ -93,7 +117,7 @@ export function CreateAccount() {
               {...register('nome')}
               autoComplete="name"
               placeholder="Seu nome completo"
-              className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+              className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
             />
             {errors.nome && (
               <span className="mt-1 block text-sm text-red-500">{errors.nome.message}</span>
@@ -114,7 +138,7 @@ export function CreateAccount() {
               {...register('email')}
               autoComplete="email"
               placeholder="exemplo@saocamilo.edu.br"
-              className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+              className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
             />
             {errors.email && (
               <span className="mt-1 block text-sm text-red-500">{errors.email.message}</span>
@@ -136,7 +160,7 @@ export function CreateAccount() {
                 {...register('senha')}
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+                className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
               />
               <button
                 type="button"
@@ -152,84 +176,51 @@ export function CreateAccount() {
             )}
           </div>
 
-          {/* Categoria */}
-          <div>
-            <label
-              htmlFor="categoria"
-              className="mb-1.5 block text-lg font-medium text-[#23262b]"
-            >
-              Categoria
-            </label>
-            <select
-              id="categoria"
-              {...register('categoria')}
-              className="h-14 w-full rounded-md bg-[#f5f5f5] px-4 text-lg text-[#23262b] outline-none transition-shadow focus:ring-2 focus:ring-gray-400/50"
-              defaultValue=""
-            >
-              <option value="" disabled>Selecione uma categoria</option>
-              <option value="atleta">Atleta</option>
-              <option value="treinador">Treinador</option>
-              <option value="nutricionista">Nutricionista</option>
-              <option value="médico">Médico</option>
-            </select>
-            {errors.categoria && (
-              <span className="mt-1 block text-sm text-red-500">{errors.categoria.message}</span>
-            )}
-          </div>
+          {/* Altura */}
+          {categoria === 'atleta' && (
+            <div>
+              <label
+                htmlFor="altura"
+                className="mb-1.5 block text-lg font-medium text-[#23262b]"
+              >
+                Altura (m)
+              </label>
+              <input
+                id="altura"
+                type="text"
+                inputMode="decimal"
+                {...register('altura')}
+                placeholder="Ex: 1,75"
+                className="h-14 w-full rounded-md bg-white border border-gray-500 px-4 pr-12 text-lg text-[#23262b] outline-none transition-shadow placeholder:text-[#a0a0a0] focus:ring-2 focus:ring-gray-400/50"
+              />
+              {errors.altura && (
+                <span className="mt-1 block text-sm text-red-500">{errors.altura.message}</span>
+              )}
+            </div>
+          )}
 
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={isLoading}
-            loading={isLoading}
-            className="mt-3 h-14 w-full cursor-pointer rounded-md border border-[#8f171d] bg-[#c81925] text-xl font-bold text-white shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
-          >
-            Criar
-          </Button>
+          {/* Ações */}
+          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              disabled={isLoading}
+              className="flex h-14 w-full items-center justify-center rounded-md border border-gray-300 bg-white text-lg font-semibold text-[#23262b] transition-colors hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 sm:w-1/3"
+            >
+              Voltar
+            </button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              className="h-14 w-full cursor-pointer rounded-md border border-[#8f171d] bg-[#c81925] text-xl font-bold text-white shadow-md transition-all hover:brightness-110 active:scale-[0.98] sm:w-2/3"
+            >
+              Criar
+            </Button>
+          </div>
 
         </form>
       </section>
-
-      {/* Modal de Sucesso */}
-      {showSuccessModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={(e) => { if (e.target === e.currentTarget) handleContinue() }}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-        >
-          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <div className="mb-4 flex justify-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#c81925]">
-                <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
-                  <path
-                    d="M11 20.5L17 26.5L29 14"
-                    stroke="white"
-                    strokeWidth="2.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-            <h3 id="modal-title" className="mb-2 text-center text-xl font-bold text-gray-900">
-              Cadastro realizado!
-            </h3>
-            <p className="mb-6 text-center text-gray-700">
-              Sua conta foi criada com sucesso.<br />
-              Bem-vindo ao São Camilo.
-            </p>
-            <Button
-              type="button"
-              onClick={handleContinue}
-              className="h-12 w-full rounded-md bg-[#c81925] text-sm font-medium text-white hover:bg-[#a1141c]"
-            >
-              Continuar
-            </Button>
-          </div>
-        </div>
-      )}
     </main>
   )
 }
