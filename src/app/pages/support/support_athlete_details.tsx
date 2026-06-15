@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FiChevronRight } from 'react-icons/fi';
 import { SlideBarContextProvider } from '../../contexts/slideBarContext';
@@ -116,6 +116,13 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
 
     const [chartMetric, setChartMetric] = useState<string>("sudorese");
     const [sessionLimit, setSessionLimit] = useState<number>(7);
+
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const chartConfig = useMemo(() => {
         switch (chartMetric) {
@@ -241,23 +248,23 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
     return (
         <SlideBarContextProvider>
             <NavBar menuItems={menuItems} />
-            <main className="min-h-screen bg-[#f8f9fa] pt-6 pb-20 px-8">
+            <main className="min-h-screen bg-[#f8f9fa] pt-6 pb-20 px-4 md:px-8">
                 
                 {/* Header */}
-                <div className="flex items-center mb-8 gap-4">
+                <div className="flex items-center mb-8 gap-2 md:gap-4">
                     <button
                         onClick={() => navigate(-1)}
-                        className="text-2xl hover:text-red-500 transition-colors"
+                        className="text-2xl hover:text-red-500 transition-colors shrink-0"
                         aria-label="Voltar"
                     >
                         <FaChevronLeft />
                     </button>
-                    <div>
-                        <h2 className="text-2xl font-bold text-black">Relatório do Atleta</h2>
-                        <p className="text-gray-500 text-sm mt-1">{member.name} &middot; {member.email}</p>
+                    <div className="flex-1 min-w-0">
+                        <h2 className="text-xl md:text-2xl font-bold text-black truncate">Relatório do Atleta</h2>
+                        <p className="text-gray-500 text-xs md:text-sm mt-1 truncate">{member.name} &middot; {member.email}</p>
                     </div>
                     <button
-                        className="ml-auto flex items-center gap-2 text-sm text-red-600 border border-red-200 rounded-full px-4 py-1.5 hover:bg-red-50 active:scale-95 transition-all"
+                        className="ml-auto flex items-center gap-1 md:gap-2 text-xs md:text-sm text-red-600 border border-red-200 rounded-full px-3 md:px-4 py-1.5 hover:bg-red-50 active:scale-95 transition-all shrink-0"
                         onClick={() => navigate("/sessionHistory", { state: { member, groupIndex: location.state?.groupIndex } })}
                     >
                         <FaHistory className="text-xs" />
@@ -278,12 +285,12 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                         onChange={(e) => setChartMetric(e.target.value)}
                                         className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-lg focus:ring-gray-300 focus:border-gray-300 block p-1.5 outline-none max-w-[170px]"
                                     >
+                                        <option value="sudorese">Sudorese (L/h)</option>
                                         <option value="massa">Variação de Massa (%)</option>
-                                        <option value="diferenca_massa">Perda de Massa (kg)</option>
+                                        <option value="diferenca_massa">Variação de Massa (kg)</option>
                                         <option value="ajustada_massa">Volume de Suor (L)</option>
                                         <option value="duracao">Duração (min)</option>
                                         <option value="intensidade">Intensidade (1-10)</option>
-                                        <option value="sudorese">Sudorese (L/h)</option>
                                     </select>
                                 </div>
                                 
@@ -306,9 +313,16 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                     </div>
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                        <LineChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="id" tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+                                            <XAxis 
+                                                dataKey="id" 
+                                                tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} 
+                                                tick={{fill: '#6b7280', fontSize: 12}} 
+                                                axisLine={false} 
+                                                tickLine={false} 
+                                                minTickGap={20}
+                                            />
                                             <YAxis 
                                                 width={65}
                                                 tick={{fill: '#6b7280', fontSize: 12}} 
@@ -437,10 +451,20 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                 nameKey="name"
                                                 cx="50%"
                                                 cy="50%"
-                                                outerRadius={80}
-                                                innerRadius={40}
+                                                outerRadius={isMobile ? 55 : 80}
+                                                innerRadius={isMobile ? 30 : 40}
                                                 labelLine={false}
-                                                label={({name, percent}) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                                label={({ cx, cy, midAngle, outerRadius, percent, name, index }: any) => {
+                                                    const RADIAN = Math.PI / 180;
+                                                    const radius = outerRadius + (isMobile ? 20 : 25);
+                                                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                                    return (
+                                                        <text x={x} y={y} fill={MODALITY_COLORS[pieData[index]?.modality] || '#6b7280'} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={isMobile ? 11 : 12} fontWeight={600}>
+                                                            {name} {((percent || 0) * 100).toFixed(0)}%
+                                                        </text>
+                                                    );
+                                                }}
                                                 isAnimationActive={false}
                                             >
                                                 {pieData.map((entry, index) => (

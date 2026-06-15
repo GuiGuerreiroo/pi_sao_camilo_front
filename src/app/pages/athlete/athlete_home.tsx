@@ -212,6 +212,13 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
     const { trainings, get_all_trainings, user, getUser } = useContext(AthleteContext);
     const [loading, setLoading] = useState(trainings === undefined || user === undefined);
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     useEffect(() => {
         const fetchInitialData = async () => {
             if (trainings !== undefined && user !== undefined) {
@@ -529,12 +536,12 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                         onChange={(e) => setChartMetric(e.target.value)}
                                         className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-lg focus:ring-gray-300 focus:border-gray-300 block p-1.5 outline-none max-w-[170px]"
                                     >
+                                        <option value="sudorese">Sudorese (L/h)</option>
                                         <option value="massa">Variação de Massa (%)</option>
-                                        <option value="diferenca_massa">Perda de Massa (kg)</option>
+                                        <option value="diferenca_massa">Variação de Massa (kg)</option>
                                         <option value="ajustada_massa">Volume de Suor (L)</option>
                                         <option value="duracao">Duração (min)</option>
                                         <option value="intensidade">Intensidade (1-10)</option>
-                                        <option value="sudorese">Sudorese (L/h)</option>
                                     </select>
                                 </div>
 
@@ -547,9 +554,16 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                     </div>
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                        <LineChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="id" tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
+                                            <XAxis 
+                                                dataKey="id" 
+                                                tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} 
+                                                tick={{ fill: '#6b7280', fontSize: 12 }} 
+                                                axisLine={false} 
+                                                tickLine={false} 
+                                                minTickGap={20}
+                                            />
                                             <YAxis
                                                 width={65}
                                                 tick={{ fill: '#6b7280', fontSize: 12 }}
@@ -678,10 +692,20 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                 nameKey="name"
                                                 cx="50%"
                                                 cy="50%"
-                                                outerRadius={80}
-                                                innerRadius={40}
+                                                outerRadius={isMobile ? 55 : 80}
+                                                innerRadius={isMobile ? 30 : 40}
                                                 labelLine={false}
-                                                label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                                label={({ cx, cy, midAngle, outerRadius, percent, name, index }: any) => {
+                                                    const RADIAN = Math.PI / 180;
+                                                    const radius = outerRadius + (isMobile ? 20 : 25);
+                                                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                                    return (
+                                                        <text x={x} y={y} fill={MODALITY_COLORS[pieData[index]?.modality] || '#6b7280'} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={isMobile ? 11 : 12} fontWeight={600}>
+                                                            {name} {((percent || 0) * 100).toFixed(0)}%
+                                                        </text>
+                                                    );
+                                                }}
                                                 isAnimationActive={false}
                                             >
                                                 {pieData.map((entry, index) => (

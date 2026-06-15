@@ -372,8 +372,8 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                   </div>
 
                   {/* Intervalo de data */}
-                  <div className="md:col-span-4 flex gap-2">
-                    <div className="w-1/2">
+                  <div className="md:col-span-4 grid grid-cols-2 gap-3">
+                    <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-1">De (Data)</label>
                       <input
                         type="date"
@@ -382,7 +382,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                         className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                       />
                     </div>
-                    <div className="w-1/2">
+                    <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-1">Até (Data)</label>
                       <input
                         type="date"
@@ -394,8 +394,8 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                   </div>
 
                   {/* Temperatura */}
-                  <div className="md:col-span-4 flex gap-2">
-                    <div className="w-1/2">
+                  <div className="md:col-span-4 grid grid-cols-2 gap-3">
+                    <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-1" title="Temperatura Mínima">Temp. Mín (°C)</label>
                         <input
                             type="number"
@@ -405,7 +405,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                             className="w-full bg-white border border-[#94a3b8] rounded-lg p-2.5 text-sm text-[#2f394e] outline-none focus:ring-2 focus:ring-gray-400/50 transition-all"
                         />
                     </div>
-                    <div className="w-1/2">
+                    <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-1" title="Temperatura Máxima">Temp. Máx (°C)</label>
                         <input
                             type="number"
