@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -72,8 +71,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                   {groups.map((group, index) => (
                     <React.Fragment key={group.group_id}>
                       <li
-                        className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 rounded-xl px-2 transition-colors"
-                        onClick={() => navigate("/admin/grupos")}
+                        className="flex items-center gap-4 py-3"
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
@@ -86,9 +84,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                             </span>
                           </div>
                         </div>
-                        <button className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors">
-                          <FiChevronRight className="w-4 h-4 ml-0.5" />
-                        </button>
+  
                       </li>
                       {index < groups.length - 1 && <hr className="border-gray-200 ml-14" />}
                     </React.Fragment>

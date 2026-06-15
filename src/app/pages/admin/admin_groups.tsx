@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -149,15 +148,45 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
 
         {/* Toast */}
         {toast && (
-          <div className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border bg-white transition-all ${
-            toast.type === "success" ? "border-green-100" : "border-red-100"
-          }`}>
-            {toast.type === "success"
-              ? <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              : <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
-            <p className={`text-sm font-semibold ${toast.type === "success" ? "text-green-700" : "text-red-600"}`}>
+          <div className="fixed top-6 right-6 z-[100] flex items-center gap-3 pl-4 pr-10 py-4 rounded-lg shadow-lg border border-gray-100 bg-white min-w-[300px] overflow-hidden transition-all">
+            {/* Ícone */}
+            {toast.type === "success" ? (
+              <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+            ) : (
+              <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            )}
+
+            {/* Mensagem */}
+            <p className="text-sm text-gray-600 font-normal">
               {toast.message}
             </p>
+
+            {/* Botão Fechar (X) */}
+            <button 
+              onClick={() => setToast(null)}
+              className="absolute top-2.5 right-2.5 text-gray-300 hover:text-gray-500 transition-colors"
+            >
+              <FiX className="w-4 h-4" />
+            </button>
+
+            {/* Barra de Progresso Inferior */}
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
+              <div 
+                className={`h-full ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+                style={{
+                  animation: "toast-progress 3500ms linear forwards",
+                  width: "100%"
+                }}
+              />
+            </div>
+
+            {/* Estilo injetado para a animação da barra sumir gradativamente */}
+            <style>{`
+              @keyframes toast-progress {
+                from { width: 100%; }
+                to { width: 0%; }
+              }
+            `}</style>
           </div>
         )}
 

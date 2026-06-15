@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -19,7 +18,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const { update_group, get_all_users, users: allUsers } = useContext(AdminContext);
+  const { update_group, get_all_users, users: allUsers, adminError } = useContext(AdminContext);
 
   const group = state?.groups?.find((_, i) => i + 1 === state?.groupIndex);
 
@@ -113,19 +112,49 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   return (
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
-      <main className="min-h-screen bg-[#f8f9fa] p-6 md:p-10">
+      <main className="min-h-screen bg-[#f8f9fa] p-6 pb-40 md:p-10 lg:pb-10">
 
         {/* Toast */}
         {toast && (
-          <div className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border bg-white transition-all ${
-            toast.type === "success" ? "border-green-100" : "border-red-100"
-          }`}>
-            {toast.type === "success"
-              ? <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              : <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
-            <p className={`text-sm font-semibold ${toast.type === "success" ? "text-green-700" : "text-red-600"}`}>
+          <div className="fixed top-6 right-6 z-[100] flex items-center gap-3 pl-4 pr-10 py-4 rounded-lg shadow-lg border border-gray-100 bg-white min-w-[300px] overflow-hidden transition-all">
+            {/* Ícone */}
+            {toast.type === "success" ? (
+              <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+            ) : (
+              <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            )}
+
+            {/* Mensagem */}
+            <p className="text-sm text-gray-600 font-normal">
               {toast.message}
             </p>
+
+            {/* Botão Fechar (X) */}
+            <button 
+              onClick={() => setToast(null)}
+              className="absolute top-2.5 right-2.5 text-gray-300 hover:text-gray-500 transition-colors"
+            >
+              <FiX className="w-4 h-4" />
+            </button>
+
+            {/* Barra de Progresso Inferior */}
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
+              <div 
+                className={`h-full ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+                style={{
+                  animation: "toast-progress 3500ms linear forwards",
+                  width: "100%"
+                }}
+              />
+            </div>
+
+            {/* Estilo injetado para a animação da barra sumir gradativamente */}
+            <style>{`
+              @keyframes toast-progress {
+                from { width: 100%; }
+                to { width: 0%; }
+              }
+            `}</style>
           </div>
         )}
 
@@ -204,7 +233,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
               ) : filteredUsers.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-8">{search ? "Nenhum usuário encontrado." : "Nenhum usuário disponível."}</p>
               ) : (
-                <ul className="space-y-1 flex-1 overflow-y-auto max-h-96 pr-1">
+                <ul className="space-y-1 flex-1 overflow-y-auto max-h-60 pr-1">
                   {filteredUsers.map((user, idx) => {
                     const already = isMember(user.user_id);
                     return (
@@ -239,20 +268,20 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
         </div>
 
         {/* Save bar */}
-        <div className="flex justify-center mt-6">
-          <div className="w-full max-w-4xl">
+        <div className="mt-6 flex justify-center w-full">
+          <div className="w-full max-w-4xl flex justify-end">
             {saveError && <p className="text-red-500 text-sm mb-3">{saveError}</p>}
-            <div className="flex gap-3">
+            <div className="flex gap-3 w-full md:w-auto">
               <button
                 onClick={() => navigate(-1)}
-                className="px-6 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                className="flex-1 md:flex-none px-6 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors bg-white"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving || saveSuccess}
-                className="flex items-center gap-2 px-8 py-2.5 rounded-xl text-sm font-semibold border-2 border-[#c81925] text-[#c81925] hover:bg-red-50 active:scale-95 transition-all disabled:opacity-60"
+                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-2.5 rounded-xl text-sm font-semibold border-2 border-[#c81925] text-[#c81925] hover:bg-red-50 active:scale-95 transition-all disabled:opacity-60 bg-white"
               >
                 {saveSuccess ? <><FiCheck className="w-4 h-4" /> Salvo!</> : isSaving ? "Salvando..." : "Salvar Alterações"}
               </button>
