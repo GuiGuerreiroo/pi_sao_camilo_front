@@ -112,7 +112,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   return (
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
-      <main className="min-h-screen bg-[#f8f9fa] p-6 pb-40 md:p-10 lg:pb-10">
+      <main className="min-h-screen bg-[#f8f9fa] p-6 pb-24 md:p-10">
 
         {/* Toast */}
         {toast && (
@@ -191,7 +191,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-800 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-400 truncate">{member.role === "USER" ? "Atleta" : "Support"}</p>
+                          <p className="text-xs text-gray-400 truncate">{member.role === "USER" ? "Atleta" : member.role === "ADM" ? "Admin" : "Support"}</p>
                         </div>
                         <button
                           onClick={() => toggleUser(member)}
@@ -244,7 +244,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{user.role === "USER" ? "Atleta" : "Support"}</p>
+                            <p className="text-xs text-gray-400 truncate">{user.role === "USER" ? "Atleta" : user.role === "ADM" ? "Admin" : "Support"}</p>
                           </div>
                           <button
                             onClick={() => toggleUser(user)}

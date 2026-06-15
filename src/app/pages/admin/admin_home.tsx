@@ -45,9 +45,9 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
   return (
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
-      <main className="min-h-screen bg-[#f8f9fa] p-10">
+      <main className="min-h-screen bg-[#f8f9fa] p-6 pb-24 md:p-10">
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">Dashboard</h1>
 
         {adminError && <p className="text-red-500 text-sm mb-4">Erro: {adminError}</p>}
 

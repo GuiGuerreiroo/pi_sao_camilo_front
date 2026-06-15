@@ -144,49 +144,30 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
   return (
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
-      <main className="min-h-screen bg-[#f8f9fa] p-10">
+
+      {/* ↓ p-6 pb-24 no mobile garante que a navbar não tapa os cards */}
+      <main className="min-h-screen bg-[#f8f9fa] p-6 pb-24 md:p-10">
 
         {/* Toast */}
         {toast && (
           <div className="fixed top-6 right-6 z-[100] flex items-center gap-3 pl-4 pr-10 py-4 rounded-lg shadow-lg border border-gray-100 bg-white min-w-[300px] overflow-hidden transition-all">
-            {/* Ícone */}
-            {toast.type === "success" ? (
-              <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-            ) : (
-              <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            )}
-
-            {/* Mensagem */}
-            <p className="text-sm text-gray-600 font-normal">
-              {toast.message}
-            </p>
-
-            {/* Botão Fechar (X) */}
-            <button 
+            {toast.type === "success"
+              ? <HiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              : <HiXCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
+            <p className="text-sm text-gray-600 font-normal">{toast.message}</p>
+            <button
               onClick={() => setToast(null)}
               className="absolute top-2.5 right-2.5 text-gray-300 hover:text-gray-500 transition-colors"
             >
               <FiX className="w-4 h-4" />
             </button>
-
-            {/* Barra de Progresso Inferior */}
             <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
-              <div 
+              <div
                 className={`h-full ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
-                style={{
-                  animation: "toast-progress 3500ms linear forwards",
-                  width: "100%"
-                }}
+                style={{ animation: "toast-progress 3500ms linear forwards", width: "100%" }}
               />
             </div>
-
-            {/* Estilo injetado para a animação da barra sumir gradativamente */}
-            <style>{`
-              @keyframes toast-progress {
-                from { width: 100%; }
-                to { width: 0%; }
-              }
-            `}</style>
+            <style>{`@keyframes toast-progress { from { width: 100%; } to { width: 0%; } }`}</style>
           </div>
         )}
 
@@ -216,6 +197,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
             {groups.map((group, index) => {
               const totalMembers = group.athletes_list.length + (group.supporter_list?.length ?? 0);
               const isOversize = totalMembers > MAX_GROUP_SIZE;
+
               return (
                 <div key={group.group_id} className={`bg-white border rounded-3xl p-6 shadow-sm flex flex-col ${isOversize ? "border-orange-300" : "border-gray-200"}`}>
                   <div className="flex items-center justify-between mb-2">
@@ -230,26 +212,38 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                     <FiUser className="w-5 h-5 text-gray-400" />
                   </div>
                   <hr className="mb-4 border-gray-100" />
+
+                  {/* ↓ Lista limitada a 3 membros para o card não crescer demais */}
                   <ul className="flex-1 space-y-0">
                     {group.athletes_list.length === 0 ? (
                       <p className="text-sm text-gray-400 text-center py-4">Nenhum atleta neste grupo.</p>
                     ) : (
-                      group.athletes_list.map((member, idx) => (
-                        <React.Fragment key={member.user_id}>
-                          <li className="flex items-center gap-3 py-3">
-                            <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <FiUser className="w-4 h-4 text-gray-400" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-gray-800 truncate">{member.name}</p>
-                              <p className="text-xs text-gray-400">{member.role === "USER" ? "Atleta" : member.role}</p>
-                            </div>
-                          </li>
-                          {idx < group.athletes_list.length - 1 && <hr className="border-gray-100 ml-12" />}
-                        </React.Fragment>
-                      ))
+                      <>
+                        {group.athletes_list.slice(0, 3).map((member, idx) => (
+                          <React.Fragment key={member.user_id}>
+                            <li className="flex items-center gap-3 py-3">
+                              <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <FiUser className="w-4 h-4 text-gray-400" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-800 truncate">{member.name}</p>
+                                <p className="text-xs text-gray-400">{member.role === "USER" ? "Atleta" : member.role}</p>
+                              </div>
+                            </li>
+                            {idx < Math.min(group.athletes_list.length, 3) - 1 && (
+                              <hr className="border-gray-100 ml-12" />
+                            )}
+                          </React.Fragment>
+                        ))}
+                        {group.athletes_list.length > 3 && (
+                          <p className="text-xs text-gray-400 text-center pt-2 pb-1">
+                            +{group.athletes_list.length - 3} {group.athletes_list.length - 3 === 1 ? "membro" : "membros"}
+                          </p>
+                        )}
+                      </>
                     )}
                   </ul>
+
                   <div className="mt-4 flex gap-2">
                     <button
                       onClick={() => navigate("/admin/grupos/editar", { state: { groups, groupIndex: index + 1 } })}
@@ -319,7 +313,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-400">{user.role === "USER" ? "Atleta" : "Support"}</p>
+                            <p className="text-xs text-gray-400">{user.role === "USER" ? "Atleta" : user.role === "ADM" ? "Admin" : "Support"}</p>
                           </div>
                           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${selected ? "border-[#c81925] bg-[#c81925]" : "border-gray-300"}`}>
                             {selected && <FiCheck className="w-3 h-3 text-white" />}
@@ -332,7 +326,6 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                 )}
               </ul>
               {actionError && <p className="text-red-500 text-xs mb-3">{actionError}</p>}
-              {/* Botão Criar centralizado, outline */}
               <div className="flex justify-center">
                 <button
                   onClick={handleCreateGroup}
