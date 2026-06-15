@@ -26,6 +26,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isLoading) {
@@ -46,8 +47,6 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
       <main className="min-h-screen bg-[#f8f9fa] p-6 pb-24 md:p-10">
-
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Dashboard</h1>
 
         {adminError && <p className="text-red-500 text-sm mb-4">Erro: {adminError}</p>}
 
@@ -117,7 +116,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                         </div>
                         <div className="flex flex-col">
                           <span className="font-semibold text-gray-800 text-sm overflow-hidden text-ellipsis whitespace-nowrap w-40">{user.name}</span>
-                          <span className="text-xs text-gray-500">{user.role === "USER" ? "Atleta" : user.role}</span>
+                          <span className="text-xs text-gray-500">{user.role === "USER" ? "Atleta" : user.role === "SUPPORT" ? "Suporte" : user.role}</span>
                         </div>
                       </li>
                       {idx < Math.min(users.length, 5) - 1 && <hr className="border-gray-200 ml-14" />}

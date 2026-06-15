@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -18,7 +19,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const { update_group, get_all_users, users: allUsers, adminError } = useContext(AdminContext);
+  const { update_group, get_all_users, users: allUsers } = useContext(AdminContext);
 
   const group = state?.groups?.find((_, i) => i + 1 === state?.groupIndex);
 
@@ -89,8 +90,9 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   };
 
   const filteredUsers = allUsers ? allUsers.filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+    (u.role === "USER" || u.role === "SUPPORT") &&
+    (u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase()))
   ) : [];
 
   if (!group) {
@@ -191,7 +193,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-800 truncate">{member.name}</p>
-                          <p className="text-xs text-gray-400 truncate">{member.role === "USER" ? "Atleta" : member.role === "ADM" ? "Admin" : "Support"}</p>
+                          <p className="text-xs text-gray-400 truncate">{member.role === "USER" ? "Atleta" : member.role === "ADM" ? "Administrador" : "Suporte"}</p>
                         </div>
                         <button
                           onClick={() => toggleUser(member)}
@@ -244,7 +246,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{user.role === "USER" ? "Atleta" : user.role === "ADM" ? "Admin" : "Support"}</p>
+                            <p className="text-xs text-gray-400 truncate">{user.role === "USER" ? "Atleta" : user.role === "ADM" ? "Administrador" : "Suporte"}</p>
                           </div>
                           <button
                             onClick={() => toggleUser(user)}

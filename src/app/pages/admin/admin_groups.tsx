@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -46,11 +47,13 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredNewGroupUsers = allUsers ? allUsers.filter((u) =>
-    u.name.toLowerCase().includes(newGroupSearch.toLowerCase()) ||
-    u.email.toLowerCase().includes(newGroupSearch.toLowerCase())
+    (u.role === "USER" || u.role === "SUPPORT") &&
+    (u.name.toLowerCase().includes(newGroupSearch.toLowerCase()) ||
+    u.email.toLowerCase().includes(newGroupSearch.toLowerCase()))
   ) : [];
 
   const isNewGroupMember = (user_id: string) =>
@@ -227,7 +230,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-gray-800 truncate">{member.name}</p>
-                                <p className="text-xs text-gray-400">{member.role === "USER" ? "Atleta" : member.role}</p>
+                                <p className="text-xs text-gray-400">{member.role === "USER" ? "Atleta" : member.role === "ADM" ? "Administrador" : "Suporte"}</p>
                               </div>
                             </li>
                             {idx < Math.min(group.athletes_list.length, 3) - 1 && (
@@ -313,7 +316,7 @@ export default function AdminGroups({ menuItems }: { menuItems: MenuItems[] }) {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-400">{user.role === "USER" ? "Atleta" : user.role === "ADM" ? "Admin" : "Support"}</p>
+                            <p className="text-xs text-gray-400">{user.role === "USER" ? "Atleta" : user.role === "ADM" ? "Administrador" : "Suporte"}</p>
                           </div>
                           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${selected ? "border-[#c81925] bg-[#c81925]" : "border-gray-300"}`}>
                             {selected && <FiCheck className="w-3 h-3 text-white" />}
