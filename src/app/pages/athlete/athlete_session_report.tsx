@@ -44,6 +44,17 @@ function getUrineColorHex(color: URINE_COLOR): string {
     }
 }
 
+const SYMPTOMS_MAP: Record<string, string> = {
+    NENHUM: "Nenhum",
+    DOR_DE_CABECA: "Dor de Cabeça",
+    NAUSEA: "Náusea",
+    CAIMBRA: "Cãibra",
+    ESTRESSE: "Estresse",
+    DOR_MUSCULAR: "Dor Muscular",
+    GASTROINTESTINAL: "Sintomas Gastrointestinais",
+    FADIGA: "Fadiga",
+};
+
 function getIntensityLabel(intensity: number): string {
     if (intensity <= 3) return "Baixa";
     if (intensity <= 6) return "Média";
@@ -244,7 +255,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                     <span>Pré:</span>
                                     <span className="text-right">
                                         {(training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0
-                                            ? (training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ")
+                                            ? (training.pre_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => SYMPTOMS_MAP[s] || s.replace(/_/g, " ")).join(", ")
                                             : "Nenhum"}
                                     </span>
                                 </div>
@@ -252,7 +263,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
                                     <span>Pós:</span>
                                     <span className="text-right">
                                         {(training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").length > 0
-                                            ? (training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => s.replace(/_/g, " ")).join(", ")
+                                            ? (training.post_training_symptoms ?? []).filter(s => s !== "NENHUM").map(s => SYMPTOMS_MAP[s] || s.replace(/_/g, " ")).join(", ")
                                             : "Nenhum"}
                                     </span>
                                 </div>

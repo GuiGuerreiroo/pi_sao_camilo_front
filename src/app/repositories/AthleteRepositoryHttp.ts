@@ -60,7 +60,7 @@ export class AthleteRepositoryHttp implements IAthleteRepository {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token not found');
 
-      const validSymptoms = ["CAIMBRA", "ESTRESSE", "DOR_MUSCULAR", "NAUSEA", "DOR_DE_CABECA", "NENHUM"];
+      const validSymptoms = ["CAIMBRA", "ESTRESSE", "DOR_MUSCULAR", "NAUSEA", "DOR_DE_CABECA", "GASTROINTESTINAL", "FADIGA", "NENHUM"];
 
       const payload = {
         modality: data.modality,

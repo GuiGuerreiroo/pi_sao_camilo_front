@@ -108,7 +108,8 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
     { value: "DOR_DE_CABECA", label: "Dor de Cabeça" },
     { value: "NAUSEA", label: "Náusea" },
     { value: "DOR_MUSCULAR", label: "Dor Muscular" },
-    { value: "CAIMBRA", label: "Cãibra" }
+    { value: "CAIMBRA", label: "Cãibra" },
+    { value: "GASTROINTESTINAL", label: "Sintomas Gastrointestinais" }
   ];
 
   const getSymptomsLabel = () => {
@@ -335,7 +336,6 @@ export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: 
             </div>
           </div>
         </div>
-
       </main>
     </SlideBarContextProvider>
   );

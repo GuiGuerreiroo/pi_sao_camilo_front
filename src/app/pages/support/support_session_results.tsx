@@ -18,6 +18,7 @@ const URINE_COLOR_MAP: Record<URINE_COLOR, { label: string; color: string }> = {
 };
 
 const SYMPTOMS_MAP: Record<SYMPTOMS, string> = {
+  GASTROINTESTINAL: "Sintomas Gastrointestinais",
   NENHUM: "Nenhum",
   DOR_DE_CABECA: "Dor de Cabeça",
   TONTURA: "Tontura",

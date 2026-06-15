@@ -8,6 +8,8 @@ export type SYMPTOMS =
     | "DOR_MUSCULAR"
     | "NAUSEA"
     | "DOR_DE_CABECA"
+    | "GASTROINTESTINAL"
+    | "FADIGA"
     | "NENHUM";
 
 export interface CreateTrainingInterface {

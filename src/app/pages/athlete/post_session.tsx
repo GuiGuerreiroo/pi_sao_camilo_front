@@ -46,8 +46,8 @@ export default function PostSession({ menuItems, currentStep = 3 }: { menuItems:
 
       // Convert checkboxes back to the backend Enum array style:
       const finalSymptoms: SYMPTOMS[] = [];
-      if (fadiga) finalSymptoms.push("DOR_MUSCULAR" as SYMPTOMS);
-      if (sintomasGastrointestinais) finalSymptoms.push("NAUSEA" as SYMPTOMS);
+      if (fadiga) finalSymptoms.push("FADIGA" as SYMPTOMS);
+      if (sintomasGastrointestinais) finalSymptoms.push("GASTROINTESTINAL" as SYMPTOMS);
 
       const endDate = new Date().getTime();
       const finalDuration = trainingData.duration || Math.max(1, Math.round((endDate - (trainingData.start_date || endDate)) / 60000));
