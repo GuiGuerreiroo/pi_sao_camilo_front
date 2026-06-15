@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useMemo, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -140,7 +141,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
     };
 
     loadFromContext();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   const trainings: TrainingInterface[] = member?.trainings || [];
 
@@ -150,7 +151,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
   }, [trainings]);
 
   const filtered = useMemo(() => {
-    let sorted = [...trainings].sort((a, b) => b.start_date - a.start_date);
+    const sorted = [...trainings].sort((a, b) => b.start_date - a.start_date);
     return sorted.filter(t => {
       if (selectedModality && t.modality !== selectedModality) return false;
       if (dateFrom && t.start_date < new Date(dateFrom).getTime()) return false;

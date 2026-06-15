@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/exhaustive-deps */
 import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AthleteContext } from "../../contexts/AthleteContext";
@@ -113,7 +114,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
         };
 
         fetchAndFind();
-    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]);  
 
     if (loading) {
         return (

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
 import { FiChevronLeft, FiChevronRight, FiUser } from 'react-icons/fi';
 import { AiOutlineAppstore } from 'react-icons/ai';

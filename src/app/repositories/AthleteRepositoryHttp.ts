@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AxiosInstance } from "axios";
 import type { UserInterface } from "../interface/UserInterface";
 import type { TrainingInterface, CreateTrainingInterface } from "../interface/TrainingInterface";

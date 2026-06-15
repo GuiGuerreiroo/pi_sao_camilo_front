@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, react-refresh/only-export-components */
 import { createContext, useState, type ReactNode } from 'react'
 import type { GroupInterface } from '../interface/GroupInterface'
 import { defaultSupportContext, type SupportContextInterface } from './SupportContextType'

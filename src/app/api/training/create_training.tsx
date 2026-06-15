@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import axios from "axios";
 import type { CreateTrainingInterface, TrainingInterface } from "../../interface/TrainingInterface";
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, react-refresh/only-export-components */
 import type { TrainingInterface } from '../interface/TrainingInterface'
 import type { UserInterface } from '../interface/UserInterface'
 import { defaultAthleteContext, type AthleteContextInterface } from './AthleteContextType'

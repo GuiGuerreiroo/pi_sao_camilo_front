@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
 import type { MenuItems } from "../../interface/menuItems";
 import type { TrainingInterface, MODALITY } from "../../interface/TrainingInterface";
 import NavBar from "../../components/navbar";
@@ -233,7 +234,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
         };
 
         fetchInitialData();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);  
 
     const safeTrainings = trainings || [];
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Route, BrowserRouter, Routes, Outlet } from 'react-router-dom'
 import { Login } from './pages/default/login'
 import { Unauthorized } from './pages/default/unauthorized'

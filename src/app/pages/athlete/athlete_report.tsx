@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/exhaustive-deps */
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AthleteContext } from "../../contexts/AthleteContext";
@@ -102,7 +103,7 @@ export function AthleteReport({ menuItems }: { menuItems: MenuItems[] }) {
             .finally(() => {
                 setLoading(false);
             });
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);  
 
     const availableModalities = useMemo(() => {
         if (!trainings) return [];

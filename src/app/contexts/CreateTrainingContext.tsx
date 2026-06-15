@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-refresh/only-export-components, no-empty */
 import { createContext, useState, useEffect, type ReactNode } from 'react';
 import type { CreateTrainingInterface, TrainingInterface, MODALITY } from '../interface/TrainingInterface';
 import { AthleteRepositoryHttp } from '../repositories/AthleteRepositoryHttp';

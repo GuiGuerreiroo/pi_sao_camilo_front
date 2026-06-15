@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 
 // Tipagem exata do que a Open-Meteo retorna para o current

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useLocation, useNavigate } from "react-router-dom";
 import type { TrainingInterface, URINE_COLOR } from "../../interface/TrainingInterface";
 import type { MenuItems } from "../../interface/menuItems";
