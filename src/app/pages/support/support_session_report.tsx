@@ -14,7 +14,6 @@ import {
     FaChartBar,
     FaBottleWater,
     FaCloudSun,
-    FaChevronRight,
     FaArrowLeft
 } from "react-icons/fa6";
 import { FaExclamationCircle, FaTshirt } from "react-icons/fa";
@@ -95,7 +94,7 @@ export default function SupportSessionReport({ menuItems }: { menuItems: MenuIte
         );
     }
 
-    const shortId = training.training_id?.split("-")[0] || "1";
+    // const shortId = training.training_id?.split("-")[0] || "1";
 
     return (
         <SlideBarContextProvider>

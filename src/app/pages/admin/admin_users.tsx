@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -9,7 +9,7 @@ import { FiChevronLeft, FiUser, FiSearch, FiX } from "react-icons/fi";
 
 export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
   const navigate = useNavigate();
-  const { get_all_users, users, adminError } = useContext(AdminContext);
+  const { get_all_users, users } = useContext(AdminContext);
 
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");

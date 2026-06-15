@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -19,7 +19,7 @@ export default function AdminEditGroup({ menuItems }: { menuItems: MenuItems[] }
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const { update_group, get_all_users, users: allUsers, adminError } = useContext(AdminContext);
+  const { update_group, get_all_users, users: allUsers } = useContext(AdminContext);
 
   const group = state?.groups?.find((_, i) => i + 1 === state?.groupIndex);
 

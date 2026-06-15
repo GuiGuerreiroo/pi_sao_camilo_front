@@ -5,9 +5,9 @@ import { FiChevronRight } from 'react-icons/fi';
 import { SlideBarContextProvider } from '../../contexts/slideBarContext';
 import NavBar from '../../components/navbar';
 import type { MenuItems } from '../../interface/menuItems';
-import type { TrainingInterface, MODALITY } from '../../interface/TrainingInterface';
+import type { MODALITY } from '../../interface/TrainingInterface';
 import type { AthleteInGroup } from '../../interface/GroupInterface';
-import { FaChevronLeft, FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaVolleyballBall, FaFutbol, FaDumbbell, FaHistory, FaWalking } from 'react-icons/fa';
+import { FaChevronLeft, FaRunning, FaSwimmer, FaBicycle, FaBasketballBall, FaFutbol, FaDumbbell, FaHistory, FaWalking } from 'react-icons/fa';
 import { MdSportsTennis } from 'react-icons/md';
 import { GiMuscleUp, GiMeditation } from 'react-icons/gi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ReferenceArea } from "recharts";
@@ -51,12 +51,12 @@ const MODALITY_COLORS: Record<MODALITY, string> = {
     OUTRO: '#6b7280',
 };
 
-function formatDuration(totalMinutes: number): string {
+/* function formatDuration(totalMinutes: number): string {
     const h = Math.floor(totalMinutes / 60);
     const m = Math.floor(totalMinutes % 60);
     if (h > 0) return `${h}h ${m}min`;
     return `${m}min`;
-}
+} */
 
 function formatDate(ts: number): string {
     return new Date(ts).toLocaleDateString("pt-BR", {
@@ -66,20 +66,20 @@ function formatDate(ts: number): string {
     });
 }
 
-function intensityColor(intensity: number): string {
+/* function intensityColor(intensity: number): string {
     if (intensity <= 3) return "#22c55e";
     if (intensity <= 6) return "#eab308";
     if (intensity <= 8) return "#f97316";
     return "#ef4444";
-}
+} */
 
-function dehydrationLevel(pct: number): { label: string; color: string } {
+/* function dehydrationLevel(pct: number): { label: string; color: string } {
     const abs = Math.abs(pct);
     if (abs < 1) return { label: "Normal", color: "#22c55e" };
     if (abs < 2) return { label: "Leve", color: "#eab308" };
     if (abs < 3) return { label: "Moderado", color: "#f97316" };
-    return { label: "Alto", color: "#ef4444" };
-}
+    return { label: "Severo", color: "#ef4444" };
+} */
 
 function AggregatedSessionCard({ modality, count, onClick }: { modality: MODALITY, count: number, onClick?: () => void }) {
     return (
@@ -319,7 +319,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                             />
                                             <Tooltip 
                                                 cursor={{stroke: '#f9fafb', strokeWidth: 2}}
-                                                content={({ active, payload, label }: any) => {
+                                                content={({ active, payload }: any) => {
                                                     if (active && payload && payload.length) {
                                                         const val = payload[0].value;
                                                         const fullDate = payload[0].payload.fullDate;

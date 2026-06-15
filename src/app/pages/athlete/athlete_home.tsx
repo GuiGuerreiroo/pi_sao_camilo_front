@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
 import type { MenuItems } from "../../interface/menuItems";
 import type { TrainingInterface, MODALITY } from "../../interface/TrainingInterface";
 import NavBar from "../../components/navbar";
@@ -11,7 +11,6 @@ import {
     FaSwimmer,
     FaBicycle,
     FaBasketballBall,
-    FaVolleyballBall,
     FaFutbol,
     FaDumbbell,
     FaWalking,
@@ -561,7 +560,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                             />
                                             <Tooltip
                                                 cursor={{ stroke: '#f9fafb', strokeWidth: 2 }}
-                                                content={({ active, payload, label }: any) => {
+                                                content={({ active, payload }: any) => {
                                                     if (active && payload && payload.length) {
                                                         const val = payload[0].value;
                                                         const fullDate = payload[0].payload.fullDate;

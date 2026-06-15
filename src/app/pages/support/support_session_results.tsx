@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
-import type { TrainingInterface, URINE_COLOR, SYMPTOMS } from "../../interface/TrainingInterface";
+import type { TrainingInterface, URINE_COLOR } from "../../interface/TrainingInterface";
 import { FiChevronLeft } from "react-icons/fi";
 import { FaThermometerHalf, FaTint, FaClock, FaTshirt, FaExclamationCircle, FaChartBar, FaWeight, FaFlask } from "react-icons/fa";
 import { GiWaterBottle } from "react-icons/gi";
@@ -17,18 +17,15 @@ const URINE_COLOR_MAP: Record<URINE_COLOR, { label: string; color: string }> = {
   MARROM: { label: "Marrom", color: "#854d0e" },
 };
 
-const SYMPTOMS_MAP: Record<SYMPTOMS, string> = {
+const SYMPTOMS_MAP: Record<string, string> = {
   GASTROINTESTINAL: "Sintomas Gastrointestinais",
   NENHUM: "Nenhum",
   DOR_DE_CABECA: "Dor de Cabeça",
-  TONTURA: "Tontura",
   NAUSEA: "Náusea",
   FADIGA: "Fadiga",
-  CAIBRA: "Cãibra",
-  SEDE_EXCESSIVA: "Sede Excessiva",
-  BOCA_SECA: "Boca Seca",
-  FRAQUEZA: "Fraqueza",
-  CONFUSAO_MENTAL: "Confusão Mental",
+  CAIMBRA: "Cãibra",
+  DOR_MUSCULAR: "Dor Muscular",
+  ESTRESSE: "Estresse",
 };
 
 function formatDate(ts: number): string {

@@ -9,7 +9,7 @@ import { AthleteContext } from "../../contexts/AthleteContext";
 import { toast } from "react-toastify";
 import type { SYMPTOMS } from "../../interface/TrainingInterface";
 import { Input } from "../../components/input";
-import { FiActivity } from "react-icons/fi";
+// import { FiActivity } from "react-icons/fi";
 
 export default function PostSession({ menuItems, currentStep = 3 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();

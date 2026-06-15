@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
-import { FiChevronLeft, FiChevronRight, FiUser } from 'react-icons/fi';
-import { AiOutlineAppstore } from 'react-icons/ai';
-import { HiOutlineUserGroup } from 'react-icons/hi';
-import { IoDocumentTextOutline, IoSettingsOutline } from 'react-icons/io5';
+import { FiChevronRight, FiUser } from 'react-icons/fi';
 import { SupportContext } from '../../contexts/SupportContext';
 import { SlideBarContextProvider } from '../../contexts/slideBarContext';
 import type { MenuItems } from '../../interface/menuItems';

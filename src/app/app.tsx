@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import { Route, BrowserRouter, Routes, Outlet } from 'react-router-dom'
 import { Login } from './pages/default/login'
 import { Unauthorized } from './pages/default/unauthorized'
@@ -28,7 +28,6 @@ import { CreateTrainingProvider } from './contexts/CreateTrainingContext';
 import SupportAthleteDetails from './pages/support/support_athlete_details';
 import SessionHistory from './pages/support/support_session_history';
 import SupportSessionReport from './pages/support/support_session_report';
-import SessionResults from './pages/support/support_session_results';
 import AdminGroups from './pages/admin/admin_groups';
 import AdminEditGroup from './pages/admin/admin_edit_group';
 import AdminUsers from './pages/admin/admin_users';

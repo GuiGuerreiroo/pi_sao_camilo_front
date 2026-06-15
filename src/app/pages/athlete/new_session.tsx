@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -12,13 +12,11 @@ import {
   FaBicycle,
   FaDumbbell,
   FaFutbol,
-  FaVolleyballBall,
   FaBasketballBall,
   FaPlayCircle,
   FaExclamationTriangle,
   FaCheck,
 } from "react-icons/fa";
-import { MdSportsTennis } from "react-icons/md";
 import { GiMuscleUp, GiYinYang } from "react-icons/gi";
 
 // Mapping exactly as defined in MODALITY Enum

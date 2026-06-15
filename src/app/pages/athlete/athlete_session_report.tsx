@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AthleteContext } from "../../contexts/AthleteContext";
@@ -16,7 +16,6 @@ import {
     FaChartBar,
     FaBottleWater,
     FaCloudSun,
-    FaChevronRight,
     FaArrowLeft
 } from "react-icons/fa6";
 import { FaExclamationCircle, FaTshirt } from "react-icons/fa";
@@ -149,7 +148,7 @@ export function AthleteSessionReport({ menuItems }: { menuItems: MenuItems[] }) 
     }
 
     // Identificador para o header
-    const shortId = training.training_id.split("-")[0] || "1";
+    // const shortId = training.training_id.split("-")[0] || "1";
 
     return (
         <SlideBarContextProvider>

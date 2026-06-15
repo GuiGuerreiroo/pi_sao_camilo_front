@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
 import type { MenuItems } from "../../interface/menuItems";
-import { FaCalendarAlt, FaClock, FaPlay, FaPause, FaMinus, FaPlus, FaChevronDown, FaEdit } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaPlay, FaPause, FaMinus, FaPlus } from "react-icons/fa";
 import { GiWaterBottle } from "react-icons/gi";
 import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
 import { toast } from "react-toastify";

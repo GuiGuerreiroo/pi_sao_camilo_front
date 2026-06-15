@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useContext, useEffect } from "react";
+ 
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -11,7 +11,7 @@ import { useWeather } from "../../hooks/apiWether";
 import { CreateTrainingContext } from "../../contexts/CreateTrainingContext";
 import type { SYMPTOMS, URINE_COLOR } from "../../interface/TrainingInterface";
 import { toast } from "react-toastify";
-import { Input } from "../../components/input";
+// import { Input } from "../../components/input";
 
 export default function PreSession({ menuItems, currentStep = 1 }: { menuItems: MenuItems[]; currentStep?: number }) {
   const navigate = useNavigate();

@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AthleteContext } from "../../contexts/AthleteContext";
-import type { TrainingInterface } from "../../interface/TrainingInterface";
 import type { MenuItems } from "../../interface/menuItems";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
