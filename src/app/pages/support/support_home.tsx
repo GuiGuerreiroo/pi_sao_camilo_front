@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import React, { useContext, useEffect, useState } from 'react';
 import { FiChevronRight, FiUser } from 'react-icons/fi';
 import { SupportContext } from '../../contexts/SupportContext';

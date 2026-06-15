@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/navbar";
@@ -27,6 +26,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isLoading) {
@@ -46,9 +46,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
   return (
     <SlideBarContextProvider>
       <NavBar menuItems={menuItems} />
-      <main className="min-h-screen bg-[#f8f9fa] p-10">
-
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+      <main className="min-h-screen bg-[#f8f9fa] p-6 pb-24 md:p-10">
 
         {adminError && <p className="text-red-500 text-sm mb-4">Erro: {adminError}</p>}
 
@@ -72,8 +70,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                   {groups.map((group, index) => (
                     <React.Fragment key={group.group_id}>
                       <li
-                        className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 rounded-xl px-2 transition-colors"
-                        onClick={() => navigate("/admin/grupos")}
+                        className="flex items-center gap-4 py-3"
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
@@ -86,9 +83,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                             </span>
                           </div>
                         </div>
-                        <button className="w-6 h-6 shrink-0 rounded-full bg-gray-400 flex items-center justify-center text-white hover:bg-gray-500 transition-colors">
-                          <FiChevronRight className="w-4 h-4 ml-0.5" />
-                        </button>
+  
                       </li>
                       {index < groups.length - 1 && <hr className="border-gray-200 ml-14" />}
                     </React.Fragment>
@@ -121,7 +116,7 @@ export default function AdminHome({ menuItems }: { menuItems: MenuItems[] }) {
                         </div>
                         <div className="flex flex-col">
                           <span className="font-semibold text-gray-800 text-sm overflow-hidden text-ellipsis whitespace-nowrap w-40">{user.name}</span>
-                          <span className="text-xs text-gray-500">{user.role === "USER" ? "Atleta" : user.role}</span>
+                          <span className="text-xs text-gray-500">{user.role === "USER" ? "Atleta" : user.role === "SUPPORT" ? "Suporte" : user.role}</span>
                         </div>
                       </li>
                       {idx < Math.min(users.length, 5) - 1 && <hr className="border-gray-200 ml-14" />}

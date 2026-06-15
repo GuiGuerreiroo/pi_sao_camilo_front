@@ -38,8 +38,8 @@ export default function AdminUsers({ menuItems }: { menuItems: MenuItems[] }) {
 
   const roleLabel = (role: string) => {
     if (role === "ADM") return "ADM";
-    if (role === "SUPPORT") return "SUPPORT";
-    return "ATLETA";
+    if (role === "SUPPORT") return "Suporte";
+    return "Atleta";
   };
 
   const roleColor = (role: string) => {
