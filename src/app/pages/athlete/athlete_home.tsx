@@ -212,13 +212,6 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
     const { trainings, get_all_trainings, user, getUser } = useContext(AthleteContext);
     const [loading, setLoading] = useState(trainings === undefined || user === undefined);
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     useEffect(() => {
         const fetchInitialData = async () => {
             if (trainings !== undefined && user !== undefined) {
@@ -692,20 +685,9 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                 nameKey="name"
                                                 cx="50%"
                                                 cy="50%"
-                                                outerRadius={isMobile ? 55 : 80}
-                                                innerRadius={isMobile ? 30 : 40}
+                                                outerRadius={90}
+                                                innerRadius={45}
                                                 labelLine={false}
-                                                label={({ cx, cy, midAngle, outerRadius, percent, name, index }: any) => {
-                                                    const RADIAN = Math.PI / 180;
-                                                    const radius = outerRadius + (isMobile ? 20 : 25);
-                                                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                                                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                                                    return (
-                                                        <text x={x} y={y} fill={MODALITY_COLORS[pieData[index]?.modality] || '#6b7280'} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={isMobile ? 11 : 12} fontWeight={600}>
-                                                            {name} {((percent || 0) * 100).toFixed(0)}%
-                                                        </text>
-                                                    );
-                                                }}
                                                 isAnimationActive={false}
                                             >
                                                 {pieData.map((entry, index) => (
@@ -720,6 +702,17 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                     </ResponsiveContainer>
                                 )}
                             </div>
+                            {/* Legenda do Gráfico de Pizza */}
+                            {pieData.length > 0 && (
+                                <div className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
+                                    {pieData.map((entry, i) => (
+                                        <div key={i} className="flex items-center gap-1">
+                                            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: MODALITY_COLORS[entry.modality] || '#6b7280' }} />
+                                            <span className="text-[11px] text-gray-500 font-medium">{entry.name} {entry.value.toFixed(0)}%</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

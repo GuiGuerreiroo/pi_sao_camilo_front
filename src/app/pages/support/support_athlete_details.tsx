@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FiChevronRight } from 'react-icons/fi';
 import { SlideBarContextProvider } from '../../contexts/slideBarContext';
@@ -116,13 +116,6 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
 
     const [chartMetric, setChartMetric] = useState<string>("sudorese");
     const [sessionLimit, setSessionLimit] = useState<number>(7);
-
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     const chartConfig = useMemo(() => {
         switch (chartMetric) {
@@ -277,8 +270,8 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Gráfico de Linhas: Evolução Multi-Métrica */}
                         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col h-80">
-                            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                                <div className="flex items-center gap-2">
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-3">
+                                <div className="flex items-center justify-between lg:justify-start gap-2">
                                     <h3 className="text-sm font-bold text-gray-700 truncate">Evolução</h3>
                                     <select
                                         value={chartMetric}
@@ -294,12 +287,12 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                     </select>
                                 </div>
                                 
-                                <div className="flex bg-gray-100 rounded-lg p-1 overflow-x-auto">
-                                    {[7, 10, 15, 20, 30].map((limit) => (
+                                <div className="flex w-full lg:w-auto bg-gray-100 rounded-lg p-1 overflow-x-auto justify-between">
+                                    {[7, 10, 15, 20].map((limit) => (
                                         <button
                                             key={limit}
                                             onClick={() => setSessionLimit(limit)}
-                                            className={`px-2 py-1 text-[10px] font-medium rounded-md transition-colors whitespace-nowrap ${sessionLimit === limit ? 'bg-white shadow-sm text-[#c81925]' : 'text-gray-500 hover:text-gray-700'}`}
+                                            className={`flex-1 lg:flex-none px-1 lg:px-2 py-1.5 lg:py-1 text-[10px] font-medium rounded-md transition-colors whitespace-nowrap text-center ${sessionLimit === limit ? 'bg-white shadow-sm text-[#c81925]' : 'text-gray-500 hover:text-gray-700'}`}
                                         >
                                             {limit} Treinos
                                         </button>
@@ -451,34 +444,34 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                 nameKey="name"
                                                 cx="50%"
                                                 cy="50%"
-                                                outerRadius={isMobile ? 55 : 80}
-                                                innerRadius={isMobile ? 30 : 40}
+                                                outerRadius={90}
+                                                innerRadius={45}
                                                 labelLine={false}
-                                                label={({ cx, cy, midAngle, outerRadius, percent, name, index }: any) => {
-                                                    const RADIAN = Math.PI / 180;
-                                                    const radius = outerRadius + (isMobile ? 20 : 25);
-                                                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                                                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                                                    return (
-                                                        <text x={x} y={y} fill={MODALITY_COLORS[pieData[index]?.modality] || '#6b7280'} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={isMobile ? 11 : 12} fontWeight={600}>
-                                                            {name} {((percent || 0) * 100).toFixed(0)}%
-                                                        </text>
-                                                    );
-                                                }}
                                                 isAnimationActive={false}
                                             >
                                                 {pieData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={MODALITY_COLORS[entry.modality] || '#6b7280'} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip 
-                                                contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                            <Tooltip
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                                 formatter={(value: any) => [`${Number(value).toFixed(1)}%`, 'Proporção']}
                                             />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 )}
                             </div>
+                            {/* Legenda do Gráfico de Pizza */}
+                            {pieData.length > 0 && (
+                                <div className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1">
+                                    {pieData.map((entry, i) => (
+                                        <div key={i} className="flex items-center gap-1">
+                                            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: MODALITY_COLORS[entry.modality] || '#6b7280' }} />
+                                            <span className="text-[11px] text-gray-500 font-medium">{entry.name} {entry.value.toFixed(0)}%</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
