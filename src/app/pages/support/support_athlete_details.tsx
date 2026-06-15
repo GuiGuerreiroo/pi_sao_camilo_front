@@ -155,6 +155,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                 default: val = t.weight_variation_percentage || 0; break;
             }
             return {
+                id: t.training_id || String(Math.random()),
                 date: formatDate(t.start_date).slice(0, 5), // DD/MM
                 fullDate: formatDate(t.start_date), // DD/MM/YYYY
                 value: Number(val.toFixed(2)),
@@ -306,7 +307,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                     <ResponsiveContainer width="100%" height="100%">
                                         <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                            <XAxis dataKey="date" tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
+                                            <XAxis dataKey="id" tickFormatter={(val) => chartData.find(d => d.id === val)?.date || ''} tick={{fill: '#6b7280', fontSize: 12}} axisLine={false} tickLine={false} />
                                             <YAxis 
                                                 width={65}
                                                 tick={{fill: '#6b7280', fontSize: 12}} 

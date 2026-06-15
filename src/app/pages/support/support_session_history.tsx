@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useContext } from "react";
+import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "../../components/navbar";
 import { SlideBarContextProvider } from "../../contexts/slideBarContext";
@@ -16,7 +17,8 @@ import {
   FaBasketballBall,
   FaFutbol,
   FaDumbbell,
-  FaWalking
+  FaWalking,
+  FaDownload
 } from "react-icons/fa";
 import { 
   FaClock, 
@@ -176,6 +178,79 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
     );
   };
 
+  const handleExportReport = async () => {
+    try {
+      const trainingIds = selectedSessions.length > 0 
+          ? selectedSessions 
+          : filtered.map(t => t.training_id).filter(Boolean);
+
+      if (!trainingIds.length) {
+          toast.warning("Nenhum treino disponível para exportar.");
+          return;
+      }
+      const baseURL = import.meta.env.VITE_MSS_API_URL;
+
+      toast.info("Gerando relatório...", { autoClose: 2000 });
+
+      const response = await axios.post(`${baseURL}/export-trainings`, {
+          athlete_id: member?.user_id,
+          training_id_list: trainingIds
+      }, {
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem('token')}`
+          }
+      });
+
+      const contentType = response.headers["content-type"];
+      let base64String = "";
+
+      if (contentType && contentType.includes("application/json")) {
+          const data = response.data;
+          if (typeof data === 'string') {
+              base64String = data;
+          } else if (data.body) {
+              base64String = data.body;
+          } else if (data.file) {
+              base64String = data.file;
+          } else {
+              base64String = Object.values(data).find(v => typeof v === 'string' && v.startsWith('JVBERi')) as string || "";
+          }
+      } else {
+          base64String = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+      }
+
+      const today = new Date();
+      const dateString = `${String(today.getDate()).padStart(2, '0')}_${String(today.getMonth() + 1).padStart(2, '0')}_${today.getFullYear()}`;
+      const filename = `relatorio_treinos_${dateString}.pdf`;
+
+      base64String = base64String.replace(/^"|"$/g, '');
+
+      const byteCharacters = atob(base64String);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Relatório exportado com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Falha ao exportar relatório.");
+    }
+  };
+
   const isFirstRender = React.useRef(true);
 
   useEffect(() => {
@@ -226,7 +301,7 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                       : "border-gray-300 text-gray-600 hover:bg-gray-100"
                   }`}
               >
-                  Selecionar {selectedSessions.length > 0 && `(${selectedSessions.length})`}
+                  Exportar {selectedSessions.length > 0 && `(${selectedSessions.length})`}
               </button>
               <button
                 onClick={() => setShowFilter(prev => !prev)}
@@ -360,54 +435,68 @@ export default function SessionHistory({ menuItems }: { menuItems: MenuItems[] }
                     <p className="text-gray-500">Nenhum treino encontrado.</p>
                 </div>
             ) : (
-                filtered.map((t, i) => (
-                    <div key={t.training_id || i} className="flex items-stretch gap-2 w-full transition-all">
-                        <div 
-                            onClick={() => navigate("/session-detail", { state: { training: t } })}
-                            className={`bg-white rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group flex-1`}
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-xl shrink-0 group-hover:bg-gray-100 transition-colors">
-                                    {MODALITY_ICONS[t.modality as MODALITY] || <FaRunning />}
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="font-semibold text-gray-800 text-lg">
-                                            {MODALITY_LABELS[t.modality as MODALITY] || t.modality} - {formatDate(t.start_date)}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                                        <div className="flex items-center gap-1.5">
-                                            <FaClock className="text-gray-400" />
-                                            <span>{formatDuration(t.duration)}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <FaChartLine className="text-gray-400" />
-                                            <span>Intensidade: {getIntensityLabel(t.training_intensity)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="hidden md:flex items-center gap-2 font-medium group-hover:translate-x-1 transition-transform text-black">
-                                <span>Ver detalhes</span>
-                                <FaChevronRight className="text-sm" />
-                            </div>
-                        </div>
-                        {isSelecting && t.training_id && (
-                            <div 
-                                onClick={(e) => handleSelectSession(t.training_id!, e)}
-                                className={`w-15 shrink-0 rounded-3xl border flex items-center justify-center cursor-pointer transition-colors shadow-sm ${
-                                    selectedSessions.includes(t.training_id) 
-                                    ? 'bg-green-500 border-green-500 text-white' 
-                                    : 'bg-white border-gray-200 text-transparent hover:border-gray-300'
-                                }`}
-                            >
-                                <FaCheck className="text-xl" />
-                            </div>
-                        )}
-                    </div>
-                ))
+                <>
+                  {filtered.map((t, i) => (
+                      <div key={t.training_id || i} className="flex items-stretch gap-2 w-full transition-all">
+                          <div 
+                              onClick={() => navigate("/session-detail", { state: { training: t } })}
+                              className={`bg-white rounded-3xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group flex-1`}
+                          >
+                              <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-xl shrink-0 group-hover:bg-gray-100 transition-colors">
+                                      {MODALITY_ICONS[t.modality as MODALITY] || <FaRunning />}
+                                  </div>
+                                  <div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                          <span className="font-semibold text-gray-800 text-lg">
+                                              {MODALITY_LABELS[t.modality as MODALITY] || t.modality} - {formatDate(t.start_date)}
+                                          </span>
+                                      </div>
+                                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                          <div className="flex items-center gap-1.5">
+                                              <FaClock className="text-gray-400" />
+                                              <span>{formatDuration(t.duration)}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1.5">
+                                              <FaChartLine className="text-gray-400" />
+                                              <span>Intensidade: {getIntensityLabel(t.training_intensity)}</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              
+                              <div className="hidden md:flex items-center gap-2 font-medium group-hover:translate-x-1 transition-transform text-black">
+                                  <span>Ver detalhes</span>
+                                  <FaChevronRight className="text-sm" />
+                              </div>
+                          </div>
+                          {isSelecting && t.training_id && (
+                              <div 
+                                  onClick={(e) => handleSelectSession(t.training_id!, e)}
+                                  className={`w-15 shrink-0 rounded-3xl border flex items-center justify-center cursor-pointer transition-colors shadow-sm ${
+                                      selectedSessions.includes(t.training_id) 
+                                      ? 'bg-green-500 border-green-500 text-white' 
+                                      : 'bg-white border-gray-200 text-transparent hover:border-gray-300'
+                                  }`}
+                              >
+                                  <FaCheck className="text-xl" />
+                              </div>
+                          )}
+                      </div>
+                  ))}
+
+                  {isSelecting && (
+                      <div className="flex justify-end mt-4 mb-8">
+                          <button
+                              onClick={handleExportReport}
+                              className="flex items-center gap-2 bg-[#E12A32] hover:bg-[#c9242d] text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-sm active:scale-95"
+                          >
+                              <FaDownload />
+                              Exportar Relatório
+                          </button>
+                      </div>
+                  )}
+                </>
             )}
           </div>
         )}
