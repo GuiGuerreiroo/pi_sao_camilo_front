@@ -189,9 +189,12 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
         if (chartMetric === 'sudorese') {
             min = Math.min(0, dMin);
             max = Math.max(3.5, dMax);
-        } else if (chartMetric === 'massa' || chartMetric === 'diferenca_massa') {
-            min = Math.min(-1, dMin);
-            max = Math.max(3, dMax);
+        } else if (chartMetric === 'massa') {
+            min = Math.min(-2.5, dMin);
+            max = Math.max(0.5, dMax);
+        } else if (chartMetric === 'diferenca_massa') {
+            min = Math.min(-avgWeight * 0.025, dMin);
+            max = Math.max(0.5, dMax);
         } else if (chartMetric === 'ajustada_massa' || chartMetric === 'urina' || chartMetric === 'duracao' || chartMetric === 'intensidade') {
             min = 0;
         }
@@ -203,7 +206,7 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
             chartMetric === 'intensidade' ? 0 : Number(min.toFixed(1)), 
             chartMetric === 'intensidade' ? 10 : Number(max.toFixed(1))
         ];
-    }, [chartData, chartMetric]);
+    }, [chartData, chartMetric, avgWeight]);
 
     const pieData = useMemo(() => {
         if (filteredTrainings.length === 0) return [];
@@ -341,14 +344,14 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                             else if (val >= 0.4) color = '#22c55e';
                                                             else color = '#eab308';
                                                         } else if (chartMetric === 'massa') {
-                                                            if (val > 2.0) color = '#ef4444';
-                                                            else if (val >= 1.51) color = '#eab308';
-                                                            else if (val >= 0.0) color = '#22c55e';
+                                                            if (val > 0) color = '#ef4444';
+                                                            else if (val >= -1.5) color = '#22c55e';
+                                                            else if (val >= -2.0) color = '#eab308';
                                                             else color = '#ef4444';
                                                         } else if (chartMetric === 'diferenca_massa') {
-                                                            if (val < 0) color = '#ef4444';
-                                                            else if (val <= ptWeight * 0.015) color = '#22c55e';
-                                                            else if (val <= ptWeight * 0.02) color = '#eab308';
+                                                            if (val > 0) color = '#ef4444';
+                                                            else if (val >= -avgWeight * 0.015) color = '#22c55e';
+                                                            else if (val >= -avgWeight * 0.02) color = '#eab308';
                                                             else color = '#ef4444';
                                                         } else if (chartMetric === 'ajustada_massa') {
                                                             if (val < 0) color = '#ef4444';
@@ -379,19 +382,19 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
 
                                             {chartMetric === 'massa' && (
                                                 <>
-                                                    <ReferenceArea y1={yAxisDomain[0]} y2={0} fill="#ef4444" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={0} y2={1.5} fill="#22c55e" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={1.5} y2={2.0} fill="#eab308" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={2.0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={yAxisDomain[0]} y2={-2.0} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-2.0} y2={-1.5} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-1.5} y2={0} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
                                                 </>
                                             )}
 
                                             {chartMetric === 'diferenca_massa' && (
                                                 <>
-                                                    <ReferenceArea y1={yAxisDomain[0]} y2={0} fill="#ef4444" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={0} y2={avgWeight * 0.015} fill="#22c55e" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={avgWeight * 0.015} y2={avgWeight * 0.02} fill="#eab308" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={avgWeight * 0.02} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={yAxisDomain[0]} y2={-avgWeight * 0.02} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-avgWeight * 0.02} y2={-avgWeight * 0.015} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-avgWeight * 0.015} y2={0} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
                                                 </>
                                             )}
 

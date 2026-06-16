@@ -120,7 +120,11 @@ function SessionCard({
     onTap: () => void;
 }) {
     const risk = dehydrationLevel(training.weight_variation_percentage);
-    const showAlert = Math.abs(training.weight_variation_percentage) >= 2;
+    const showAlert = 
+        (training.weight_variation_percentage || 0) > 0 ||
+        (training.weight_variation_percentage || 0) <= -2 ||
+        (training.sudorese || 0) > 2.0 ||
+        (training.ajusted_weight_difference || 0) < 0;
 
     return (
         <button
@@ -143,30 +147,30 @@ function SessionCard({
                 </p>
             </div>
 
-            {/* intensity bar */}
-            <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className="w-16 h-1.5 rounded-full bg-gray-200 overflow-hidden">
-                    <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                            width: `${training.training_intensity * 10}%`,
-                            backgroundColor: intensityColor(
-                                training.training_intensity
-                            ),
-                        }}
-                    />
+            {/* alert + intensity bar */}
+            <div className="flex items-center gap-4 shrink-0">
+                {showAlert && (
+                    <span style={{ color: "#ef4444" }} className="text-lg mb-3">
+                        <FaExclamationTriangle />
+                    </span>
+                )}
+                <div className="flex flex-col items-end gap-1">
+                    <div className="w-16 h-1.5 rounded-full bg-gray-200 overflow-hidden">
+                        <div
+                            className="h-full rounded-full transition-all"
+                            style={{
+                                width: `${training.training_intensity * 10}%`,
+                                backgroundColor: intensityColor(
+                                    training.training_intensity
+                                ),
+                            }}
+                        />
+                    </div>
+                    <span className="text-[10px] text-gray-400">
+                        Intensidade {training.training_intensity}/10
+                    </span>
                 </div>
-                <span className="text-[10px] text-gray-400">
-                    Intensidade {training.training_intensity}/10
-                </span>
             </div>
-
-            {/* alert */}
-            {showAlert && (
-                <span style={{ color: risk.color }} className="text-lg shrink-0">
-                    <FaExclamationTriangle />
-                </span>
-            )}
         </button>
     );
 }
@@ -253,7 +257,11 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
             safeTrainings.reduce((s, t) => s + (t.sudorese || 0), 0) / safeTrainings.length;
         const last = safeTrainings[0];
         const alerts = safeTrainings.filter(
-            (t) => Math.abs(t.weight_variation_percentage) >= 2
+            (t) =>
+                (t.weight_variation_percentage || 0) > 0 ||
+                (t.weight_variation_percentage || 0) <= -2 ||
+                (t.sudorese || 0) > 2.0 ||
+                (t.ajusted_weight_difference || 0) < 0
         ).length;
         const avgIntensity =
             safeTrainings.reduce((s, t) => s + t.training_intensity, 0) /
@@ -343,9 +351,12 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
         if (chartMetric === 'sudorese') {
             min = Math.min(0, dMin);
             max = Math.max(3.5, dMax);
-        } else if (chartMetric === 'massa' || chartMetric === 'diferenca_massa') {
-            min = Math.min(-1, dMin);
-            max = Math.max(3, dMax);
+        } else if (chartMetric === 'massa') {
+            min = Math.min(-2.5, dMin);
+            max = Math.max(0.5, dMax);
+        } else if (chartMetric === 'diferenca_massa') {
+            min = Math.min(-avgWeight * 0.025, dMin);
+            max = Math.max(0.5, dMax);
         } else if (chartMetric === 'ajustada_massa' || chartMetric === 'urina' || chartMetric === 'duracao' || chartMetric === 'intensidade') {
             min = 0;
         }
@@ -357,7 +368,7 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
             chartMetric === 'intensidade' ? 0 : Number(min.toFixed(1)),
             chartMetric === 'intensidade' ? 10 : Number(max.toFixed(1))
         ];
-    }, [chartData, chartMetric]);
+    }, [chartData, chartMetric, avgWeight]);
 
     const pieData = useMemo(() => {
         if (filteredTrainings.length === 0) return [];
@@ -582,14 +593,14 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                             else if (val >= 0.4) color = '#22c55e';
                                                             else color = '#eab308';
                                                         } else if (chartMetric === 'massa') {
-                                                            if (val > 2.0) color = '#ef4444';
-                                                            else if (val >= 1.51) color = '#eab308';
-                                                            else if (val >= 0.0) color = '#22c55e';
+                                                            if (val > 0) color = '#ef4444';
+                                                            else if (val >= -1.5) color = '#22c55e';
+                                                            else if (val >= -2.0) color = '#eab308';
                                                             else color = '#ef4444';
                                                         } else if (chartMetric === 'diferenca_massa') {
-                                                            if (val < 0) color = '#ef4444';
-                                                            else if (val <= ptWeight * 0.015) color = '#22c55e';
-                                                            else if (val <= ptWeight * 0.02) color = '#eab308';
+                                                            if (val > 0) color = '#ef4444';
+                                                            else if (val >= -avgWeight * 0.015) color = '#22c55e';
+                                                            else if (val >= -avgWeight * 0.02) color = '#eab308';
                                                             else color = '#ef4444';
                                                         } else if (chartMetric === 'ajustada_massa') {
                                                             if (val < 0) color = '#ef4444';
@@ -620,19 +631,19 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
 
                                             {chartMetric === 'massa' && (
                                                 <>
-                                                    <ReferenceArea y1={yAxisDomain[0]} y2={0} fill="#ef4444" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={0} y2={1.5} fill="#22c55e" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={1.5} y2={2.0} fill="#eab308" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={2.0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={yAxisDomain[0]} y2={-2.0} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-2.0} y2={-1.5} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-1.5} y2={0} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
                                                 </>
                                             )}
 
                                             {chartMetric === 'diferenca_massa' && (
                                                 <>
-                                                    <ReferenceArea y1={yAxisDomain[0]} y2={0} fill="#ef4444" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={0} y2={avgWeight * 0.015} fill="#22c55e" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={avgWeight * 0.015} y2={avgWeight * 0.02} fill="#eab308" fillOpacity={0.15} />
-                                                    <ReferenceArea y1={avgWeight * 0.02} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={yAxisDomain[0]} y2={-avgWeight * 0.02} fill="#ef4444" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-avgWeight * 0.02} y2={-avgWeight * 0.015} fill="#eab308" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={-avgWeight * 0.015} y2={0} fill="#22c55e" fillOpacity={0.15} />
+                                                    <ReferenceArea y1={0} y2={yAxisDomain[1]} fill="#ef4444" fillOpacity={0.15} />
                                                 </>
                                             )}
 
