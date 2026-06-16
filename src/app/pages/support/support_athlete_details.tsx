@@ -336,7 +336,6 @@ export default function SupportAthleteDetails({ menuItems }: { menuItems: MenuIt
                                                         const name = chartConfig.name;
                                                         const unit = chartConfig.unit ? ` ${chartConfig.unit}` : '';
                                                         
-                                                        const ptWeight = payload[0].payload.raw?.pre_training_weight || 70;
                                                         let color = '#6b7280';
                                                         if (chartMetric === 'sudorese') {
                                                             if (val > 2.0) color = '#ef4444';

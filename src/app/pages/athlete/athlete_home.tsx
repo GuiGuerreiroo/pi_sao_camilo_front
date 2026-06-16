@@ -101,15 +101,6 @@ function intensityColor(intensity: number): string {
     return "#ef4444"; // red
 }
 
-/** weight variation → dehydration risk */
-function dehydrationLevel(pct: number): { label: string; color: string } {
-    const abs = Math.abs(pct);
-    if (abs < 1) return { label: "Normal", color: "#22c55e" };
-    if (abs < 2) return { label: "Leve", color: "#eab308" };
-    if (abs < 3) return { label: "Moderado", color: "#f97316" };
-    return { label: "Alto", color: "#ef4444" };
-}
-
 /* ─────────────────────── sub-components ─────────────────────── */
 
 function SessionCard({
@@ -119,7 +110,6 @@ function SessionCard({
     training: TrainingInterface;
     onTap: () => void;
 }) {
-    const risk = dehydrationLevel(training.weight_variation_percentage);
     const showAlert = 
         (training.weight_variation_percentage || 0) > 0 ||
         (training.weight_variation_percentage || 0) <= -2 ||
@@ -585,7 +575,6 @@ export function AthleteHome({ menuItems }: { menuItems: MenuItems[] }) {
                                                         const name = chartConfig.name;
                                                         const unit = chartConfig.unit ? ` ${chartConfig.unit}` : '';
 
-                                                        const ptWeight = payload[0].payload.raw?.pre_training_weight || 70;
                                                         let color = '#6b7280';
                                                         if (chartMetric === 'sudorese') {
                                                             if (val > 2.0) color = '#ef4444';
